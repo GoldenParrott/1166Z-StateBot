@@ -66,6 +66,26 @@ void initialize(void);
 void disabled(void);
 void competition_initialize(void);
 void opcontrol(void);
+
+
+// autons.cpp
+    // global autons
+    void globalBlueGoal(void);
+    void globalBlueRing(void);
+    void globalRedGoal(void);
+    void globalRedRing(void);
+    void autoTest(void);
+
+    // specific autons
+    void redGoalside(void);
+    void blueGoalside(void);
+    void redRingside(void);
+    void blueRingside(void);
+    void autoSkills(void);
+
+// draw.cpp
+void drawAutonSelector(void);
+
 #ifdef __cplusplus
 }
 #endif
