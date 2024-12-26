@@ -60,6 +60,9 @@ void opcontrol() {
 	// Front, Middle, Rear
 	leftDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	rightDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	arm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	bool clampOn = true;
 
 	// Drving variables
 	int drvfb;
@@ -68,6 +71,7 @@ void opcontrol() {
 
 	while (true) {
 		
+	//Drivetrain Control 
 		drvfb = master.get_analog(ANALOG_LEFT_Y);
 		drvlr = master.get_analog(ANALOG_RIGHT_X);
 
@@ -79,8 +83,59 @@ void opcontrol() {
 			rightDrivetrain.brake();
       		leftDrivetrain.brake();
     	} 
-			
+	
+	//Intake Control
+	//Arm up Y
+	//Arm down B
+		if(master.get_digital(DIGITAL_RIGHT))
+		{
+			intake.move(127);
+		}
+		else if(master.get_digital(DIGITAL_DOWN))
+		{
+			intake.move(-127);
+		}
+		else if(master.get_digital(DIGITAL_R2))
+		{
+			preRoller.move(127);
+		}
+		else
+		{
+			intake.brake();
+		}
 
+	//Arm Control
+		if(master.get_digital(DIGITAL_Y))
+		{
+			arm.move(127);
+		}
+		else if(master.get_digital(DIGITAL_B))
+		{
+			arm.move(-127);
+		}
+		else
+		{
+			arm.brake();
+		}			
+
+		//Mogo
+		if(Master.get_digital_new_press(DIGITAL_R1)){
+
+			// ↓↓ If the manipulator is open, activate this code
+			if (clamp.get_value() == false) {
+
+				// ↓↓ Closes the manipulator to grab an object
+				clamp.set_value(true);
+
+			// ↓↓ If the manipulator is closed, activate this code
+			} else if (clamp.get_value() == true){
+
+				// ↓↓ Opens the manipulator to grab an object
+				clamp.set_value(false);
+			}
+		}
+		
+		
 		pros::delay(20);
 	}
 }

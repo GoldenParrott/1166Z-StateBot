@@ -7,22 +7,37 @@
     extern pros::Controller Master;
 
 //Motors
-    extern pros::Motor leftFront;
-    extern pros::Motor leftMiddle;
-    extern pros::Motor leftRear;
+    //Drivetrain 
+        extern pros::Motor leftFront;
+        extern pros::Motor leftMiddle;
+        extern pros::Motor leftRear;
 
-    extern pros::Motor rightFront;
-    extern pros::Motor rightMiddle;
-    extern pros::Motor rightRear;
+        extern pros::Motor rightFront;
+        extern pros::Motor rightMiddle;
+        extern pros::Motor rightRear;
 
-    extern pros::MotorGroup leftDrivetrain;
-	extern pros::MotorGroup rightDrivetrain;
+        extern pros::MotorGroup leftDrivetrain;
+        extern pros::MotorGroup rightDrivetrain;
 
-    extern pros::MotorGroup drivetrain;
+        extern pros::MotorGroup drivetrain;
+
+    //Intake
+        extern pros::Motor preRoller;
+        extern pros::Motor transport;
+
+        extern pros::MotorGroup intake;
+
+    //Arm
+        extern pros::Motor arm;
+    
+    //Clamp
+        extern pros::ADIDigitalOut clamp;
+   
 
 
 // Variables
 
     extern int num;
+    extern bool clampOn;
 
 #endif
