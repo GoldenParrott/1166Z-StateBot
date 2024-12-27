@@ -40,4 +40,8 @@
     extern int num;
     extern bool clampOn;
 
+// Pointers
+
+    pros::Task* controlLoop_task_ptr;
+
 #endif

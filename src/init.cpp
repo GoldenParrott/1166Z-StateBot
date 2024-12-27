@@ -31,6 +31,10 @@
 
     //mogo
          pros::ADIDigitalOut clamp(1);
+
+// Task Pointers
+
+    pros::Task* controlLoop_task_ptr = NULL;
       
 // Variables
 
