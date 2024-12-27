@@ -27,7 +27,7 @@
         pros::MotorGroup intake({9,-10}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
     
     //Arm 
-        pros::Motor arm(2,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees );
+        pros::Motor arm(-2,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees );
 
     //mogo
          pros::ADIDigitalOut clamp(1);

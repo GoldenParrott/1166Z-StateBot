@@ -61,7 +61,7 @@ void opcontrol() {
 	leftDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	rightDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-	arm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	arm.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	bool clampOn = true;
 
 	// Drving variables
