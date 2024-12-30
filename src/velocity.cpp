@@ -99,10 +99,8 @@ void VelocityController::startQueuedProfile() {
 
     auto filterLoopFunction = [this] () {return this->followProfile(this->queuedProfile);};
 
-    filterLoopFunction();
-
     if (controlLoop_task_ptr == NULL) {
-        controlLoop_task_ptr = new pros::Task(followProfile);
+        controlLoop_task_ptr = new pros::Task(filterLoopFunction);
     }
 }
 

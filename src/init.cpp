@@ -30,7 +30,7 @@
         pros::Motor arm(-2,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees );
 
     //mogo
-         pros::ADIDigitalOut clamp(1);
+         pros::adi::DigitalOut clamp(1);
 
 // Task Pointers
 

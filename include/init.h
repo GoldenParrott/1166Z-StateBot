@@ -31,7 +31,7 @@
         extern pros::Motor arm;
     
     //Clamp
-        extern pros::ADIDigitalOut clamp;
+        extern pros::adi::DigitalOut clamp;
    
 
 
@@ -42,6 +42,6 @@
 
 // Pointers
 
-    pros::Task* controlLoop_task_ptr;
+    extern pros::Task* controlLoop_task_ptr;
 
 #endif

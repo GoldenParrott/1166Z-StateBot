@@ -2,8 +2,8 @@
 #include <vector>
 #include <iostream>
 #include <functional>
-#ifndef _POLYFUNCH_
-#define _POLYFUNCH_
+#ifndef _PROFILINGH_
+#define _PROFILINGH_
 
 struct Point {
     double x;
@@ -149,7 +149,7 @@ class VelocityController {
         MotionProfile* queuedProfile;
         std::vector<double> actionTs;
         std::vector<std::function<void(void)>> actions;
-        // pros::Task* controlLoop_ptr = NULL;
+        // pros::Task* controlLoop_task_ptr = NULL;
 };
 
 
