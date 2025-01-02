@@ -20,7 +20,7 @@ double findHeadingOfLine(
     else { // quadrants 2 or 4
         triangleAngle = std::atan(std::abs(yChange) / std::abs(xChange)); // tangent is opposite/adjacent, and y is opposite in these cases
     }
-    triangleAngle = (triangleAngle * 180) / 3.14;
+    triangleAngle = (triangleAngle * 180) / M_PI;
 
     double heading = 0;
     if (xIsPositive && yIsPositive) { // quadrant 1
@@ -111,13 +111,13 @@ Line findLineWithHeading(
 
     // if the heading is in quadrants 1 or 3, then the x-value is the opposite leg (sine) and the y-value is the adjacent leg (cosine)
     if ((heading < 90) || (heading >= 180 && heading < 270)) {
-        xChange = std::sin(((triangleAngle * 3.141592) / 180)) * hypotenuse;
-        yChange = std::cos(((triangleAngle * 3.141592) / 180)) * hypotenuse;
+        xChange = std::sin(((triangleAngle * M_PI) / 180)) * hypotenuse;
+        yChange = std::cos(((triangleAngle * M_PI) / 180)) * hypotenuse;
     }
     // otherwise, if the heading is in quadrants 2 or 4, then the x-value is the adjacent leg (cosine) and the y-value is the opposite leg (sine)
     else {
-        xChange = std::cos(((triangleAngle * 3.141592) / 180)) * hypotenuse;
-        yChange = std::sin(((triangleAngle * 3.141592) / 180)) * hypotenuse;
+        xChange = std::cos(((triangleAngle * M_PI) / 180)) * hypotenuse;
+        yChange = std::sin(((triangleAngle * M_PI) / 180)) * hypotenuse;
     }
 
     // slope of line = rise / run

@@ -43,13 +43,13 @@ Point updateLocation(double heading, double dist) {
     double yChange = 0;
     // if the heading is in quadrants 1 or 3, then the x-value is the opposite leg (sine) and the y-value is the adjacent leg (cosine)
     if ((heading < 90) || (heading >= 180 && heading < 270)) {
-        xChange = std::sin(((triangleAngle * 3.141592) / 180)) * dist;
-        yChange = std::cos(((triangleAngle * 3.141592) / 180)) * dist;
+        xChange = std::sin(((triangleAngle * M_PI) / 180)) * dist;
+        yChange = std::cos(((triangleAngle * M_PI) / 180)) * dist;
     }
     // otherwise, if the heading is in quadrants 2 or 4, then the x-value is the adjacent leg (cosine) and the y-value is the opposite leg (sine)
     else {
-        xChange = std::cos(((triangleAngle * 3.141592) / 180)) * dist;
-        yChange = std::sin(((triangleAngle * 3.141592) / 180)) * dist;
+        xChange = std::cos(((triangleAngle * M_PI) / 180)) * dist;
+        yChange = std::sin(((triangleAngle * M_PI) / 180)) * dist;
     }
 
     // reverses the movement of x and y if they moved in a positive direction and moved down or if they moved in a negative direction and moved up

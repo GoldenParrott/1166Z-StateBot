@@ -68,7 +68,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+void autonomous(void);
+void initialize(void);
+void disabled(void);
+void competition_initialize(void);
+void opcontrol(void);
 #ifdef __cplusplus
 }
 #endif
@@ -86,12 +90,6 @@ struct Inequality {
     double yIntercept;
     int equality;
 };
-
-void autonomous(void);
-void initialize(void);
-void disabled(void);
-void competition_initialize(void);
-void opcontrol(void);
 
 // kalman.cpp
 class KalmanFilter {
