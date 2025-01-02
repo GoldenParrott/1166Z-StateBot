@@ -128,7 +128,7 @@ void autonomous() {
 
 
 	auto RPMtoMPS = [] (double gearset, double gearRatio, double diameter) {
-        return (gearset * gearRatio * (3.14 * diameter)) / 60;
+        return (gearset * gearRatio * (M_PI * diameter)) / 60;
     };
 
     // ROBOT CONFIG

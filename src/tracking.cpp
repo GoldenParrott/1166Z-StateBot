@@ -2,7 +2,7 @@
 
 double calculateSingleDegree(double wheelDiameter) {
     // sets up the odometry to convert angle readings to cm
-    double wheelCircumference = 3.141592 * wheelDiameter; // 2 is the pre-measured wheel diameter in inches
+    double wheelCircumference = M_PI * wheelDiameter; // 2 is the pre-measured wheel diameter in inches
 	long double singleDegree = wheelCircumference / 360; // the distance that the robot moves in one degree of rotation of its wheels
 
     return singleDegree;
@@ -54,7 +54,7 @@ double readOdomAngle(pros::Rotation turnOdom) {
      * (using a derived version of the arc formula) */
     double robotHeadingRadians = (double) odomReading / distanceBetweenCenterAndOdom;
     //     theta/angle  =    arc      /           radius
-    double robotHeadingDegrees = (robotHeadingRadians * 180.0) / 3.14;
+    double robotHeadingDegrees = (robotHeadingRadians * 180.0) / M_PI;
 
     return robotHeadingDegrees;
 }

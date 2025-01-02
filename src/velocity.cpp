@@ -14,8 +14,8 @@ std::vector<double> VelocityController::calculateOutputOfSides(double linearVelo
     double leftVelocityMPS = linearVelocityMPS - ((angularVelocityRADPS * (this->distBetweenWheels * 0.0254)) / 2); // lv = v - ((w * L) / 2)
     double rightVelocityMPS = linearVelocityMPS + ((angularVelocityRADPS * (this->distBetweenWheels * 0.0254)) / 2); // rv = v + ((w * L) / 2)
 
-    double leftVelocityRPM = (leftVelocityMPS * 60 / (3.141592 * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
-    double rightVelocityRPM = (rightVelocityMPS * 60 / (3.141592 * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
+    double leftVelocityRPM = (leftVelocityMPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
+    double rightVelocityRPM = (rightVelocityMPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
 
     if (leftVelocityRPM > this->maxRPM) {
         double scaling = maxRPM / leftVelocityRPM;
@@ -43,7 +43,7 @@ std::vector<double> VelocityController::calculateOutputOfSides(double linearVelo
 // calculates the linear travel of a single degree of movement for a wheel of a given diameter
 double VelocityController::calculateSingleDegree(double wheelDiameter) {
     // sets up the odometry to convert angle readings to cm
-    double wheelCircumference = 3.141592 * wheelDiameter; // 2 is the pre-measured wheel diameter in inches
+    double wheelCircumference = M_PI * wheelDiameter; // 2 is the pre-measured wheel diameter in inches
 	long double singleDegree = wheelCircumference / 360; // the distance that the robot moves in one degree of rotation of its wheels
 
     return singleDegree;
@@ -98,7 +98,7 @@ void VelocityController::followProfile(MotionProfile* profile, bool RAMSETE)
         }
 
         auto RPMtoMPS = [] (double gearset, double gearRatio, double diameter) {
-            return (gearset * gearRatio * (3.14 * diameter)) / 60;
+            return (gearset * gearRatio * (M_PI * diameter)) / 60;
         };
         MPPoint nextPoint = this->queuedProfile->profile[(currentStep + step) * 512];
         double timeAtCurrentVelocity = (calculateDistance({currentPoint.x, currentPoint.y}, {nextPoint.x, nextPoint.y}) / 100) / ((RPMtoMPS(velocitiesRPM[0], gearRatio, wheelDiameter) + (RPMtoMPS(velocitiesRPM[1], gearRatio, wheelDiameter))) / 2);
