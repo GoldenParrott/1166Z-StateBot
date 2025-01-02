@@ -41,5 +41,5 @@ void autoTest() {
     MotionProfile* myProfile = new MotionProfile(mySpline.entirePath(numPoints), maxSpeed);
     VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
     myController.queueProfile(myProfile);
-    myController.startQueuedProfile();
+    myController.startQueuedProfile(false);
 }

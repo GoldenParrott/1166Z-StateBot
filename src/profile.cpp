@@ -1,4 +1,4 @@
-#include "profiling.h"
+#include "main.h"
 
 MotionProfile::MotionProfile(std::vector<UltraPose> pointList, double maxSpeed) {
     this->pointList = pointList;

@@ -7,6 +7,12 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
+
+	pros::lcd::initialize();
+	pros::lcd::print(1, "I SUCK");
+	master.print(0, 0, "I REFUSE TO WORK");
+
+	intake.move_relative(1000, 600);
 	
 }
 
@@ -26,7 +32,55 @@ void disabled() {}
  * This task will exit when the robot is enabled and autonomous or opcontrol
  * starts.
  */
-void competition_initialize() {}
+void competition_initialize() {
+
+	// autoSelector_task_ptr = new pros::Task(drawAutonSelector);
+	autonnumber = -5;
+	globalAuton = false;
+
+
+	while (true) {
+		if (globalAuton == true) {
+			switch (autonnumber) {
+				case 1: //Blue Mogo
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, -36}, 251);
+					break;
+				case 2:
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {54.5, 13.125}, 208);
+					break;
+				case -1:
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-49.25, -60.325}, 69);
+					break;
+				case -2: //Red Ring
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 12}, 148);
+					break;
+				case 3:
+				case -3: //Test (?)
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-48, -48}, 225);
+					break;
+			}
+		} else {
+			switch (autonnumber) {
+				case 1://Blue Mogo
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, -36}, 251);
+					break;
+				case -1:
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-49.25, -60.325}, 69);
+					break;
+				case 2:
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 0);
+					break;
+				case -2:
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54, 12.5}, 232);
+					break;
+				case -5:
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 90);
+					break;
+			}
+		}
+	}
+	pros::delay(10);
+}
 
 /**
  * Runs the user autonomous code. This function will be started in its own task
@@ -39,7 +93,63 @@ void competition_initialize() {}
  * will be stopped. Re-enabling the robot will restart the task, not re-start it
  * from where it left off.
  */
-void autonomous() {}
+void autonomous() {
+	// disables the auto selector
+	if (autoSelector_task_ptr != NULL) {
+		autoSelector_task_ptr->remove();
+	}
+
+	// starts the system that fixes the turning tracking wheel's heading
+	pros::Task updateRotational = pros::Task(bindTurnTrackingWheelHeading);
+
+	// starts the coordinate updating system
+	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
+
+	// autonomous setup
+	colorSense.set_led_pwm(100);
+
+	intake.tare_position();
+
+	arm.set_encoder_units(MOTOR_ENCODER_DEGREES);
+	arm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
+	arm.tare_position();
+
+	Kalman1.startFilter();
+	Kalman2.startFilter();
+
+
+
+
+
+
+
+
+
+
+
+	auto RPMtoMPS = [] (double gearset, double gearRatio, double diameter) {
+        return (gearset * gearRatio * (3.14 * diameter)) / 60;
+    };
+
+    // ROBOT CONFIG
+    double gearRatio = 0.75;
+    double maxRPM = 600;
+    double diameter = 3.25;
+    double distBetweenWheels = 10.5;
+
+
+    double numPoints = 1000;
+
+    double maxSpeed = RPMtoMPS(maxRPM, gearRatio, diameter); // in meters per second
+
+
+    
+    CubicHermiteSpline mySpline = CubicHermiteSpline({0, 0}, {0, -1}, {0.5, -0.5}, {1, -0.5});
+    MotionProfile* myProfile = new MotionProfile(mySpline.entirePath(numPoints), maxSpeed);
+    VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
+    myController.queueProfile(myProfile);
+    myController.startQueuedProfile(false);
+}
 
 /**
  * Runs the operator control code. This function will be started in its own task
@@ -55,7 +165,8 @@ void autonomous() {}
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
+
+	master.print(0, 0, "sup");
 
 	// Front, Middle, Rear
 	leftDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -119,7 +230,7 @@ void opcontrol() {
 		}			
 
 		//Mogo
-		if(Master.get_digital_new_press(DIGITAL_R1)){
+		if(master.get_digital_new_press(DIGITAL_R1)){
 
 			// ↓↓ If the manipulator is open, activate this code
 			if (clamp.get_value() == false) {

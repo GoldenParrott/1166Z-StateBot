@@ -1,4 +1,4 @@
-#include "profiling.h"
+#include "init.h"
 
 double findHeadingOfLine(
     Point point1, // the initial point
@@ -36,6 +36,7 @@ double findHeadingOfLine(
     return heading;
 }
 
+// distance formula function
 double calculateDistance(Point point1, Point point2) {
     return std::sqrt(std::pow((point2.x - point1.x), 2) + std::pow((point2.y - point1.y), 2));
 }
@@ -130,7 +131,7 @@ Line findLineWithHeading(
     return line;
 }
 
-Line calculatePerpendicular(
+Line calculatePerpendicularNonInequality(
     Point point1, // has a line between it and point2 that will have a line perpendicular to it
     Point point2 // the point that the perpendicular line will cross
 )
@@ -158,4 +159,126 @@ Line calculatePerpendicular(
     LinePerp.yIntercept = (-1 * (LinePerp.slope * point2.x)) + point2.y;
 
     return LinePerp;
+}
+
+// calculates the standard deviation of a set of values, used for the filter (private)
+double calculateStandardDeviation(
+    std::deque<double> listOfValues // list of values to use
+)
+{
+    // calculates the mean of the values
+    double meanOfValues = 0;
+    for (int i = 0; i < listOfValues.size(); i++) {
+        meanOfValues += listOfValues[i]; // adds each value together to calculate their mean
+    }
+    meanOfValues = meanOfValues / listOfValues.size();
+
+    // calculates the variance of the values
+    std::vector<double> listOfDifferences;
+    double variance = 0;
+    for (int i = 0; i < listOfValues.size(); i++) {
+        variance += std::pow((listOfValues[i] - meanOfValues), 2); // variance is calculated by adding the squares of each value's difference from the mean together
+    }
+    variance = variance / listOfValues.size();
+
+    double standardDeviation = std::sqrt(variance); // standard deviation = square root of variance
+
+    return standardDeviation;
+}
+
+Inequality calculatePerpendicularInequality(
+    Point point1, // has a line between it and point2 that will have a line perpendicular to it
+    Point point2 // the point that the perpendicular line will cross
+)
+{
+    Inequality Line1;
+    Inequality LinePerp;
+
+    if (point2.y - point1.y == 0) { // handles the case if y does not change (line takes the form of x = k)
+        LinePerp.slope = NAN;
+        LinePerp.yIntercept = point2.x; // yIntercept serves as the value of k (in x = k) for this case
+        LinePerp.equality = point1.x > point2.x // a copy of findEquality that simply compares the x-values of both points to determine the equality
+                                ? 2 // if the value of the first point is greater than the value of the second point, 
+                                     // then the equality is on the opposite side (negative)
+                                : -2;
+        return LinePerp;
+    }
+    else if (point2.x - point1.x == 0) { // handles the case if x does not change (line takes the form of y = k)
+        LinePerp.slope = 0;
+        LinePerp.yIntercept = point2.y; // yIntercept serves as the value of k (in y = k) for this case
+        LinePerp.equality = point1.y > point2.y // a copy of findEquality that simply compares the x-values of both points to determine the equality
+                                ? 2 // if the value of the first point is greater than the value of the second point, 
+                                     // then the equality is on the opposite side (negative)
+                                : -2;
+        return LinePerp;
+    }
+    
+    // handles all y = mx + b cases
+    Line1.slope = (point2.y - point1.y) / (point2.x - point1.x); // calculates the slope of the first line
+    Line1.yIntercept = (-1 * (Line1.slope * point1.x)) + point1.y; // formula for y-intercept based on point-slope form
+    Line1.equality = 0; // this line is just treated as an equation
+    
+
+    LinePerp.slope = -1 * (1 / Line1.slope); // slope of a perpendicular line is the negative reciprocal of the slope of the original
+    LinePerp.yIntercept = (-1 * (LinePerp.slope * point2.x)) + point2.y;
+    LinePerp.equality = findEquality(LinePerp, point1); // sets the inequality to include the side with point 1 on it
+
+    return LinePerp;
+}
+
+int findEquality(
+    Inequality line, // the line to find the equality of
+    Point includedPoint // a point on the side of the inequality that will be part of the inequality
+)
+{
+    double result = (line.slope * includedPoint.x) + line.yIntercept; // the result of the equation when x from the point is plugged into it
+
+    if (includedPoint.y != result) { // if the actual y-value is not the same as the y-value that the line produces, they are not equal
+        if (includedPoint.y > result) { // if the actual y-value is greater than the line's y-value, then the included part is above the line
+            return 2; // 2 signifies greater than for the Line structure
+        }
+        else { // if the actual y-value is less than the line's y-value, then the included part is below the line
+            return -2; // -2 signifies less than for the Line structure
+        }
+    } else { // if the point is on the line, then the line is an equation
+            return 0; // 0 signifies equal to on the Line structure
+    }
+}
+
+Point findIntersection(
+    Line line1, // the first line
+    Line line2 // the second line
+)
+{
+    Point intersect = {0, 0};
+    // first, the x-intersect is found with substitution
+    // this starts with y = ax + b and y = cx + d, which can be substituted into ax + b = cx + d
+    double mergedSlope = line1.slope - line2.slope;  // ax - cx, which leaves one x term on the left side and none on the right: (a-c)x + b = d
+    double mergedYInt = line2.yIntercept - line1.yIntercept; // d - b, which leaves one constant on the right and none on the left: (a-c)x = (d-b)
+    intersect.x = mergedYInt / mergedSlope; // (d-b) divided by (a-c), which leaves x isolated on the left side: x = (a-c)/(d-b)
+
+    // next, the y-intersect is found by substituting the x-intersect into one equation
+    intersect.y = (line1.slope * intersect.x) + line1.yIntercept;
+
+    return intersect;
+}
+
+// fixes angle from a vertical 0, increasing clockwise to the coordinates of the unit circle
+double fixAngle(
+    double originalAngle // an angle that uses 0 as the top and increases clockwise
+)
+{
+    double fixedAngle = 0;
+    if (originalAngle <= 90) {
+        fixedAngle = (originalAngle + 90) - (2 * ((originalAngle + 90) - 90));
+    } else if (originalAngle <= 180) {
+        fixedAngle = (originalAngle + 270) - (2 * (360 - (originalAngle + 270)));
+    } else if (originalAngle <= 270) {
+        fixedAngle = (originalAngle + 90) - (2 * ((originalAngle + 90) - 270));
+    } else if (originalAngle < 360) {
+        fixedAngle = (originalAngle - 270) + (2 * (90 - (originalAngle - 270)));
+    } else {
+        fixedAngle = -1;
+    }
+    return fixedAngle;
 }

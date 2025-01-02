@@ -255,7 +255,8 @@
       }
     },
     "upload_options": {
-      "description": ":D"
+      "description": ":D",
+      "slot": 1
     },
     "use_early_access": true
   }

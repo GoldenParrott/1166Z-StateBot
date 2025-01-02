@@ -1,7 +1,3 @@
-#include <cmath>
-#include <vector>
-#include <iostream>
-#include <functional>
 #ifndef _PROFILINGH_
 #define _PROFILINGH_
 
@@ -72,12 +68,6 @@ enum Direction {
     RIGHT = 1,
 };
 
-double findHeadingOfLine(Point point1, Point point2);
-double calculateDistance(Point point1, Point point2);
-Line findLineWithPoints(Point point1, Point point2);
-QuadraticPolyData derivativeOfCubicPoly(CubicPolyData cubicPoly);
-Line derivativeOfQuadratic(QuadraticPolyData quadPoly);
-
 class CubicHermiteSpline {
     public:
         CubicHermiteSpline(Point startPos, Point startV, Point endPos, Point endV);
@@ -130,7 +120,7 @@ class VelocityController {
         double angVel;
         std::vector<double> FINDME;
         VelocityController(double wheelDiameter, double distBetweenWheels, double gearRatio, double maxRPM);
-        void startQueuedProfile(void);
+        void startQueuedProfile(bool RAMSETE);
         void endProfile(void);
         void queueProfile(MotionProfile* profile);
         void addAction(std::function<void(void)> action, double time);
@@ -139,7 +129,7 @@ class VelocityController {
     private:
         std::vector<double> calculateOutputOfSides(double linearVelocityMPS, double angularVelocityRADPS, Direction direction);
         double calculateSingleDegree(double wheelDiameter);
-        void followProfile(MotionProfile* profile);
+        void followProfile(MotionProfile* profile, bool RAMSETE);
         
         double wheelDiameter;
         double distBetweenWheels;
