@@ -5,6 +5,8 @@ VelocityController::VelocityController(double wheelDiameter, double distBetweenW
     this->distBetweenWheels = distBetweenWheels;
     this->gearRatio = gearRatio;
     this->maxRPM = maxRPM;
+    this->actions = {[](){master.rumble(".");pros::lcd::print(0, "0.25");}, [](){master.rumble(".");pros::lcd::print(1, "0,5");}, [](){master.rumble(".");pros::lcd::print(2, "0.9");}};
+    this->actionTs = {0.25, 0.5, 0.9};
 }
 
 // uses the kinematic equations of a differential chassis and unit conversions to convert a linear and angular velocity to something that can be used
@@ -50,18 +52,30 @@ double VelocityController::calculateSingleDegree(double wheelDiameter) {
 }
 
 // (private)
-void VelocityController::followProfile(MotionProfile* profile, bool RAMSETE)
+void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool RAMSETE)
 {
+    // step-related variables
     double currentStep = 0;
-    double len = this->queuedProfile->profile.size();
+    double len = currentlyFollowing->profile.size();
     double step = 1 / len;
     int x = 0;
+    double sum;
+    int count = 0;
+    // point variables
+    MPPoint currentPoint = {0, 0, 0, 0, 0, 0};
+    MPPoint nextPoint = {0, 0, 0, 0, 0, 0};
+    // speed variables
+    std::vector<double> velocitiesRPM = {0, 0};
+
     // control loop
     while (true) {
-        MPPoint currentPoint = profile->findNearestPoint(currentStep);
+
+        double start = pros::micros();
+
+        currentPoint = currentlyFollowing->findNearestPoint(currentStep);
 
         // standard calculation of output of each side based on specifications of the motion profile
-        std::vector<double> velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel, this->queuedProfile->findCurveDirectionOfPoint(currentPoint));
+        velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel, currentlyFollowing->findCurveDirectionOfPoint(currentPoint));
 
         // calculation of output of each side with error corrections from RAMSETE
         if (RAMSETE) {
@@ -100,30 +114,39 @@ void VelocityController::followProfile(MotionProfile* profile, bool RAMSETE)
         auto RPMtoMPS = [] (double gearset, double gearRatio, double diameter) {
             return (gearset * gearRatio * (M_PI * diameter)) / 60;
         };
-        MPPoint nextPoint = this->queuedProfile->profile[(currentStep + step) * 512];
-        double timeAtCurrentVelocity = (calculateDistance({currentPoint.x, currentPoint.y}, {nextPoint.x, nextPoint.y}) / 100) / ((RPMtoMPS(velocitiesRPM[0], gearRatio, wheelDiameter) + (RPMtoMPS(velocitiesRPM[1], gearRatio, wheelDiameter))) / 2);
-
+        MPPoint nextPoint = this->queuedProfile->findNearestPoint((currentStep + step) * this->queuedProfile->profile.size());
+        double timeAtCurrentVelocity = (calculateDistance({currentPoint.x, currentPoint.y}, {nextPoint.x, nextPoint.y})) / ((RPMtoMPS(velocitiesRPM[0], gearRatio, wheelDiameter) + (RPMtoMPS(velocitiesRPM[1], gearRatio, wheelDiameter))) / 2);
         for (int i = 0; i < actions.size(); i++) {
             if (currentPoint.t == actionTs[i]) {
                 actions[i]();
             }
         }
 
-        leftDrivetrain.move_velocity(velocitiesRPM[0]);
-        rightDrivetrain.move_velocity(velocitiesRPM[1]);
+        if (x == 10) {
+            count++;
+            std::cout << count << ": " << sum << "\n";
+            sum = 0;
+            x = 0;
+        }
 
+        x++;
+        sum += calculateDistance({currentPoint.x, currentPoint.y}, {nextPoint.x, nextPoint.y});
 
-        std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
-        std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
-        std::cout << "step = " << currentStep << "\n";
-        std::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
+        //leftDrivetrain.move_velocity(velocitiesRPM[0]);
+        //rightDrivetrain.move_velocity(velocitiesRPM[1]);
+
+        // std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
+        //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
+        //std::cout << "step = " << currentStep << "\n";
+        //Sstd::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
         
-        pros::delay(timeAtCurrentVelocity / 1000);
+        pros::delay(timeAtCurrentVelocity * 1000);
 
         currentStep += step;
 
-        if (currentPoint.t == 1) {
+        if (currentStep >= 1) {
             drivetrain.brake();
+            std::cout << sum << "\n";
             return;
         }
     }
@@ -136,7 +159,8 @@ void VelocityController::startQueuedProfile(bool RAMSETE) {
         auto controlLoopFunction = [this, RAMSETE] () {return this->followProfile(this->queuedProfile, RAMSETE);};
 
     if (controlLoop_task_ptr == NULL) {
-        controlLoop_task_ptr = new pros::Task(controlLoopFunction);
+        this->followProfile(this->queuedProfile, RAMSETE);
+        pros::Task* controlLoop_task_ptr = new pros::Task(controlLoopFunction);
     }
 }
 

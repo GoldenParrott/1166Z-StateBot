@@ -38,7 +38,7 @@ void competition_initialize() {
 	autonnumber = -5;
 	globalAuton = false;
 
-
+	/*
 	while (true) {
 		if (globalAuton == true) {
 			switch (autonnumber) {
@@ -78,7 +78,10 @@ void competition_initialize() {
 					break;
 			}
 		}
-	}
+	} */
+
+	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 225);
+
 	pros::delay(10);
 }
 
@@ -245,7 +248,24 @@ void opcontrol() {
 				clamp.set_value(false);
 			}
 		}
-		
+
+		// Yoinker
+		if (master.get_digital_new_press(DIGITAL_L1)) {
+			if (!yoin.get_value()) {
+				yoin.set_value(true);
+			} else {
+				yoin.set_value(false);
+			}
+		}
+
+		// Finger
+		if (master.get_digital_new_press(DIGITAL_L2)) {
+			if (!ker.get_value()) {
+				ker.set_value(true);
+			} else {
+				ker.set_value(false);
+			}
+		}
 		
 		pros::delay(20);
 	}

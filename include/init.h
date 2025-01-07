@@ -30,8 +30,10 @@
     //Arm
         extern pros::Motor arm;
     
-    //Clamp
+    // Pistons
         extern pros::adi::DigitalOut clamp;
+        extern pros::adi::DigitalOut yoin;
+        extern pros::adi::DigitalOut ker;
 
     // Rotational Sensors
         extern pros::Rotation Rotational;

@@ -2,7 +2,6 @@
 
 MotionProfile::MotionProfile(std::vector<UltraPose> pointList, double maxSpeed) {
     this->pointList = pointList;
-    this->profile = {};
     this->maxSpeed = maxSpeed;
     this->zones = {
         {0, 0.1, {9, 0.1}},
@@ -14,7 +13,6 @@ MotionProfile::MotionProfile(std::vector<UltraPose> pointList, double maxSpeed) 
 
 MotionProfile::MotionProfile(std::vector<UltraPose> pointList, std::vector<std::vector<Point>> zonePoints, double maxSpeed) {
     this->pointList = pointList;
-    this->profile = {};
     this->maxSpeed = maxSpeed;
     this->constructWithCustomZones(zonePoints);
     this->generateVelocities();
@@ -73,7 +71,7 @@ void MotionProfile::generateVelocities(void) {
 MPPoint MotionProfile::findNearestPoint(double givenT) {
     MPPoint closestCandidate;
     double closestDifference = 10000;
-    for (int i = 0; i < pointList.size(); i++) {
+    for (int i = 0; i < profile.size(); i++) {
         if (std::abs(givenT - this->profile[i].t) < closestDifference) {
             closestCandidate = this->profile[i];
             closestDifference = std::abs(givenT - this->profile[i].t);

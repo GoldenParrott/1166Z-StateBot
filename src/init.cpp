@@ -19,7 +19,7 @@
         pros::MotorGroup leftDrivetrain({-12,-1,-4}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
         pros::MotorGroup rightDrivetrain({20,7,17}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
 
-        pros::MotorGroup drivetrain({12,1,4,-20,-7,-17}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::MotorGroup drivetrain({-12,-1,-4,20,7,17}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
 
     //Intake
         pros::Motor preRoller(19,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);
@@ -30,8 +30,10 @@
     //Arm 
         pros::Motor arm(10,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);
 
-    //mogo
+    // Pistons
          pros::adi::DigitalOut clamp(1);
+         pros::adi::DigitalOut yoin(5);
+         pros::adi::DigitalOut ker(7);
 
     // Rotational Sensors
         pros::Rotation Rotational(9);
