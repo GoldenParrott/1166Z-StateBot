@@ -7,19 +7,19 @@
 // Hello, anyone who might be in the vicinity. Ports 2, 3, and 11 are dead, likely afflicted by one of the many ailments that their kind is subject to. Please remove them
 // from the brain and replace them with another port, ensuring that they are well-educated in how to connect a device to a V5 brain so the robot will not break mid-match.
     //Drivetrain
-        pros::Motor leftFront(12, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
-        pros::Motor leftMiddle(1,pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
-        pros::Motor leftRear(4, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::Motor leftFront(-11, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::Motor leftMiddle(-1,pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::Motor leftRear(-4, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
 
-        pros::Motor rightFront(-20, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
-        pros::Motor rightMiddle(-7, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
-        pros::Motor rightRear(-17,pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::Motor rightFront(20, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::Motor rightMiddle(7, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::Motor rightRear(17,pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
 
         // Front, Middle, Rear
-        pros::MotorGroup leftDrivetrain({-12,-1,-4}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::MotorGroup leftDrivetrain({-11,-1,-4}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
         pros::MotorGroup rightDrivetrain({20,7,17}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
 
-        pros::MotorGroup drivetrain({-12,-1,-4,20,7,17}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+        pros::MotorGroup drivetrain({-11,-1,-4,20,7,17}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
 
     //Intake
         pros::Motor preRoller(19,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);
@@ -32,6 +32,7 @@
 
     // Pistons
          pros::adi::DigitalOut clamp(1);
+         pros::adi::DigitalOut inPutston(2);
          pros::adi::DigitalOut yoin(5);
          pros::adi::DigitalOut ker(7);
 

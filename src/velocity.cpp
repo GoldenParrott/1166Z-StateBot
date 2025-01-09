@@ -52,12 +52,13 @@ double VelocityController::calculateSingleDegree(double wheelDiameter) {
 }
 
 // (private)
-void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool RAMSETE)
+void VelocityController::followProfile(MotionProfile currentlyFollowing, CubicHermiteSpline path, bool RAMSETE)
 {
     // step-related variables
     double currentStep = 0;
-    double len = currentlyFollowing->profile.size();
+    double len = currentlyFollowing.profile.size();
     double step = 1 / len;
+    double distStep = 0.001;
     int x = 0;
     double sum;
     int count = 0;
@@ -67,15 +68,20 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
     // speed variables
     std::vector<double> velocitiesRPM = {0, 0};
 
+
+
+    pros::lcd::print(0, "yes");
+
     // control loop
     while (true) {
 
+
         double start = pros::micros();
 
-        currentPoint = currentlyFollowing->findNearestPoint(currentStep);
+        currentPoint = currentlyFollowing.findNearestPoint(currentStep);
 
         // standard calculation of output of each side based on specifications of the motion profile
-        velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel, currentlyFollowing->findCurveDirectionOfPoint(currentPoint));
+        velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel, currentlyFollowing.findCurveDirectionOfPoint(currentPoint));
 
         // calculation of output of each side with error corrections from RAMSETE
         if (RAMSETE) {
@@ -114,53 +120,49 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
         auto RPMtoMPS = [] (double gearset, double gearRatio, double diameter) {
             return (gearset * gearRatio * (M_PI * diameter)) / 60;
         };
-        MPPoint nextPoint = this->queuedProfile->findNearestPoint((currentStep + step) * this->queuedProfile->profile.size());
-        double timeAtCurrentVelocity = (calculateDistance({currentPoint.x, currentPoint.y}, {nextPoint.x, nextPoint.y})) / ((RPMtoMPS(velocitiesRPM[0], gearRatio, wheelDiameter) + (RPMtoMPS(velocitiesRPM[1], gearRatio, wheelDiameter))) / 2);
-        for (int i = 0; i < actions.size(); i++) {
-            if (currentPoint.t == actionTs[i]) {
-                actions[i]();
-            }
+        MPPoint nextPoint = this->queuedProfile->findNearestPoint(currentStep + step);
+        double pointDist = 0;
+        for (double t = currentPoint.t; t < nextPoint.t; t += distStep) {
+            pointDist += calculateDistance({currentPoint.x, currentPoint.y}, path.findPoint(t + distStep));
         }
+        double timeAtCurrentVelocity = pointDist / ((RPMtoMPS(velocitiesRPM[0], gearRatio, wheelDiameter) + (RPMtoMPS(velocitiesRPM[1], gearRatio, wheelDiameter))) / 2);
 
-        if (x == 10) {
-            count++;
-            std::cout << count << ": " << sum << "\n";
-            sum = 0;
-            x = 0;
-        }
+
+     
 
         x++;
-        sum += calculateDistance({currentPoint.x, currentPoint.y}, {nextPoint.x, nextPoint.y});
-
+        sum += pointDist;
+        std::cout << pointDist << "\n";
         //leftDrivetrain.move_velocity(velocitiesRPM[0]);
         //rightDrivetrain.move_velocity(velocitiesRPM[1]);
 
-        // std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
+        //std::cout << timeAtCurrentVelocity << "\n";
+        //std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
         //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
         //std::cout << "step = " << currentStep << "\n";
         //Sstd::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
+        std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
         
         pros::delay(timeAtCurrentVelocity * 1000);
-
-        currentStep += step;
 
         if (currentStep >= 1) {
             drivetrain.brake();
             std::cout << sum << "\n";
             return;
         }
+
+        currentStep += step;
     }
 }
 
 // starts the filter loop if it is not already active (public)
-void VelocityController::startQueuedProfile(bool RAMSETE) {
+void VelocityController::startQueuedProfile(CubicHermiteSpline path, bool RAMSETE) {
 
-
-        auto controlLoopFunction = [this, RAMSETE] () {return this->followProfile(this->queuedProfile, RAMSETE);};
+    // auto controlLoopFunction = [this, path, RAMSETE] () {return this->followProfile(*this->queuedProfile, path, RAMSETE);};
 
     if (controlLoop_task_ptr == NULL) {
-        this->followProfile(this->queuedProfile, RAMSETE);
-        pros::Task* controlLoop_task_ptr = new pros::Task(controlLoopFunction);
+        // pros::Task* controlLoop_task_ptr = new pros::Task(controlLoopFunction);
+        this->followProfile(*this->queuedProfile, path, RAMSETE);
     }
 }
 

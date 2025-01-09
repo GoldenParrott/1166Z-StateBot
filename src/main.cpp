@@ -9,10 +9,6 @@
 void initialize() {
 
 	pros::lcd::initialize();
-	pros::lcd::print(1, "I SUCK");
-	master.print(0, 0, "I REFUSE TO WORK");
-
-	intake.move_relative(1000, 600);
 	
 }
 
@@ -140,8 +136,7 @@ void autonomous() {
     double diameter = 3.25;
     double distBetweenWheels = 10.5;
 
-
-    double numPoints = 1000;
+    double numPoints = 100;
 
     double maxSpeed = RPMtoMPS(maxRPM, gearRatio, diameter); // in meters per second
 
@@ -151,7 +146,11 @@ void autonomous() {
     MotionProfile* myProfile = new MotionProfile(mySpline.entirePath(numPoints), maxSpeed);
     VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
     myController.queueProfile(myProfile);
-    myController.startQueuedProfile(false);
+    myController.startQueuedProfile(mySpline, false);
+
+	while (true) {
+		pros::delay(20);
+	}
 }
 
 /**
@@ -175,7 +174,7 @@ void opcontrol() {
 	leftDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	rightDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
 	intake.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
-	arm.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
+	arm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	bool clampOn = true;
 
 	// Drving variables
@@ -211,7 +210,7 @@ void opcontrol() {
 		}
 		else if(master.get_digital(DIGITAL_R2))
 		{
-			preRoller.move(127);
+			preRoller.move(-127);
 		}
 		else
 		{
