@@ -85,3 +85,4 @@
 
     Point universalCurrentLocation = {0, 0};
 
+    File logfile = File("log");

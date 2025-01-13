@@ -1,6 +1,8 @@
 #ifndef _PROFILINGH_
 #define _PROFILINGH_
 
+#include <vector>
+
 struct Point {
     double x;
     double y;
@@ -103,6 +105,7 @@ class MotionProfile {
         void generateVelocities(void);
         std::vector<MPPoint> profile;
         double maxSpeed;
+        double totalTime;
         MPPoint findNearestPoint(double givenT);
         Direction findCurveDirectionOfPoint(MPPoint currentPoint);
         void constructWithCustomZones(std::vector<std::vector<Point>> zoneLinePoints);

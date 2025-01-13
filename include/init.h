@@ -84,4 +84,6 @@
 // declared in initialize(), not init.cpp
     extern Point universalCurrentLocation;
 
+    extern File logfile;
+
 #endif

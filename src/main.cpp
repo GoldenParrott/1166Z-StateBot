@@ -117,32 +117,19 @@ void autonomous() {
 	Kalman2.startFilter();
 
 
-
-
-
-
-
-
-
-
-
-	auto RPMtoMPS = [] (double gearset, double gearRatio, double diameter) {
-        return (gearset * gearRatio * (M_PI * diameter)) / 60;
-    };
-
     // ROBOT CONFIG
     double gearRatio = 0.75;
     double maxRPM = 600;
     double diameter = 3.25;
     double distBetweenWheels = 10.5;
 
-    double numPoints = 100;
+    double numPoints = 1000;
 
-    double maxSpeed = RPMtoMPS(maxRPM, gearRatio, diameter); // in meters per second
+    double maxSpeed = RPMtoIPS(300, gearRatio, diameter); // in meters per second
 
 
     
-    CubicHermiteSpline mySpline = CubicHermiteSpline({0, 0}, {0, -1}, {0.5, -0.5}, {1, -0.5});
+    CubicHermiteSpline mySpline = CubicHermiteSpline({0, 0}, {0, 300}, {48, 0}, {48, -12});
     MotionProfile* myProfile = new MotionProfile(mySpline.entirePath(numPoints), maxSpeed);
     VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
     myController.queueProfile(myProfile);
@@ -167,7 +154,7 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
-
+	//std::cout << logfile.readFile();
 	master.print(0, 0, "sup");
 
 	// Front, Middle, Rear

@@ -65,6 +65,13 @@ void MotionProfile::generateVelocities(void) {
         profile.push_back({pointList[i].x, pointList[i].y, pointList[i].heading, linearVelocity, angularVelocity, t});
     }
 
+    double segLength = 0;
+    this->totalTime = 0;
+    for (int i = 0; i < profile.size() - 1; i++) {
+        segLength = calculateDistance({this->profile[i].x, this->profile[i].y}, {this->profile[i+1].x, this->profile[i+1].y});
+        totalTime += segLength / this->profile[i].linVel;
+    }
+
 }
 
 // given a value of t on the profile, finds the profile's closest generated point

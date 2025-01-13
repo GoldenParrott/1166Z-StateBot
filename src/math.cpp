@@ -282,3 +282,11 @@ double fixAngle(
     }
     return fixedAngle;
 }
+
+double RPMtoIPS(double rpm, double gearRatio, double diameter) {
+    return (rpm * gearRatio * (M_PI * diameter)) / 60;
+}
+
+double IPStoRPM(double ips, double gearRatio, double diameter) {
+    return (ips / (M_PI * diameter) / gearRatio) * 60;
+}

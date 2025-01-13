@@ -11,22 +11,24 @@ VelocityController::VelocityController(double wheelDiameter, double distBetweenW
 
 // uses the kinematic equations of a differential chassis and unit conversions to convert a linear and angular velocity to something that can be used
 // by each side of the drivetrain
-std::vector<double> VelocityController::calculateOutputOfSides(double linearVelocityMPS, double angularVelocityRADPS, Direction direction) {
+std::vector<double> VelocityController::calculateOutputOfSides(double linearVelocityIPS, double angularVelocityRADPS, Direction direction) {
     
-    double leftVelocityMPS = linearVelocityMPS - ((angularVelocityRADPS * (this->distBetweenWheels * 0.0254)) / 2); // lv = v - ((w * L) / 2)
-    double rightVelocityMPS = linearVelocityMPS + ((angularVelocityRADPS * (this->distBetweenWheels * 0.0254)) / 2); // rv = v + ((w * L) / 2)
+    double leftVelocityIPS = linearVelocityIPS - ((angularVelocityRADPS * this->distBetweenWheels) / 2); // lv = v - ((w * L) / 2)
+    double rightVelocityIPS = linearVelocityIPS + ((angularVelocityRADPS * this->distBetweenWheels) / 2); // rv = v + ((w * L) / 2)
 
-    double leftVelocityRPM = (leftVelocityMPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
-    double rightVelocityRPM = (rightVelocityMPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
+    double leftVelocityRPM = (leftVelocityIPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
+    double rightVelocityRPM = (rightVelocityIPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
+    
+    double profileMax = IPStoRPM(this->queuedProfile->maxSpeed, gearRatio, wheelDiameter);
 
-    if (leftVelocityRPM > this->maxRPM) {
-        double scaling = maxRPM / leftVelocityRPM;
+    if (leftVelocityRPM > profileMax) {
+        double scaling = profileMax / leftVelocityRPM;
         leftVelocityRPM *= scaling;
         rightVelocityRPM *= scaling;
     }
 
-    if (rightVelocityRPM > this->maxRPM) {
-        double scaling = maxRPM / rightVelocityRPM;
+    if (rightVelocityRPM > profileMax) {
+        double scaling = profileMax / rightVelocityRPM;
         leftVelocityRPM *= scaling;
         rightVelocityRPM *= scaling;
     }
@@ -59,26 +61,27 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, CubicHe
     double len = currentlyFollowing.profile.size();
     double step = 1 / len;
     double distStep = 0.001;
+    double pointDist = 0;
+    int currentFrac = 0;
     int x = 0;
-    double sum;
+    double sum = 0;
     int count = 0;
     // point variables
     MPPoint currentPoint = {0, 0, 0, 0, 0, 0};
     MPPoint nextPoint = {0, 0, 0, 0, 0, 0};
     // speed variables
     std::vector<double> velocitiesRPM = {0, 0};
-
-
-
-    pros::lcd::print(0, "yes");
+    uint32_t timeSinceStartOfLoop;
+    uint32_t startTime = pros::millis();
 
     // control loop
     while (true) {
+    
+        timeSinceStartOfLoop = pros::micros();
 
-
-        double start = pros::micros();
-
-        currentPoint = currentlyFollowing.findNearestPoint(currentStep);
+        currentPoint = currentlyFollowing.findNearestPoint((((double) pros::millis() - (double) startTime) / 1000) / currentlyFollowing.totalTime);
+        std::cout << currentPoint.t << "\n";
+        currentStep = currentPoint.t;
 
         // standard calculation of output of each side based on specifications of the motion profile
         velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel, currentlyFollowing.findCurveDirectionOfPoint(currentPoint));
@@ -116,36 +119,52 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, CubicHe
             // the angular velocity does not need to be transformed in the same way that the linear velocity needs to because it is already angular in reference to the robot
             double angVel = currentPoint.angVel - u2;
         }
-
-        auto RPMtoMPS = [] (double gearset, double gearRatio, double diameter) {
-            return (gearset * gearRatio * (M_PI * diameter)) / 60;
-        };
-        MPPoint nextPoint = this->queuedProfile->findNearestPoint(currentStep + step);
-        double pointDist = 0;
-        for (double t = currentPoint.t; t < nextPoint.t; t += distStep) {
-            pointDist += calculateDistance({currentPoint.x, currentPoint.y}, path.findPoint(t + distStep));
+        for (int i = 0; i < actions.size(); i++) {
+            if (currentPoint.t == actionTs[i]) {
+                actions[i]();
+            }
         }
-        double timeAtCurrentVelocity = pointDist / ((RPMtoMPS(velocitiesRPM[0], gearRatio, wheelDiameter) + (RPMtoMPS(velocitiesRPM[1], gearRatio, wheelDiameter))) / 2);
-
-
-     
-
-        x++;
+        MPPoint nextPoint = this->queuedProfile->findNearestPoint(currentStep + step);
+        if (currentPoint.t == (1 - step)) {
+            nextPoint = {path.findPoint(1).x, path.findPoint(1).y, 0, 0, 0, 1};
+        }
+        pointDist = 0;
+        for (double t = currentPoint.t; (nextPoint.t - t) > 0.000001; t += distStep) {
+            double nextT = t + distStep;
+            pointDist += calculateDistance(path.findPoint(t), path.findPoint(nextT));
+            // std::cout << "dist = " << calculateDistance(path.findPoint(t), path.findPoint(nextT)) << ", cx = " << path.findPoint(t).x << ", cy = " << path.findPoint(t).y << ", ct = " << t << ", nx = " << path.findPoint(nextT).x << ", ny = " << path.findPoint(nextT).y << ", nt = " << (nextT) << "\n";
+        }
         sum += pointDist;
-        std::cout << pointDist << "\n";
-        //leftDrivetrain.move_velocity(velocitiesRPM[0]);
-        //rightDrivetrain.move_velocity(velocitiesRPM[1]);
+        double timeAtCurrentVelocity = pointDist / currentPoint.linVel;
+
+        int maxVoltage = 12000; // innate max voltage of motors (in mV)
+        double rpmToV = maxVoltage / this->maxRPM; // multiplier to convert rpm to voltage (in units of voltage / rpm so multiplying it by rpm cancels to voltage)
+        leftDrivetrain.move_voltage(velocitiesRPM[0] * rpmToV);
+        rightDrivetrain.move_voltage(velocitiesRPM[1] * rpmToV);
 
         //std::cout << timeAtCurrentVelocity << "\n";
+        //std::cout << "lvol = " << velocitiesRPM[0] * rpmToV << ", rvol = " << velocitiesRPM[1] * rpmToV << "\n";
         //std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
         //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
         //std::cout << "step = " << currentStep << "\n";
         //Sstd::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
-        std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
-        
-        pros::delay(timeAtCurrentVelocity * 1000);
+        //std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
+        //logfile.appendFile("x = " + std::to_string(universalCurrentLocation.x) + ", should be " + std::to_string(currentPoint.x) + "\n");
+        //logfile.appendFile("y = " + std::to_string(universalCurrentLocation.y) + ", should be " + std::to_string(currentPoint.y) + "\n");
+        //logfile.appendFile("h = " + std::to_string(getAggregatedHeading(Kalman1, Kalman2)) + ", should be " + std::to_string(currentPoint.heading));
+        //logfile.appendFile("lvol = " + std::to_string(leftDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[0] * rpmToV) + "\n" + "rvol = " + std::to_string(rightDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[1] * rpmToV) + "\n\n");
+        //std::cout << (pros::micros() - timeTrack) / 1000 << " is calc\n";
+        //std::cout << timeAtCurrentVelocity * 1000 << " is delay\n";
+        int calcTime = pros::micros() - timeSinceStartOfLoop;
+        double totalDelay = ((timeAtCurrentVelocity * 1000) - (calcTime / 1000)) * 1.25;
+        int delay = std::round(totalDelay);
+        if (delay < 5) {delay = 5;}
 
-        if (currentStep >= 1) {
+        //std::cout << delay << "\n";
+
+        pros::delay(delay);
+
+        if (currentStep >= 1 - step) {
             drivetrain.brake();
             std::cout << sum << "\n";
             return;

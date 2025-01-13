@@ -45,6 +45,8 @@
 #include <functional>
 #include <vector>
 #include <deque>
+#include <cstdio>
+#include <string>
 
 #include "profiling.h"
 
@@ -90,7 +92,7 @@ struct Inequality {
     double yIntercept;
     int equality;
 };
-
+//hif
 // kalman.cpp
 class KalmanFilter {
     private:
@@ -123,6 +125,18 @@ class KalmanFilter {
         // start and stop methods for the filter
         void startFilter(void);
         void endFilter(void);
+};
+
+// fileio.cpp
+class File {
+    private:
+        std::string filename;
+
+    public:
+        File(std::string filename);
+        std::string readFile(void);
+        void writeFile(std::string text);
+        void appendFile(std::string text);
 };
 
 // autons.cpp
@@ -161,6 +175,9 @@ Line findLineWithPoints(Point point1, Point point2);
 QuadraticPolyData derivativeOfCubicPoly(CubicPolyData cubicPoly);
 Line derivativeOfQuadratic(QuadraticPolyData quadPoly);
 double fixAngle(double originalAngle);
+double RPMtoIPS(double rpm, double gearRatio, double diameter);
+double IPStoRPM(double ips, double gearRatio, double diameter);
+
 
 // tracking.cpp
 double calculateSingleDegree(double wheelDiameter);
