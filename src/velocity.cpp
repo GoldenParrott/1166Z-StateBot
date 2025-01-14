@@ -63,6 +63,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, CubicHe
     double distStep = 0.001;
     double pointDist = 0;
     int currentFrac = 0;
+    double timeAtCurrentVelocity = 0;
     int x = 0;
     double sum = 0;
     int count = 0;
@@ -74,14 +75,35 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, CubicHe
     uint32_t timeSinceStartOfLoop;
     uint32_t startTime = pros::millis();
 
+    for (int i = 0; i < currentlyFollowing.profile.size(); i++) {
+        MPPoint currentPoint = currentlyFollowing.findNearestPoint(i);
+        MPPoint nextPoint = this->queuedProfile->findNearestPoint(i + step);
+        if (currentPoint.t == (1 - step)) {
+            nextPoint = {path.findPoint(1).x, path.findPoint(1).y, 0, 0, 0, 1};
+        }
+        pointDist = 0;
+        for (double t = currentPoint.t; (nextPoint.t - t) > 0.000001; t += distStep) {
+            double nextT = t + distStep;
+            pointDist += calculateDistance(path.findPoint(t), path.findPoint(nextT));
+            // std::cout << "dist = " << calculateDistance(path.findPoint(t), path.findPoint(nextT)) << ", cx = " << path.findPoint(t).x << ", cy = " << path.findPoint(t).y << ", ct = " << t << ", nx = " << path.findPoint(nextT).x << ", ny = " << path.findPoint(nextT).y << ", nt = " << (nextT) << "\n";
+        }
+        double timeAtCurrentVelocity = pointDist / currentPoint.linVel;
+
+        currentlyFollowing.profile[i] = {currentlyFollowing.profile[i].x, currentlyFollowing.profile[i].y, currentlyFollowing.profile[i].heading, currentlyFollowing.profile[i].linVel, currentlyFollowing.profile[i].angVel, currentlyFollowing.profile[i].t, pointDist};
+
+        currentStep += step;
+    }
+    currentStep = 0;
     // control loop
     while (true) {
     
         timeSinceStartOfLoop = pros::micros();
 
-        currentPoint = currentlyFollowing.findNearestPoint((((double) pros::millis() - (double) startTime) / 1000) / currentlyFollowing.totalTime);
-        std::cout << currentPoint.t << "\n";
-        currentStep = currentPoint.t;
+        //currentPoint = currentlyFollowing.findNearestPoint((((double) pros::millis() - (double) startTime) / 1000) / currentlyFollowing.totalTime);
+        currentPoint = currentlyFollowing.findNearestPoint(currentStep);
+        //std::cout << currentPoint.t << "\n";
+        //currentStep = currentPoint.t;
+        timeAtCurrentVelocity = currentPoint.timeAtPoint;
 
         // standard calculation of output of each side based on specifications of the motion profile
         velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel, currentlyFollowing.findCurveDirectionOfPoint(currentPoint));
@@ -124,18 +146,11 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, CubicHe
                 actions[i]();
             }
         }
-        MPPoint nextPoint = this->queuedProfile->findNearestPoint(currentStep + step);
-        if (currentPoint.t == (1 - step)) {
-            nextPoint = {path.findPoint(1).x, path.findPoint(1).y, 0, 0, 0, 1};
+        if (timeAtCurrentVelocity * 1000 < 5) {
+            double timeAtNext = currentlyFollowing.profile[(currentPoint.t * currentlyFollowing.profile.size()) + 1].timeAtPoint;
+            timeAtCurrentVelocity += timeAtNext;
         }
-        pointDist = 0;
-        for (double t = currentPoint.t; (nextPoint.t - t) > 0.000001; t += distStep) {
-            double nextT = t + distStep;
-            pointDist += calculateDistance(path.findPoint(t), path.findPoint(nextT));
-            // std::cout << "dist = " << calculateDistance(path.findPoint(t), path.findPoint(nextT)) << ", cx = " << path.findPoint(t).x << ", cy = " << path.findPoint(t).y << ", ct = " << t << ", nx = " << path.findPoint(nextT).x << ", ny = " << path.findPoint(nextT).y << ", nt = " << (nextT) << "\n";
-        }
-        sum += pointDist;
-        double timeAtCurrentVelocity = pointDist / currentPoint.linVel;
+        sum += timeAtCurrentVelocity;
 
         int maxVoltage = 12000; // innate max voltage of motors (in mV)
         double rpmToV = maxVoltage / this->maxRPM; // multiplier to convert rpm to voltage (in units of voltage / rpm so multiplying it by rpm cancels to voltage)
@@ -147,19 +162,19 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, CubicHe
         //std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
         //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
         //std::cout << "step = " << currentStep << "\n";
-        //Sstd::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
-        //std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
+        //std::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
+        std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
         //logfile.appendFile("x = " + std::to_string(universalCurrentLocation.x) + ", should be " + std::to_string(currentPoint.x) + "\n");
         //logfile.appendFile("y = " + std::to_string(universalCurrentLocation.y) + ", should be " + std::to_string(currentPoint.y) + "\n");
         //logfile.appendFile("h = " + std::to_string(getAggregatedHeading(Kalman1, Kalman2)) + ", should be " + std::to_string(currentPoint.heading));
         //logfile.appendFile("lvol = " + std::to_string(leftDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[0] * rpmToV) + "\n" + "rvol = " + std::to_string(rightDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[1] * rpmToV) + "\n\n");
+        //std::cout << "t = " << std::to_string(currentPoint.t) << ", time = " << std::to_string(((double) pros::millis() - (double) startTime) / 1000) << "\n";
         //std::cout << (pros::micros() - timeTrack) / 1000 << " is calc\n";
         //std::cout << timeAtCurrentVelocity * 1000 << " is delay\n";
         int calcTime = pros::micros() - timeSinceStartOfLoop;
-        double totalDelay = ((timeAtCurrentVelocity * 1000) - (calcTime / 1000)) * 1.25;
+        double totalDelay = ((timeAtCurrentVelocity * 1000) - (calcTime / 1000));
         int delay = std::round(totalDelay);
-        if (delay < 5) {delay = 5;}
-
+        // if (delay < 5) {delay = 5;}
         //std::cout << delay << "\n";
 
         pros::delay(delay);

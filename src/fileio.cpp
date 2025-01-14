@@ -8,8 +8,8 @@ std::string File::readFile(void) {
     std::string fname = std::string("/usd/" + this->filename + ".txt");
     FILE* file = std::fopen(fname.c_str(), "r");
     
-    char output[INT_MAX];
-    fread(output, 1, INT_MAX, file);
+    char output[3000];
+    fread(output, 1, 3000, file);
 
     fclose(file);
 

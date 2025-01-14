@@ -33,6 +33,7 @@ struct MPPoint {
     double linVel;
     double angVel;
     double t;
+    double timeAtPoint;
 };
 
 struct Zone {
