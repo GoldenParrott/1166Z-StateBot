@@ -123,17 +123,16 @@ void autonomous() {
     double diameter = 3.25;
     double distBetweenWheels = 10.5;
 
-    double numPoints = 1000;
-
     double maxSpeed = RPMtoIPS(300, gearRatio, diameter); // in meters per second
 
-
+	leftDrivetrain.set_brake_mode(pros::MotorBrake::hold);
+	rightDrivetrain.set_brake_mode(pros::MotorBrake::hold);
     
     CubicHermiteSpline mySpline = CubicHermiteSpline({0, 0}, {0, 300}, {48, 0}, {48, -12});
-    MotionProfile* myProfile = new MotionProfile(mySpline.entirePath(numPoints), maxSpeed);
+    MotionProfile* myProfile = new MotionProfile(&mySpline, maxSpeed);
     VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
     myController.queueProfile(myProfile);
-    myController.startQueuedProfile(mySpline, false);
+    myController.startQueuedProfile(false);
 
 	while (true) {
 		pros::delay(20);
@@ -168,9 +167,8 @@ void opcontrol() {
 	int drvfb;
 	int drvlr;
 	int drvtrdz = 10;
-
+coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
 	while (true) {
-		
 	//Drivetrain Control 
 		drvfb = master.get_analog(ANALOG_LEFT_Y);
 		drvlr = master.get_analog(ANALOG_RIGHT_X);

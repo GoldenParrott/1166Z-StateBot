@@ -51,6 +51,13 @@ Pose CubicHermiteSpline::findPose(double t, double step) {
     return currentP;
 }
 
+UltraPose CubicHermiteSpline::findUltraPose(double t, double step) {
+    Pose currentP = this->findPose(t, step);
+    UltraPose currentUltraP = {currentP.x, currentP.y, currentP.heading, this->calculateCurvature(t)};
+
+    return currentUltraP;
+}
+
 std::vector<UltraPose> CubicHermiteSpline::entirePath(double numPoints) {
     UltraPose currentPose;
     std::vector<UltraPose> fullPath;

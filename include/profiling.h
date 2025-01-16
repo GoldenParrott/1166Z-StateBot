@@ -76,7 +76,8 @@ class CubicHermiteSpline {
         CubicHermiteSpline(Point startPos, Point startV, Point endPos, Point endV);
         Point findPoint(double t);
         Pose findPose(double t, double step);
-        std::vector<UltraPose> entirePath(double step);
+        UltraPose findUltraPose(double t, double step);
+        std::vector<UltraPose> entirePath(double numPoints);
         void findFunction(void);
         void findDerivative(void);
         void findSecondDerivative(void);
@@ -101,18 +102,27 @@ class CubicHermiteSpline {
 
 class MotionProfile {
     public:
-        MotionProfile(std::vector<UltraPose> pointList, double maxSpeed);
-        MotionProfile(std::vector<UltraPose> pointList, std::vector<std::vector<Point>> zonePoints, double maxSpeed);
-        void generateVelocities(void);
+        // constructors (one with custom zoning, one without)
+        MotionProfile(CubicHermiteSpline* path, double maxSpeed);
+        MotionProfile(CubicHermiteSpline* path, std::vector<std::vector<Point>> zonePoints, double maxSpeed);
+
+        // instance variables (data about profile)
         std::vector<MPPoint> profile;
         double maxSpeed;
         double totalTime;
+
+        // public methods (operations on points)
         MPPoint findNearestPoint(double givenT);
         Direction findCurveDirectionOfPoint(MPPoint currentPoint);
-        void constructWithCustomZones(std::vector<std::vector<Point>> zoneLinePoints);
 
     private:
-        std::vector<UltraPose> pointList;
+        // private methods (profile generation)
+        void generateVelocities(std::vector<UltraPose> pointList);
+        void constructWithCustomZones(std::vector<std::vector<Point>> zoneLinePoints);
+        void createProfile(void);
+
+        // private instance variables (used in profile generation)
+        CubicHermiteSpline* path;
         std::vector<Zone> zones;
 
 
@@ -124,7 +134,7 @@ class VelocityController {
         double angVel;
         std::vector<double> FINDME;
         VelocityController(double wheelDiameter, double distBetweenWheels, double gearRatio, double maxRPM);
-        void startQueuedProfile(CubicHermiteSpline path, bool RAMSETE);
+        void startQueuedProfile(bool RAMSETE);
         void endProfile(void);
         void queueProfile(MotionProfile* profile);
         void addAction(std::function<void(void)> action, double time);
@@ -133,7 +143,7 @@ class VelocityController {
     private:
         std::vector<double> calculateOutputOfSides(double linearVelocityMPS, double angularVelocityRADPS, Direction direction);
         double calculateSingleDegree(double wheelDiameter);
-        void followProfile(MotionProfile profile, CubicHermiteSpline path, bool RAMSETE);
+        void followProfile(MotionProfile profile, bool RAMSETE);
         
         double wheelDiameter;
         double distBetweenWheels;
