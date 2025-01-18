@@ -11,7 +11,7 @@ VelocityController::VelocityController(double wheelDiameter, double distBetweenW
 
 // uses the kinematic equations of a differential chassis and unit conversions to convert a linear and angular velocity to something that can be used
 // by each side of the drivetrain
-std::vector<double> VelocityController::calculateOutputOfSides(double linearVelocityIPS, double angularVelocityRADPS, Direction direction) {
+std::vector<double> VelocityController::calculateOutputOfSides(double linearVelocityIPS, double angularVelocityRADPS) {
     
     double leftVelocityIPS = linearVelocityIPS - ((angularVelocityRADPS * this->distBetweenWheels) / 2); // lv = v - ((w * L) / 2)
     double rightVelocityIPS = linearVelocityIPS + ((angularVelocityRADPS * this->distBetweenWheels) / 2); // rv = v + ((w * L) / 2)
@@ -20,8 +20,6 @@ std::vector<double> VelocityController::calculateOutputOfSides(double linearVelo
     double rightVelocityRPM = (rightVelocityIPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
     
     double profileMax = IPStoRPM(this->queuedProfile->maxSpeed, gearRatio, wheelDiameter);
-
-    std::cout << "lv = " << leftVelocityRPM << ", rv = " << rightVelocityRPM << "\n";
 
     if (leftVelocityRPM > profileMax) {
         double scaling = profileMax / leftVelocityRPM;
@@ -33,16 +31,6 @@ std::vector<double> VelocityController::calculateOutputOfSides(double linearVelo
         double scaling = profileMax / rightVelocityRPM;
         leftVelocityRPM *= scaling;
         rightVelocityRPM *= scaling;
-    }
-
-    std::cout << "alv = " << leftVelocityRPM << ", arv = " << rightVelocityRPM << "\n";
-
-    if (((leftVelocityRPM > rightVelocityRPM) && (direction == RIGHT)) ||
-    ((rightVelocityRPM > leftVelocityRPM) && (direction == LEFT)))
-    {
-        double rvcache = rightVelocityRPM;
-        rightVelocityRPM = leftVelocityRPM;
-        leftVelocityRPM = rvcache;
     }
 
     return {leftVelocityRPM, rightVelocityRPM};
@@ -73,7 +61,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
     uint32_t timeSinceStartOfLoop;
     uint32_t startTime = pros::millis();
     // action variables
-    std::vector<bool> actionCompleteds(3, false);
+    std::vector<bool> actionCompleteds = {false, false, false};
 
     // control loop
     while (true) {
@@ -86,7 +74,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         //std::cout << currentPoint.t << "\n";
 
         // standard calculation of output of each side based on specifications of the motion profile
-        velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel, currentlyFollowing.findCurveDirectionOfPoint(currentPoint));
+        velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel);
 
         // calculation of output of each side with error corrections from RAMSETE
         if (RAMSETE) {
@@ -123,8 +111,9 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         }
         // executes custom actions if the profile has reached or passed their t-point and have not yet been activated
         for (int i = 0; i < actions.size(); i++) {
-            if ((currentPoint.t >= actionTs[i]) && actionCompleteds[i]) {
+            if (((currentPoint.t >= actionTs[i])) && !actionCompleteds[i]) {
                 actions[i]();
+                actionCompleteds[i] = true;
             }
         }
 
@@ -138,6 +127,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // LOGGING FOR TEST PURPOSES
         //std::cout << timeAtCurrentVelocity << "\n";
+        std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
         //std::cout << "lvol = " << velocitiesRPM[0] * rpmToV << ", rvol = " << velocitiesRPM[1] * rpmToV << "\n";
         //std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
         //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";

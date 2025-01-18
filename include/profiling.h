@@ -113,7 +113,6 @@ class MotionProfile {
 
         // public methods (operations on points)
         MPPoint findNearestPoint(double givenT);
-        Direction findCurveDirectionOfPoint(MPPoint currentPoint);
 
     private:
         // private methods (profile generation)
@@ -141,7 +140,7 @@ class VelocityController {
 
 
     private:
-        std::vector<double> calculateOutputOfSides(double linearVelocityMPS, double angularVelocityRADPS, Direction direction);
+        std::vector<double> calculateOutputOfSides(double linearVelocityMPS, double angularVelocityRADPS);
         double calculateSingleDegree(double wheelDiameter);
         void followProfile(MotionProfile profile, bool RAMSETE);
         

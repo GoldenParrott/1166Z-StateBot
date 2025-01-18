@@ -72,13 +72,20 @@ void MotionProfile::generateVelocities(std::vector<UltraPose> pointList) {
             }
         }
 
+        // determines the direction of the curve by examining whether the heading is changing to the right or to the left
+        Pose prevPoint = this->path->findPose(t - (1 / (double) pointList.size()), (1 / (double) pointList.size()));
+        double dir;
+        if (prevPoint.heading > pointList[i].heading) {dir = 1;}
+        else if (pointList[i].heading > prevPoint.heading) {dir = -1;}
+        else {dir = 0;}
+
         // velocity calculations
         // the zone line is solved for at the point t to find the velocity multiplier
         double linearVelocityMultiplier = (assignedZone.zoneLine.slope * t) + assignedZone.zoneLine.yIntercept;
         // the linear velocity is simply the multiplier (which is a percentage) of the maximum speed allowed by the profile
         double linearVelocity = linearVelocityMultiplier * this->maxSpeed;
         // the angular velocity is the curvature of the current point multiplied by the current linear velocity
-        double angularVelocity = linearVelocity * pointList[i].curvature;
+        double angularVelocity = linearVelocity * pointList[i].curvature * dir; //* (double) curveDirection;
 
         
         profile.push_back({pointList[i].x, pointList[i].y, pointList[i].heading, linearVelocity, angularVelocity, t});
@@ -121,15 +128,4 @@ MPPoint MotionProfile::findNearestPoint(double givenT) {
         }
     }
     return closestCandidate;
-}
-
-Direction MotionProfile::findCurveDirectionOfPoint(MPPoint currentPoint) {
-    MPPoint prevPoint = this->profile[(currentPoint.t * this->profile.size()) - 1];
-    Direction dir;
-
-    if (prevPoint.heading > currentPoint.heading) {dir = RIGHT;}
-    else if (currentPoint.heading > prevPoint.heading) {dir = LEFT;}
-    else {dir = STRAIGHT;}
-
-    return dir;
 }
