@@ -137,6 +137,7 @@ class File {
         std::string readFile(void);
         void writeFile(std::string text);
         void appendFile(std::string text);
+        void writeLoop(void);
 };
 
 // autons.cpp

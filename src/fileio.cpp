@@ -33,3 +33,17 @@ void File::appendFile(std::string text) {
 
     fclose(file);
 }
+
+void File::writeLoop(void) {
+    int i = 0;
+    while (true) {
+        if (!textToWrite.empty()) {
+            std::cout << "LOG START";
+            //this->writeFile(textToWrite);
+            //textToWrite = "";
+            pros::delay(5);
+        } else {
+            pros::delay(5);
+        }
+    }
+}

@@ -9,7 +9,10 @@ void initializeRobotOnCoordinate(pros::Rotation *rotational, // parallel rotatio
                         ) 
 {
     // sets the current location to the offset
-    universalCurrentLocation = offset;
+    universalCurrentLocation = {offset.x, offset.y, (double) startHeading};
+
+    // resets the rotational sensor to zero
+    rotational->set_position(0);
 
     // sets the headings to the heading offset
     imu1->set_heading(startHeading);
@@ -72,7 +75,7 @@ Point updateLocation(double heading, double dist) {
 void updateCoordinateLoop() {
 
     // declaration of previous location
-    Point previousLocation = universalCurrentLocation;
+    Pose previousLocation = universalCurrentLocation;
     // calculates the change in odometry for the location update
     double changeInOdom = 0;
     double previousOdom = 0;
@@ -86,7 +89,10 @@ void updateCoordinateLoop() {
             // calculates the change in odometry reading based on the previous measurement
             changeInOdom = cumulativeOdom - previousOdom;
             // updates the location
-            universalCurrentLocation = updateLocation(getAggregatedHeading(Kalman1, Kalman2), changeInOdom);
+            double newHeading = getAggregatedHeading(Kalman1, Kalman2);
+            Point newLocation = updateLocation(newHeading, changeInOdom);
+            universalCurrentLocation = {newLocation.x, newLocation.y, newHeading};
+            //std::cout << "x = " << universalCurrentLocation.x << ", y = " << universalCurrentLocation.y << ", h = " << universalCurrentLocation.heading << "\n";
             // previous location for use in next cycle
             previousLocation = universalCurrentLocation;
             // cumulative odometry value for use in next cycle as previous value

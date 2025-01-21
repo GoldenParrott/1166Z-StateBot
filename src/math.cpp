@@ -272,7 +272,8 @@ double fixAngle(
     if (originalAngle <= 90) {
         fixedAngle = (originalAngle + 90) - (2 * ((originalAngle + 90) - 90));
     } else if (originalAngle <= 180) {
-        fixedAngle = (originalAngle + 270) - (2 * (360 - (originalAngle + 270)));
+        // fixedAngle = (originalAngle + 270) - (2 * (360 - (originalAngle + 270)));
+        fixedAngle = 360 - (90 - (360 - (originalAngle + 180)));
     } else if (originalAngle <= 270) {
         fixedAngle = (originalAngle + 90) - (2 * ((originalAngle + 90) - 270));
     } else if (originalAngle < 360) {

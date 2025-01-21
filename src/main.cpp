@@ -132,10 +132,14 @@ void autonomous() {
     MotionProfile* myProfile = new MotionProfile(&mySpline, maxSpeed);
     VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
     myController.queueProfile(myProfile);
-    myController.startQueuedProfile(false);
+	std::cout << "hi" << "\n";
+    myController.startQueuedProfile(true);
 
-	while (true) {
-		pros::delay(20);
+
+	master.print(0, 0, "%d", (int) textToWrite.size());
+
+				for (int i = 0; i < textToWrite.size(); i++) {
+		std::cout << textToWrite[i];
 	}
 }
 

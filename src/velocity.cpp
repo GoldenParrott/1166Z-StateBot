@@ -52,6 +52,8 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
     double currentStep = 0;
     double step = 1 / (double) currentlyFollowing.profile.size();
     double sum = 0;
+    // distance calculation variables
+
     // point variables
     MPPoint currentPoint = {0, 0, 0, 0, 0, 0};
     MPPoint nextPoint = {0, 0, 0, 0, 0, 0};
@@ -60,6 +62,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
     // clock variables
     uint32_t timeSinceStartOfLoop;
     uint32_t startTime = pros::millis();
+    double delay;
     // action variables
     std::vector<bool> actionCompleteds = {false, false, false};
 
@@ -69,25 +72,50 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         // begins a timer to ensure that the calculation time is subtracted from the delay
         timeSinceStartOfLoop = pros::micros();
 
+        // while RAMSETE is not on, the delay is always 5 ms
+        delay = 5;
+
         // calculates the current point as the nearest point to the current step
         currentPoint = currentlyFollowing.findNearestPoint(currentStep);
+        nextPoint = currentlyFollowing.findNearestPoint(currentStep + step);
         //std::cout << currentPoint.t << "\n";
 
-        // standard calculation of output of each side based on specifications of the motion profile
-        velocitiesRPM = this->calculateOutputOfSides(currentPoint.linVel, currentPoint.angVel);
+        // sets linear and angular velocities to that of the current point - these are changed by RAMSETE if it is on
+        double linVel = currentPoint.linVel;
+        double angVel = currentPoint.angVel;
+
+        // std::cout << "lv = " << linVel << ", rv = " << angVel << "\n";
 
         // calculation of output of each side with error corrections from RAMSETE
         if (RAMSETE) {
-            fixAngle(currentPoint.heading);
+            double fixedOdomAngle = fixAngle(universalCurrentLocation.heading);
+            double fixedNextAngle = fixAngle(nextPoint.heading);
+        //textToWrite.push_back("odom = " + std::to_string(universalCurrentLocation.heading) + ", fodom = " + std::to_string(fixedOdomAngle) + "\n");
+        //textToWrite.push_back("next = " + std::to_string(nextPoint.heading) + ", fnext = " + std::to_string(fixedNextAngle) + "\n\n");
         // rotation of the x, y, and heading errors to fit the local frame
             Pose error;
-            error.x = (std::cos(currentPoint.heading) * (currentPoint.x - universalCurrentLocation.x)) + (std::sin(currentPoint.heading) * (currentPoint.y - universalCurrentLocation.y));
-            error.y = (-1 * std::sin(currentPoint.heading) * (currentPoint.x - universalCurrentLocation.x) + (std::cos(currentPoint.heading) * (currentPoint.y - universalCurrentLocation.y)));
-            error.heading = currentPoint.heading - getAggregatedHeading(Kalman1, Kalman2);
+            error.x = (std::cos(fixedOdomAngle) * (nextPoint.x - universalCurrentLocation.x)) + (std::sin(fixedOdomAngle)) * (nextPoint.y - universalCurrentLocation.y);
+            error.y = (std::cos(fixedOdomAngle) * (nextPoint.x - universalCurrentLocation.x)) - std::sin(fixedOdomAngle) * (nextPoint.y - universalCurrentLocation.y);
+            error.heading = fixedNextAngle - fixedOdomAngle;
+            //std::cout << error.heading << "\n";
+
+        // bounds the error from 0-180 to prevent the correction from being an un-optimal turn direction (where going the other way would be faster)
+            if (error.heading < -180) {
+                error.heading = error.heading + 360;
+            } else if (error.heading > 180) {
+                error.heading = 360 - error.heading;
+            }
+
+            // std::cout << "prp = " << fixedNextAngle << ", ap = " << fixedOdomAngle << ", c = " << error.heading << "\n";
+            std::cout << "ucl = " << universalCurrentLocation.heading << ", actual = " << getAggregatedHeading(Kalman1, Kalman2) << ", used = " << fixedOdomAngle << "\n";
+
+            if ((error.heading < 2.5) && (error.heading > -2.5)) {
+                error.heading = 0;
+            }
 
         // tuning constants (current values are from the widely accepted defaults from FTCLib)
             double b = 2.0; // this is a proportional gain for each of the different error elements of the controller (put into the gain value calculations)
-            double zeta = 0.6; // this is a dampener for the direct movements (k1 and k3/x-value and heading-value)
+            double zeta = 0.7; // this is a dampener for the direct movements (k1 and k3/x-value and heading-value)
 
         // gain values that serve as scaling multipliers for the outputs based on the profile's velocity and pre-set constants
             // k1/k3: the proportional gain value for both the local frame of x and heading
@@ -97,18 +125,31 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // control inputs that determine the controller's influence on the velocity based on the error
             // simply the normal gain value multiplied by the x-error because that can be directly moved upon (input for linear velocity)
-            double u1 = -1 * k * error.x;
+            double u1 = k * error.x;
             // the special gain value is used for the y-value, and it is also scaled with the part in purple parenthesis to let it switch directions smoothly if it is past
             // its goal point; the second part is the same simple direct angular movement for the error in heading that is used in the same way with the x-value for linear
             // movement
-            double u2 = (-1 * k2 * (std::sin(error.heading) / error.heading) * error.y) + (-1 * k * error.heading);
+            double u2 = /* (k2 * (std::sin(error.heading) / error.heading) * error.y) + */ (k * error.heading);
 
         // actual calculations of modified linear and angular velocities as additions/subtractions to the profile's original values
             // the original linear velocity is also transformed to follow the robot's error in heading before having the control input subtracted from it
-            double linVel = (currentPoint.linVel * std::cos(error.heading)) - u1;
+            linVel = (currentPoint.linVel * std::cos(error.heading)) + u1;
             // the angular velocity does not need to be transformed in the same way that the linear velocity needs to because it is already angular in reference to the robot
-            double angVel = currentPoint.angVel - u2;
+            angVel = currentPoint.angVel + u2;
+
+        // recalculates the delay, as it may change due to the RAMSETE controller modifying the robot's movement
+            double newDistance = calculateDistance({universalCurrentLocation.x, universalCurrentLocation.y}, {nextPoint.x, nextPoint.y});
+            double newDelay = newDistance / linVel;
+            delay = newDelay * 1000;
+
+            // textToWrite.push_back("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
+            // std::cout << ("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
+            //std::cout << "nd = " << delay << "\n";
         }
+
+        // standard calculation of output of each side based on specifications of the motion profile
+        velocitiesRPM = this->calculateOutputOfSides(linVel, angVel);
+
         // executes custom actions if the profile has reached or passed their t-point and have not yet been activated
         for (int i = 0; i < actions.size(); i++) {
             if (((currentPoint.t >= actionTs[i])) && !actionCompleteds[i]) {
@@ -127,8 +168,10 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // LOGGING FOR TEST PURPOSES
         //std::cout << timeAtCurrentVelocity << "\n";
-        std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
+        //textToWrite.push_back("ix = " + std::to_string(currentPoint.x) + ", iy = " + std::to_string(currentPoint.y) + ", ihead = " + std::to_string(currentPoint.heading) + "\n" + "ax = " + std::to_string(universalCurrentLocation.x) + ", ay = " + std::to_string(universalCurrentLocation.y) + ", ahead = " + std::to_string(universalCurrentLocation.heading) + "\n" + std::to_string(currentPoint.t) + "\n\n");
+        // textToWrite.push_back("il = " + std::to_string(currentPoint.linVel) + ", ia = " + std::to_string(currentPoint.angVel) + "\nal = " + std::to_string(linVel) + ", aa = " + std::to_string(angVel) + "\n\n");
         //std::cout << "lvol = " << velocitiesRPM[0] * rpmToV << ", rvol = " << velocitiesRPM[1] * rpmToV << "\n";
+        // std::cout << "lv = " << linVel << ", rv = " << angVel << "\n\n";
         //std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
         //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
         //std::cout << "step = " << currentStep << "\n";
@@ -136,7 +179,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         // std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
         //logfile.appendFile("x = " + std::to_string(universalCurrentLocation.x) + ", should be " + std::to_string(currentPoint.x) + "\n");
         //logfile.appendFile("y = " + std::to_string(universalCurrentLocation.y) + ", should be " + std::to_string(currentPoint.y) + "\n");
-        //logfile.appendFile("h = " + std::to_string(getAggregatedHeading(Kalman1, Kalman2)) + ", should be " + std::to_string(currentPoint.heading));
+        //logfile.appendFile("h = " + std::to_string(universalCurrentLocation.heading + ", should be " + std::to_string(currentPoint.heading));
         //logfile.appendFile("lvol = " + std::to_string(leftDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[0] * rpmToV) + "\n" + "rvol = " + std::to_string(rightDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[1] * rpmToV) + "\n\n");
         //std::cout << "t = " << std::to_string(currentPoint.t) << ", time = " << std::to_string(((double) pros::millis() - (double) startTime) / 1000) << "\n";
         //std::cout << (pros::micros() - timeTrack) / 1000 << " is calc\n";
@@ -146,7 +189,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         double calcTime = (pros::micros() - timeSinceStartOfLoop) / 1000;
 
         // 5 ms delay (- the time taken to calculate)
-        pros::delay(5 - calcTime);
+        pros::delay(delay - calcTime);
 
         // if the current step is the final point (t = 1 - step), 
         // then the drivetrain is stopped and the function ends

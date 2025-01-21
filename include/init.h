@@ -55,6 +55,7 @@
     extern pros::Task* coordinateUpdater_task_ptr;
     extern pros::Task* rotationalBinder_task_ptr ;
     extern pros::Task* autoSelector_task_ptr;
+    extern pros::Task* loggingEnabled_task_ptr;
 
 // Variables
 
@@ -82,7 +83,9 @@
     extern bool endended;
 
 // declared in initialize(), not init.cpp
-    extern Point universalCurrentLocation;
+    extern Pose universalCurrentLocation;
+
+    extern std::vector<std::string> textToWrite;
 
     extern File logfile;
 

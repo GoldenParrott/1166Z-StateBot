@@ -37,8 +37,8 @@
          pros::adi::DigitalOut ker(7);
 
     // Rotational Sensors
-        pros::Rotation Rotational(9);
-        pros::Rotation RotationalTurn(6);
+        pros::Rotation Rotational(6);
+        pros::Rotation RotationalTurn(9);
         pros::Rotation ArmRotational(21);
 
     // Other Sensors
@@ -57,6 +57,7 @@
     pros::Task* coordinateUpdater_task_ptr = NULL;
     pros::Task* rotationalBinder_task_ptr = NULL;
     pros::Task* autoSelector_task_ptr = NULL;
+    pros::Task* loggingEnabled_task_ptr = NULL;
       
 // Variables
 
@@ -83,6 +84,8 @@
     bool endReverse;
     bool endended;
 
-    Point universalCurrentLocation = {0, 0};
+    Pose universalCurrentLocation = {0, 0};
+
+    std::vector<std::string> textToWrite;
 
     File logfile = File("log");
