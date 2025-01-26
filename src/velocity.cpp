@@ -68,7 +68,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
     // control loop
     while (true) {
-    
+        sum++;
         // begins a timer to ensure that the calculation time is subtracted from the delay
         timeSinceStartOfLoop = pros::micros();
 
@@ -77,7 +77,6 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // calculates the current point as the nearest point to the current step
         currentPoint = currentlyFollowing.findNearestPoint(currentStep);
-        nextPoint = currentlyFollowing.findNearestPoint(currentStep + step);
         //std::cout << currentPoint.t << "\n";
 
         // sets linear and angular velocities to that of the current point - these are changed by RAMSETE if it is on
@@ -88,30 +87,34 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // calculation of output of each side with error corrections from RAMSETE
         if (RAMSETE) {
-            double fixedOdomAngle = fixAngle(universalCurrentLocation.heading);
-            double fixedNextAngle = fixAngle(nextPoint.heading);
-        //textToWrite.push_back("odom = " + std::to_string(universalCurrentLocation.heading) + ", fodom = " + std::to_string(fixedOdomAngle) + "\n");
+            Pose location = {universalCurrentLocation.x * 0.0254, universalCurrentLocation.y * 0.0254, universalCurrentLocation.heading};
+            nextPoint = currentlyFollowing.findNearestPoint(currentStep + step);
+            nextPoint = {nextPoint.x * 0.0254, nextPoint.y * 0.0254, nextPoint.heading};
+
+            double fixedOdomAngle = fixAngle(location.heading) * (M_PI / 180);
+            double fixedNextAngle = fixAngle(nextPoint.heading) * (M_PI / 180);
+
+            //std::cout << "fodom = " << fixedOdomAngle << "\n";
+            //std::cout << "fnext = " << fixedNextAngle << "\n\n";
+
+        //textToWrite.push_back("odom = " + std::to_string(location.heading) + ", fodom = " + std::to_string(fixedOdomAngle) + "\n");
         //textToWrite.push_back("next = " + std::to_string(nextPoint.heading) + ", fnext = " + std::to_string(fixedNextAngle) + "\n\n");
         // rotation of the x, y, and heading errors to fit the local frame
             Pose error;
-            error.x = (std::cos(fixedOdomAngle) * (nextPoint.x - universalCurrentLocation.x)) + (std::sin(fixedOdomAngle)) * (nextPoint.y - universalCurrentLocation.y);
-            error.y = (std::cos(fixedOdomAngle) * (nextPoint.x - universalCurrentLocation.x)) - std::sin(fixedOdomAngle) * (nextPoint.y - universalCurrentLocation.y);
+            error.x = (std::cos(fixedOdomAngle) * (nextPoint.x - location.x)) + (std::sin(fixedOdomAngle) * (nextPoint.y - location.y));
+            error.y = (std::cos(fixedOdomAngle) * (nextPoint.x - location.x)) - (std::sin(fixedOdomAngle) * (nextPoint.y - location.y));
             error.heading = fixedNextAngle - fixedOdomAngle;
-            //std::cout << error.heading << "\n";
+            // std::cout << error.heading << "\n";
 
         // bounds the error from 0-180 to prevent the correction from being an un-optimal turn direction (where going the other way would be faster)
-            if (error.heading < -180) {
-                error.heading = error.heading + 360;
-            } else if (error.heading > 180) {
-                error.heading = 360 - error.heading;
+            if (error.heading < -M_PI) {
+                error.heading = error.heading + (2 * M_PI);
+            } else if (error.heading > M_PI) {
+                error.heading = (2 * M_PI) - error.heading;
             }
 
-            // std::cout << "prp = " << fixedNextAngle << ", ap = " << fixedOdomAngle << ", c = " << error.heading << "\n";
-            std::cout << "ucl = " << universalCurrentLocation.heading << ", actual = " << getAggregatedHeading(Kalman1, Kalman2) << ", used = " << fixedOdomAngle << "\n";
-
-            if ((error.heading < 2.5) && (error.heading > -2.5)) {
-                error.heading = 0;
-            }
+            //std::cout << "prp = " << fixedNextAngle << ", ap = " << fixedOdomAngle << ", c = " << error.heading << "\n";
+            //std::cout << "ucl = " << location.heading << ", actual = " << getAggregatedHeading(Kalman1, Kalman2) << ", used = " << fixedOdomAngle << "\n";
 
         // tuning constants (current values are from the widely accepted defaults from FTCLib)
             double b = 2.0; // this is a proportional gain for each of the different error elements of the controller (put into the gain value calculations)
@@ -129,7 +132,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
             // the special gain value is used for the y-value, and it is also scaled with the part in purple parenthesis to let it switch directions smoothly if it is past
             // its goal point; the second part is the same simple direct angular movement for the error in heading that is used in the same way with the x-value for linear
             // movement
-            double u2 = /* (k2 * (std::sin(error.heading) / error.heading) * error.y) + */ (k * error.heading);
+            double u2 = (k2 * (std::sin(error.heading) / error.heading) * error.y) + (k * error.heading);
 
         // actual calculations of modified linear and angular velocities as additions/subtractions to the profile's original values
             // the original linear velocity is also transformed to follow the robot's error in heading before having the control input subtracted from it
@@ -137,14 +140,33 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
             // the angular velocity does not need to be transformed in the same way that the linear velocity needs to because it is already angular in reference to the robot
             angVel = currentPoint.angVel + u2;
 
+            linVel *= 39.37008;
+
         // recalculates the delay, as it may change due to the RAMSETE controller modifying the robot's movement
-            double newDistance = calculateDistance({universalCurrentLocation.x, universalCurrentLocation.y}, {nextPoint.x, nextPoint.y});
-            double newDelay = newDistance / linVel;
+            double newDistance = std::fabs(error.heading * (linVel / angVel));
+            double newDelay = newDistance / std::fabs(linVel);
             delay = newDelay * 1000;
 
             // textToWrite.push_back("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
-            // std::cout << ("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
-            //std::cout << "nd = " << delay << "\n";
+            //std::cout << ("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
+            /*
+            if (delay > 100) {
+                std::cout << "PSYCHOPATH VALUES AHEAD: \n";
+                std::cout << "nd = " << delay << "\n";
+                std::cout << "t = " << sum << "\n";
+                std::cout << ("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
+                std::cout << "ucl = " << location.heading << ", actual = " << getAggregatedHeading(Kalman1, Kalman2) << ", used = " << fixedOdomAngle << ", desired = " << fixedNextAngle << "\n\n";
+            } else {
+                std::cout << "nd = " << delay << "\n\n";
+            }
+            */
+            if (delay < 5) {
+                delay = 5;
+            }
+
+            std::cout << "linv = " << linVel << ", prolinv = " << currentPoint.linVel << "\n";
+            std::cout << "angv = " << angVel << ", proangv = " << currentPoint.angVel << "\n\n";
+            
         }
 
         // standard calculation of output of each side based on specifications of the motion profile
@@ -168,7 +190,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // LOGGING FOR TEST PURPOSES
         //std::cout << timeAtCurrentVelocity << "\n";
-        //textToWrite.push_back("ix = " + std::to_string(currentPoint.x) + ", iy = " + std::to_string(currentPoint.y) + ", ihead = " + std::to_string(currentPoint.heading) + "\n" + "ax = " + std::to_string(universalCurrentLocation.x) + ", ay = " + std::to_string(universalCurrentLocation.y) + ", ahead = " + std::to_string(universalCurrentLocation.heading) + "\n" + std::to_string(currentPoint.t) + "\n\n");
+        //textToWrite.push_back("ix = " + std::to_string(currentPoint.x) + ", iy = " + std::to_string(currentPoint.y) + ", ihead = " + std::to_string(currentPoint.heading) + "\n" + "ax = " + std::to_string(location.x) + ", ay = " + std::to_string(location.y) + ", ahead = " + std::to_string(location.heading) + "\n" + std::to_string(currentPoint.t) + "\n\n");
         // textToWrite.push_back("il = " + std::to_string(currentPoint.linVel) + ", ia = " + std::to_string(currentPoint.angVel) + "\nal = " + std::to_string(linVel) + ", aa = " + std::to_string(angVel) + "\n\n");
         //std::cout << "lvol = " << velocitiesRPM[0] * rpmToV << ", rvol = " << velocitiesRPM[1] * rpmToV << "\n";
         // std::cout << "lv = " << linVel << ", rv = " << angVel << "\n\n";
@@ -177,9 +199,9 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         //std::cout << "step = " << currentStep << "\n";
         //std::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
         // std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
-        //logfile.appendFile("x = " + std::to_string(universalCurrentLocation.x) + ", should be " + std::to_string(currentPoint.x) + "\n");
-        //logfile.appendFile("y = " + std::to_string(universalCurrentLocation.y) + ", should be " + std::to_string(currentPoint.y) + "\n");
-        //logfile.appendFile("h = " + std::to_string(universalCurrentLocation.heading + ", should be " + std::to_string(currentPoint.heading));
+        //logfile.appendFile("x = " + std::to_string(location.x) + ", should be " + std::to_string(currentPoint.x) + "\n");
+        //logfile.appendFile("y = " + std::to_string(location.y) + ", should be " + std::to_string(currentPoint.y) + "\n");
+        //logfile.appendFile("h = " + std::to_string(location.heading + ", should be " + std::to_string(currentPoint.heading));
         //logfile.appendFile("lvol = " + std::to_string(leftDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[0] * rpmToV) + "\n" + "rvol = " + std::to_string(rightDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[1] * rpmToV) + "\n\n");
         //std::cout << "t = " << std::to_string(currentPoint.t) << ", time = " << std::to_string(((double) pros::millis() - (double) startTime) / 1000) << "\n";
         //std::cout << (pros::micros() - timeTrack) / 1000 << " is calc\n";
