@@ -62,6 +62,8 @@
 // using namespace pros::literals;
 // using namespace okapi;
 
+#define waitUntil(condition) while (!(condition)) { pros::delay(50); }
+
 /**
  * Prototypes for the competition control tasks are redefined here to ensure
  * that they can be called from user code (i.e. calling autonomous from a

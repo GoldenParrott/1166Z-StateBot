@@ -83,6 +83,9 @@
     Point endCoords;
     bool endReverse;
     bool endended;
+    
+    //For Autonomous Selector
+    pros::screen_touch_status_s_t status;
 
     Pose universalCurrentLocation = {0, 0};
 
