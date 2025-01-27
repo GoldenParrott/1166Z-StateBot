@@ -133,7 +133,7 @@ class VelocityController {
         double angVel;
         std::vector<double> FINDME;
         VelocityController(double wheelDiameter, double distBetweenWheels, double gearRatio, double maxRPM);
-        void startQueuedProfile(bool RAMSETE);
+        void startQueuedProfile(bool RAMSETE, bool reverse);
         void endProfile(void);
         void queueProfile(MotionProfile* profile);
         void addAction(std::function<void(void)> action, double time);
@@ -142,7 +142,7 @@ class VelocityController {
     private:
         std::vector<double> calculateOutputOfSides(double linearVelocityMPS, double angularVelocityRADPS);
         double calculateSingleDegree(double wheelDiameter);
-        void followProfile(MotionProfile profile, bool RAMSETE);
+        void followProfile(MotionProfile profile, bool RAMSETE, bool reverse);
         
         double wheelDiameter;
         double distBetweenWheels;

@@ -76,7 +76,7 @@ void competition_initialize() {
 		}
 	} */
 
-	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 0);
+	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 90);
 
 	pros::delay(10);
 }
@@ -119,21 +119,24 @@ void autonomous() {
 
     // ROBOT CONFIG
     double gearRatio = 0.75;
-    double maxRPM = 600;
+    double maxRPM = 300;
     double diameter = 3.25;
     double distBetweenWheels = 10.5;
 
-    double maxSpeed = RPMtoIPS(300, gearRatio, diameter); // in meters per second
+    double maxSpeed = RPMtoIPS(600, gearRatio, diameter); // in meters per second
 
 	leftDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 	rightDrivetrain.set_brake_mode(pros::MotorBrake::hold);
     
-    CubicHermiteSpline mySpline = CubicHermiteSpline({0, 0}, {0, 300}, {48, 0}, {48, -12});
-    MotionProfile* myProfile = new MotionProfile(&mySpline, maxSpeed);
+    CubicHermiteSpline mySpline = CubicHermiteSpline({0, 0}, {0, 200}, {48, 48}, {72, 48});
+	CubicHermiteSpline horizSpline = CubicHermiteSpline({0, 0}, {0, 0}, {-48, 0}, {-48, 0});
+    MotionProfile* myProfile = new MotionProfile(&horizSpline, 
+	// {{{0, 0.1}, {0.1, 1}}, {{0.1, 1}, {0.3, 1}}, {{0.3, 1}, {0.5, 0.5}}, {{0.5, 0.5}, {0.7, 0.5}}, {{0.7, 0.5}, {0.8, 1}}, {{0.8, 1}, {1, 0}}},
+	 maxSpeed);
     VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
     myController.queueProfile(myProfile);
 	std::cout << "hi" << "\n";
-    myController.startQueuedProfile(true);
+    myController.startQueuedProfile(true, true);
 
 
 	master.print(0, 0, "%d", (int) textToWrite.size());

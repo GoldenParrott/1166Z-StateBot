@@ -46,7 +46,7 @@ double VelocityController::calculateSingleDegree(double wheelDiameter) {
 }
 
 // (private)
-void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RAMSETE)
+void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RAMSETE, bool reverse)
 {
     // step-related variables
     double currentStep = 0;
@@ -87,6 +87,13 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // calculation of output of each side with error corrections from RAMSETE
         if (RAMSETE) {
+        if (reverse) {
+            if (nextPoint.heading > 180) {
+                nextPoint.heading -= 180;
+            } else {
+                nextPoint.heading += 180;
+            }
+        }
             Pose location = {universalCurrentLocation.x * 0.0254, universalCurrentLocation.y * 0.0254, universalCurrentLocation.heading};
             nextPoint = currentlyFollowing.findNearestPoint(currentStep + step);
             nextPoint = {nextPoint.x * 0.0254, nextPoint.y * 0.0254, nextPoint.heading};
@@ -102,9 +109,11 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         // rotation of the x, y, and heading errors to fit the local frame
             Pose error;
             error.x = (std::cos(fixedOdomAngle) * (nextPoint.x - location.x)) + (std::sin(fixedOdomAngle) * (nextPoint.y - location.y));
-            error.y = (std::cos(fixedOdomAngle) * (nextPoint.x - location.x)) - (std::sin(fixedOdomAngle) * (nextPoint.y - location.y));
+            error.y = (std::cos(fixedOdomAngle) * (nextPoint.y - location.y)) - (std::sin(fixedOdomAngle) * (nextPoint.x - location.x));
             error.heading = fixedNextAngle - fixedOdomAngle;
             // std::cout << error.heading << "\n";
+
+            linVel *= 0.0254;
 
         // bounds the error from 0-180 to prevent the correction from being an un-optimal turn direction (where going the other way would be faster)
             if (error.heading < -M_PI) {
@@ -136,7 +145,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // actual calculations of modified linear and angular velocities as additions/subtractions to the profile's original values
             // the original linear velocity is also transformed to follow the robot's error in heading before having the control input subtracted from it
-            linVel = (currentPoint.linVel * std::cos(error.heading)) + u1;
+            linVel = ((currentPoint.linVel * 0.0254) * std::cos(error.heading)) + u1;
             // the angular velocity does not need to be transformed in the same way that the linear velocity needs to because it is already angular in reference to the robot
             angVel = currentPoint.angVel + u2;
 
@@ -157,12 +166,16 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
                 std::cout << ("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
                 std::cout << "ucl = " << location.heading << ", actual = " << getAggregatedHeading(Kalman1, Kalman2) << ", used = " << fixedOdomAngle << ", desired = " << fixedNextAngle << "\n\n";
             } else {
-                std::cout << "nd = " << delay << "\n\n";
+                */std::cout << "nd = " << delay << "\n";/*
             }
             */
-            if (delay < 5) {
+            
                 delay = 5;
-            }
+            
+
+            std::cout << "ex = " << error.x << "\ney = " << error.y << "\neh = " << error.heading << "\n\n";
+
+            std::cout << "k = " << k << "\nk2 = " << k2 << "\n\n";
 
             std::cout << "linv = " << linVel << ", prolinv = " << currentPoint.linVel << "\n";
             std::cout << "angv = " << angVel << ", proangv = " << currentPoint.angVel << "\n\n";
@@ -185,8 +198,13 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         double rpmToV = maxVoltage / this->maxRPM; // multiplier to convert rpm to voltage (in units of millivoltage / rpm so multiplying it by rpm cancels to millivoltage)
 
         // sends the output voltage to the motors
-        leftDrivetrain.move_voltage(velocitiesRPM[0] * rpmToV);
-        rightDrivetrain.move_voltage(velocitiesRPM[1] * rpmToV);
+        if (reverse && !RAMSETE) {
+            leftDrivetrain.move_voltage(-velocitiesRPM[1] * rpmToV);
+            rightDrivetrain.move_voltage(-velocitiesRPM[0] * rpmToV);
+        } else {
+            leftDrivetrain.move_voltage(velocitiesRPM[0] * rpmToV);
+            rightDrivetrain.move_voltage(velocitiesRPM[1] * rpmToV);
+        }
 
         // LOGGING FOR TEST PURPOSES
         //std::cout << timeAtCurrentVelocity << "\n";
@@ -228,13 +246,13 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 }
 
 // starts the filter loop if it is not already active (public)
-void VelocityController::startQueuedProfile(bool RAMSETE) {
+void VelocityController::startQueuedProfile(bool RAMSETE, bool reverse) {
 
     // auto controlLoopFunction = [this, path, RAMSETE] () {return this->followProfile(*this->queuedProfile, path, RAMSETE);};
 
     if (controlLoop_task_ptr == NULL) {
         // pros::Task* controlLoop_task_ptr = new pros::Task(controlLoopFunction);
-        this->followProfile(*this->queuedProfile, RAMSETE);
+        this->followProfile(*this->queuedProfile, RAMSETE, reverse);
     }
 }
 
