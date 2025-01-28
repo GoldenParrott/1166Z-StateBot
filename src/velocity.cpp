@@ -5,7 +5,7 @@ VelocityController::VelocityController(double wheelDiameter, double distBetweenW
     this->distBetweenWheels = distBetweenWheels;
     this->gearRatio = gearRatio;
     this->maxRPM = maxRPM;
-    this->actions = {[](){master.rumble(".");pros::lcd::print(0, "0.25");}, [](){master.rumble(".");pros::lcd::print(1, "0,5");}, [](){master.rumble(".");pros::lcd::print(2, "0.9");}};
+    this->actions = {[](){master.rumble(".");pros::lcd::print(0, "0.25");}, [](){master.rumble(".");pros::lcd::print(1, "0,5");intake.move(128);}, [](){master.rumble(".");pros::lcd::print(2, "0.9");}};
     this->actionTs = {0.25, 0.5, 0.9};
 }
 
@@ -87,16 +87,18 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // calculation of output of each side with error corrections from RAMSETE
         if (RAMSETE) {
-        if (reverse) {
-            if (nextPoint.heading > 180) {
-                nextPoint.heading -= 180;
-            } else {
-                nextPoint.heading += 180;
-            }
-        }
             Pose location = {universalCurrentLocation.x * 0.0254, universalCurrentLocation.y * 0.0254, universalCurrentLocation.heading};
             nextPoint = currentlyFollowing.findNearestPoint(currentStep + step);
             nextPoint = {nextPoint.x * 0.0254, nextPoint.y * 0.0254, nextPoint.heading};
+
+            if (reverse) {
+                linVel *= -1;
+                if (nextPoint.heading > 180) {
+                    nextPoint.heading -= 180;
+                } else {
+                    nextPoint.heading += 180;
+                }
+            }
 
             double fixedOdomAngle = fixAngle(location.heading) * (M_PI / 180);
             double fixedNextAngle = fixAngle(nextPoint.heading) * (M_PI / 180);
@@ -205,7 +207,6 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
             leftDrivetrain.move_voltage(velocitiesRPM[0] * rpmToV);
             rightDrivetrain.move_voltage(velocitiesRPM[1] * rpmToV);
         }
-
         // LOGGING FOR TEST PURPOSES
         //std::cout << timeAtCurrentVelocity << "\n";
         //textToWrite.push_back("ix = " + std::to_string(currentPoint.x) + ", iy = " + std::to_string(currentPoint.y) + ", ihead = " + std::to_string(currentPoint.heading) + "\n" + "ax = " + std::to_string(location.x) + ", ay = " + std::to_string(location.y) + ", ahead = " + std::to_string(location.heading) + "\n" + std::to_string(currentPoint.t) + "\n\n");
