@@ -123,7 +123,7 @@ void autonomous() {
     double diameter = 3.25;
     double distBetweenWheels = 10.5;
 
-    double maxSpeed = RPMtoIPS(300, gearRatio, diameter); // in meters per second
+    double maxSpeed = RPMtoIPS(600, gearRatio, diameter); // in meters per second
 
 	leftDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 	rightDrivetrain.set_brake_mode(pros::MotorBrake::hold);
@@ -131,7 +131,8 @@ void autonomous() {
     CubicHermiteSpline mySpline = CubicHermiteSpline({0, 0}, {0, 200}, {48, 48}, {72, 48});
 	CubicHermiteSpline horizSpline = CubicHermiteSpline({0, 0}, {0, 0}, {-60, 0}, {-60, 0});
     MotionProfile* myProfile = new MotionProfile(&horizSpline,
-	// {{{0, 0.2}, {0.2, 1}}, {{0.1, 1}, {0.3, 1}}, {{0.3, 1}, {0.5, 0.5}}, {{0.5, 0.5}, {0.7, 0.5}}, {{0.7, 0.5}, {0.8, 1}}, {{0.8, 1}, {1, 0}}},
+	// {{{0, 0.2}, {0.2, 1}}, {{0.2, 1}, {0.3, 1}}, {{0.3, 1}, {0.5, 0.5}}, {{0.5, 0.5}, {0.7, 0.5}}, {{0.7, 0.5}, {0.8, 1}}, {{0.8, 1}, {1, 0}}},
+	{{{0, 1}, {1, 1}}},
 	 maxSpeed);
     VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
     myController.queueProfile(myProfile);
@@ -141,7 +142,7 @@ void autonomous() {
 
 	master.print(0, 0, "%d", (int) textToWrite.size());
 
-				for (int i = 0; i < textToWrite.size(); i++) {
+	for (int i = 0; i < textToWrite.size(); i++) {
 		std::cout << textToWrite[i];
 	}
 }

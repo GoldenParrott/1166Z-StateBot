@@ -51,7 +51,7 @@ Line findLineWithPoints(
 
     if (point2.y - point1.y == 0) {
         Line1.slope = 0;
-        Line1.yIntercept = point1.x;
+        Line1.yIntercept = point1.y;
         return Line1;
     }
     else if (point2.x - point1.x == 0) {

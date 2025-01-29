@@ -56,6 +56,9 @@ void MotionProfile::constructWithCustomZones(std::vector<std::vector<Point>> zon
             return;
         }
     }
+    for (int i = 0; i < zones.size(); i++) {
+        std::cout << "start t = " << zones[i].startT << ", end t = " << zones[i].endT << "; y = " << zones[i].zoneLine.slope << "x + " << zones[i].zoneLine.yIntercept << "\n";
+    }
     return;
 }
 
@@ -82,6 +85,7 @@ void MotionProfile::generateVelocities(std::vector<UltraPose> pointList) {
         // velocity calculations
         // the zone line is solved for at the point t to find the velocity multiplier
         double linearVelocityMultiplier = (assignedZone.zoneLine.slope * t) + assignedZone.zoneLine.yIntercept;
+        // if (pointList.size() != 1000) {std::cout << linearVelocityMultiplier << ", t = " << t << "\n";}
         // the linear velocity is simply the multiplier (which is a percentage) of the maximum speed allowed by the profile
         double linearVelocity = linearVelocityMultiplier * this->maxSpeed;
         // the angular velocity is the curvature of the current point multiplied by the current linear velocity
