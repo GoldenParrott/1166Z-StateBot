@@ -29,7 +29,7 @@ void disabled() {}
  */
 void competition_initialize() {
 
-	// autoSelector_task_ptr = new pros::Task(drawAutonSelector);
+	autoSelector_task_ptr = new pros::Task(drawAutonSelector);
 	autonnumber = -5;
 	globalAuton = false;
 
@@ -78,6 +78,7 @@ void competition_initialize() {
 	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 270);
 
 	pros::delay(10);
+	}
 }
 
 /**
@@ -162,7 +163,6 @@ void autonomous() {
  */
 void opcontrol() {
 
-	pros::Task makeImage(drawAutonSelector);
 
 	
 	//std::cout << logfile.readFile();
@@ -182,7 +182,6 @@ void opcontrol() {
 	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
 	while (true) {
 
-		status = pros::screen::touch_status();
 
 		/*
 	//Drivetrain Control 
