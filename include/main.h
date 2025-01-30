@@ -190,5 +190,8 @@ double readOdomAngle(pros::Rotation turnOdom);
 double getAggregatedHeading(KalmanFilter inertial1, KalmanFilter inertial2);
 void bindTurnTrackingWheelHeading();
 
+// sidetasks.cpp
+void ArmMacros(void);
+void eject(void);
 
 #endif  // _PROS_MAIN_H_

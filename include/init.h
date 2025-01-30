@@ -55,6 +55,8 @@
 
     extern pros::Task* controlLoop_task_ptr;
     extern pros::Task* coordinateUpdater_task_ptr;
+    extern pros::Task* macros_task_ptr;
+    extern pros::Task* eject_task_ptr;
     extern pros::Task* rotationalBinder_task_ptr ;
     extern pros::Task* autoSelector_task_ptr;
     extern pros::Task* loggingEnabled_task_ptr;

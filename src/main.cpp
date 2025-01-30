@@ -180,7 +180,10 @@ void opcontrol() {
 	int drvfb;
 	int drvlr;
 	int drvtrdz = 10;
-	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
+	
+	//coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
+	//eject_task_ptr = new pros::Task(eject);
+	//macros_task_ptr = new pros::Task(ArmMacros);
 	while (true) {
 
 

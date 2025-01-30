@@ -4,8 +4,9 @@
 void ArmMacros() {
 	bool armMoving = false;
 	int armStartPoint = 0;
-
+	master.print(0, 0, "entered");
     while (true) {
+		
 		int varSpeed = 128;
 		int slowdown = 2;
 		// scores the arm on a Wall Stake and then retracts to its original position
@@ -28,17 +29,25 @@ void ArmMacros() {
                 }
             }
         }
+	pros::delay(10);
     }
+	
 }
 
 void eject() {
 	bool ejectOn = false;
 	int ejectStartPoint = 0;
+	autonnumber = 1;
+	master.print(0, 0, "entered");
+
 	if(autonnumber < 0){
 		master.print(0,0,"Scoring Red ",NULL);
 	}else if(autonnumber > 0){
 		master.print(0,0,"Scoring Blue ",NULL);
 	}
+
+	
+
 	while (true) {
 		// distance sensor (eject)
 		// Changes the eject to be for the opposite color when the button is pressed
@@ -86,6 +95,7 @@ void eject() {
 			}
 		pros::delay(20);
 		}
+	pros::delay(10);
 	}
 }
 
