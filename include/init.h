@@ -34,10 +34,12 @@
         extern pros::adi::DigitalOut clamp;
         extern pros::adi::DigitalOut yoin;
         extern pros::adi::DigitalOut ker;
+        extern pros::adi::DigitalOut inPutston;
 
     // Rotational Sensors
         extern pros::Rotation Rotational;
         extern pros::Rotation RotationalTurn;
+        extern pros::Rotation ArmRotational;
 
     // Other Sensors
         extern pros::Optical colorSense;

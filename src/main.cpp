@@ -78,7 +78,6 @@ void competition_initialize() {
 	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 270);
 
 	pros::delay(10);
-	}
 }
 
 /**
@@ -175,7 +174,7 @@ void opcontrol() {
 	arm.set_brake_mode(pros::E_MOTOR_BRAKE_HOLD);
 	bool clampOn = true;
 
-	// Drving variables
+	// Driving variables
 	int drvfb;
 	int drvlr;
 	int drvtrdz = 10;
@@ -183,13 +182,13 @@ void opcontrol() {
 	while (true) {
 
 
-		/*
+	
 	//Drivetrain Control 
 		drvfb = master.get_analog(ANALOG_LEFT_Y);
 		drvlr = master.get_analog(ANALOG_RIGHT_X);
 
 		if ((abs(drvfb) > drvtrdz) || (abs(drvlr) > drvtrdz)) {
-      		// ^^ Checks to see if either joystick has moved out of the deadzone
+      		// ^^ Checks to see if either joystick has moved out of the deadzMasterone
 			rightDrivetrain.move((drvfb-(drvlr)));
       		leftDrivetrain.move((drvfb+(drvlr)));	
     	} else {
@@ -218,11 +217,11 @@ void opcontrol() {
 		}
 
 	//Arm Control
-		if(master.get_digital(DIGITAL_Y))
+		if(master.get_digital(DIGITAL_UP))
 		{
 			arm.move(127);
 		}
-		else if(master.get_digital(DIGITAL_B))
+		else if(master.get_digital(DIGITAL_LEFT))
 		{
 			arm.move(-127);
 		}
@@ -265,7 +264,16 @@ void opcontrol() {
 				ker.set_value(false);
 			}
 		}
-		*/
+
+		// Input Raiser
+		if (master.get_digital_new_press(DIGITAL_A)) {
+			if (!inPutston.get_value()) {
+				inPutston.set_value(true);
+			} else {
+				inPutston.set_value(false);
+			}
+		}
+		
 		pros::delay(20);
 	}
 }
