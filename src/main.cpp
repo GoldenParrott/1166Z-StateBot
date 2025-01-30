@@ -29,11 +29,12 @@ void disabled() {}
  */
 void competition_initialize() {
 
-	autoSelector_task_ptr = new pros::Task(drawAutonSelector);
+	//autoSelector_task_ptr = new pros::Task(drawAutonSelector);
 	autonnumber = -5;
 	globalAuton = false;
 
-	/*
+	pros::Task task(drawAutonSelector);
+
 	while (true) {
 		if (globalAuton == true) {
 			switch (autonnumber) {
@@ -73,11 +74,12 @@ void competition_initialize() {
 					break;
 			}
 		}
-	} */
-
+	status = pros::screen::touch_status();
 	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 270);
-
 	pros::delay(10);
+
+	}
+	
 }
 
 /**
