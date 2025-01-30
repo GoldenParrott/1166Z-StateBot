@@ -81,7 +81,10 @@
     extern Point endCoords;
     extern bool endReverse;
     extern bool endended;
-
+    
+    //For Autonomous Selector
+    extern pros::screen_touch_status_s_t status;
+    
 // declared in initialize(), not init.cpp
     extern Pose universalCurrentLocation;
 

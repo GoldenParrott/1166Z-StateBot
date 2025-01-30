@@ -8,7 +8,6 @@
  */
 void initialize() {
 
-	pros::lcd::initialize();
 	
 }
 
@@ -162,6 +161,10 @@ void autonomous() {
  * task, not resume it from where it left off.
  */
 void opcontrol() {
+
+	pros::Task makeImage(drawAutonSelector);
+
+	
 	//std::cout << logfile.readFile();
 	master.print(0, 0, "sup");
 
@@ -176,8 +179,12 @@ void opcontrol() {
 	int drvfb;
 	int drvlr;
 	int drvtrdz = 10;
-coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
+	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
 	while (true) {
+
+		status = pros::screen::touch_status();
+
+		/*
 	//Drivetrain Control 
 		drvfb = master.get_analog(ANALOG_LEFT_Y);
 		drvlr = master.get_analog(ANALOG_RIGHT_X);
@@ -259,7 +266,7 @@ coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
 				ker.set_value(false);
 			}
 		}
-		
+		*/
 		pros::delay(20);
 	}
 }
