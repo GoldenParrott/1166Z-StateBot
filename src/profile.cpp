@@ -12,7 +12,7 @@ MotionProfile::MotionProfile(CubicHermiteSpline* path, double maxSpeed) {
         {0.9, 1, {-10, 10}}
     };
     // ends by creating the profile
-    this->createProfile();
+    this->generateVelocities();
 }
 
 MotionProfile::MotionProfile(CubicHermiteSpline* path, std::vector<std::vector<Point>> zonePoints, double maxSpeed) {
@@ -22,7 +22,7 @@ MotionProfile::MotionProfile(CubicHermiteSpline* path, std::vector<std::vector<P
     // custom velocity zoning
     this->constructWithCustomZones(zonePoints);
     // ends by creating the profile
-    this->createProfile();
+    this->generateVelocities();
 }
 
 
@@ -47,7 +47,7 @@ void MotionProfile::constructWithCustomZones(std::vector<std::vector<Point>> zon
         }
         // if a point doesn't have a valid zone, the default zoning is used instead
         if (std::isnan(assignedZone.startT)) {
-            pros::lcd::print(0, "Invalid velocity zoning! Using default as substitute.");
+            // pros::lcd::print(0, "Invalid velocity zoning! Using default as substitute.");
             this->zones = {
                 {0, 0.1, {9, 0.1}},
                 {0.1, 0.9, {0, 1}},
@@ -62,63 +62,65 @@ void MotionProfile::constructWithCustomZones(std::vector<std::vector<Point>> zon
     return;
 }
 
-void MotionProfile::generateVelocities(std::vector<UltraPose> pointList) {
-    for (int i = 0; i < pointList.size(); i++) {
+void MotionProfile::generateVelocities() {
+    UltraPose currentPoint = this->path->findUltraPose(0, 0.0001);
+    double currentT = 0;
+    double prevT = -0.0001;
+    while (true) {
 
-        double t = i / (double) pointList.size();
         Zone assignedZone = {NAN, NAN, {NAN, NAN}};
 
         // iterates through the zones until the one that contains the current point's t value is found
         for (int j = 0; j < this->zones.size(); j++) {
-            if ((this->zones[j].startT <= t) && (this->zones[j].endT >= t)) {
+            if ((this->zones[j].startT <= currentT) && (this->zones[j].endT >= currentT)) {
                 assignedZone = this->zones[j];
             }
         }
 
         // determines the direction of the curve by examining whether the heading is changing to the right or to the left
-        Pose prevPoint = this->path->findPose(t - (1 / (double) pointList.size()), (1 / (double) pointList.size()));
+        Pose prevPoint = this->path->findPose(prevT, 0.0001);
         double dir;
-        if (prevPoint.heading > pointList[i].heading) {dir = 1;}
-        else if (pointList[i].heading > prevPoint.heading) {dir = -1;}
+        if (prevPoint.heading > currentPoint.heading) {dir = 1;}
+        else if (currentPoint.heading > prevPoint.heading) {dir = -1;}
         else {dir = 0;}
 
         // velocity calculations
         // the zone line is solved for at the point t to find the velocity multiplier
-        double linearVelocityMultiplier = (assignedZone.zoneLine.slope * t) + assignedZone.zoneLine.yIntercept;
+        double linearVelocityMultiplier = (assignedZone.zoneLine.slope * currentT) + assignedZone.zoneLine.yIntercept;
         // if (pointList.size() != 1000) {std::cout << linearVelocityMultiplier << ", t = " << t << "\n";}
         // the linear velocity is simply the multiplier (which is a percentage) of the maximum speed allowed by the profile
         double linearVelocity = linearVelocityMultiplier * this->maxSpeed;
         // the angular velocity is the curvature of the current point multiplied by the current linear velocity
-        double angularVelocity = linearVelocity * pointList[i].curvature * dir; //* (double) curveDirection;
+        double angularVelocity = linearVelocity * this->path->calculateCurvature(currentT) * dir; //* (double) curveDirection;
 
+        // notes the t from the current cycle for use in the profile list and for the next cycle
+        prevT = currentT;
         
-        profile.push_back({pointList[i].x, pointList[i].y, pointList[i].heading, linearVelocity, angularVelocity, t});
+        // adds the new velocities and point as the next profile point
+        profile.push_back({currentPoint.x, currentPoint.y, currentPoint.heading, linearVelocity, angularVelocity, prevT});
+
+        // redefines the current point to the next point for the next loop
+        currentPoint.x = currentPoint.x + ((linearVelocity * 0.005) * std::cos(fixAngle(currentPoint.heading) * (M_PI / 180)));
+        currentPoint.y = currentPoint.y + ((linearVelocity * 0.005) * std::sin(fixAngle(currentPoint.heading) * (M_PI / 180)));
+        currentT = this->path->findNearestPointOnSpline({currentPoint.x, currentPoint.y}, prevT);
+
+        // std::cout << "cx = " << currentT << ", cy = " << currentT << "\n";
+
+        std::cout << "r = " << (linearVelocity * 0.005) << "\n";
+
+        std::cout << "Working... t=" << currentT << "\n";
+
+        //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
+
+        currentPoint = this->path->findUltraPose(currentT, 0.0001);
+
+
+        //    std::cout << "Working... t = " << currentT << "\n";
+
+        if (currentT >= 1) {
+            break;
+        }
     }
-}
-
-void MotionProfile::createProfile(void) {
-    // first, creates the profile with 1000 points as a baseline
-    double numPoints = 1000;
-    double step = 1 / numPoints;
-    std::vector<UltraPose> pointList = this->path->entirePath(numPoints);
-    this->generateVelocities(pointList);
-
-    // second, calculates the total time and length of the profile
-    double totalTime = 0;
-    double totalLength = 0;
-    double segLength = 0;
-    for (int i = 0; i < pointList.size() - 1; i += 1) {
-        segLength = calculateDistance({this->profile[i].x, this->profile[i].y}, {this->profile[i+1].x, this->profile[i+1].y});
-        totalTime += segLength / this->profile[i].linVel;
-        totalLength += segLength;
-    }
-
-    // third and finally, recalculates the profile with a variable number of points, equally spaced out at intervals of 5 ms
-    int trueNumPoints = std::round((totalTime * 1000) / 5);
-    pointList.clear();
-    profile.clear();
-    pointList = this->path->entirePath(trueNumPoints);
-    this->generateVelocities(pointList);
 }
 
 // given a value of t on the profile, finds the profile's closest generated point

@@ -9,6 +9,8 @@ CubicHermiteSpline::CubicHermiteSpline(Point startPos, Point startV, Point endPo
     this->findFunction();
     this->findDerivative();
     this->findSecondDerivative();
+    
+    this->fullSampleSpline = this->entirePath(10000);
 }
 
 double CubicHermiteSpline::evaluateP0(double t) {
@@ -197,4 +199,24 @@ double CubicHermiteSpline::calculateCurvature(double t) {
     double curvature = (std::abs((derivativeX * solvedSDY) - (derivativeY * solvedSDX))) / std::pow(std::sqrt((std::pow(derivativeX, 2) + std::pow(derivativeY, 2))), 3);
 
     return curvature;
+}
+
+// given a point, finds the nearest point to that point on the profile and returns its t
+double CubicHermiteSpline::findNearestPointOnSpline(Point givenPoint, double excludeBelow) {
+    double closestT = -1;
+    double currentT = 0;
+    double closestDistance = 10000;
+    double currentDistance = 0;
+    for (int i = 0; i < fullSampleSpline.size(); i++) {
+        currentDistance = calculateDistance(givenPoint, {fullSampleSpline[i].x, fullSampleSpline[i].y});
+        currentT = (i + 1) / (double) fullSampleSpline.size();
+        if ((currentDistance < closestDistance) && (currentT > excludeBelow)) {
+            closestT = currentT;
+            closestDistance = currentDistance;
+        }
+        if ((currentT - closestT > 0.01) && (closestT != -1)) {
+            break;
+        }
+    }
+    return closestT;
 }

@@ -174,14 +174,14 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
             
                 delay = 5;
             
-/*
+
             std::cout << "ex = " << error.x << "\ney = " << error.y << "\neh = " << error.heading << "\n\n";
 
             std::cout << "k = " << k << "\nk2 = " << k2 << "\n\n";
 
             std::cout << "linv = " << linVel << ", prolinv = " << currentPoint.linVel << "\n";
             std::cout << "angv = " << angVel << ", proangv = " << currentPoint.angVel << "\n\n";
-            */
+            
         }
 
         // standard calculation of output of each side based on specifications of the motion profile

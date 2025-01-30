@@ -82,10 +82,12 @@ class CubicHermiteSpline {
         void findDerivative(void);
         void findSecondDerivative(void);
         double calculateCurvature(double t);
+        double findNearestPointOnSpline(Point givenPoint, double excludeBelow);
 
         std::vector<CubicPolyData> functions;
         std::vector<QuadraticPolyData> derivative;
         std::vector<HexicPolyData> secondDerivative;
+        std::vector<UltraPose> fullSampleSpline;
 
 
     private:
@@ -109,16 +111,14 @@ class MotionProfile {
         // instance variables (data about profile)
         std::vector<MPPoint> profile;
         double maxSpeed;
-        double totalTime;
 
         // public methods (operations on points)
         MPPoint findNearestPoint(double givenT);
 
     private:
         // private methods (profile generation)
-        void generateVelocities(std::vector<UltraPose> pointList);
+        void generateVelocities(void);
         void constructWithCustomZones(std::vector<std::vector<Point>> zoneLinePoints);
-        void createProfile(void);
 
         // private instance variables (used in profile generation)
         CubicHermiteSpline* path;
