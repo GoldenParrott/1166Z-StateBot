@@ -1,37 +1,38 @@
 #include "init.h"
 
-
 void ArmMacros() {
-	bool armMoving = false;
-	int armStartPoint = 0;
-	master.print(0, 0, "entered");
     while (true) {
 		
-		int varSpeed = 128;
-		int slowdown = 2;
+	
 		// scores the arm on a Wall Stake and then retracts to its original position
 		if (master.get_digital(DIGITAL_Y)) {
-            armStartPoint = ArmRotational.get_position();
-			while (ArmRotational.get_position() < 1500) {
+			armMoving = true;
+			while (ArmRotational.get_position() > -14000) {
                 arm.move(127);
             }
-            while (ArmRotational.get_position() > armStartPoint) {
-                arm.move(-127);
+            while (ArmRotational.get_position() < -3000) {
+                arm.move(-32);
             }
+			arm.brake();
+			armMoving = false;
 		}
 		// puts the arm in a scoring position
-		else if (master.get_digital(DIGITAL_B)) {
-			while ((ArmRotational.get_position() > (50 - 5)) && (ArmRotational.get_position() < (50 + 5))) {
-                if (ArmRotational.get_position() < 50) {
-                    arm.move(64);
-                } else {
-                    arm.move(-64);
-                }
-            }
+		else if (master.get_digital_new_press(DIGITAL_B)) {
+			armMoving = true;
+			if(ArmRotational.get_position() > -1100){
+				while (ArmRotational.get_position() > -2000) {
+					arm.move(32);
+				}
+			}else{
+				while (ArmRotational.get_position() < 0) {
+					arm.move(-32);
+				}
+			}
+			arm.brake();
+			armMoving = false;
         }
 	pros::delay(10);
     }
-	
 }
 
 void eject() {
@@ -45,8 +46,6 @@ void eject() {
 	}else if(autonnumber > 0){
 		master.print(0,0,"Scoring Blue ",NULL);
 	}
-
-	
 
 	while (true) {
 		// distance sensor (eject)

@@ -78,6 +78,7 @@
     bool toggleColorSensor = false;
     int colorDelay = 0;
     bool ejectIsEjecting = false;
+    bool armMoving = false;
 
     bool presettingA = false;
     bool presettingX = false;
