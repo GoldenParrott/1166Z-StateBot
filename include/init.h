@@ -78,6 +78,7 @@
     extern bool toggleColorSensor;
     extern int colorDelay;
     extern bool ejectIsEjecting;
+    extern bool armMoving;
 
     extern bool presettingA;
     extern bool presettingX;

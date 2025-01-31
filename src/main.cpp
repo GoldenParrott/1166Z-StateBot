@@ -158,10 +158,10 @@ void opcontrol() {
 	
 	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
 	//eject_task_ptr = new pros::Task(eject);
-	//macros_task_ptr = new pros::Task(ArmMacros);
+	macros_task_ptr = new pros::Task(ArmMacros);
 	while (true) {
 
-
+		master.print(0,0,"%d \n",ArmRotational.get_position());
 	
 	//Drivetrain Control 
 		drvfb = master.get_analog(ANALOG_LEFT_Y);
@@ -205,7 +205,7 @@ void opcontrol() {
 		{
 			arm.move(-127);
 		}
-		else
+		else if(armMoving == false)
 		{
 			arm.brake();
 		}			
