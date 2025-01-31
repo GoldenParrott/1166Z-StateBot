@@ -107,6 +107,7 @@ class MotionProfile {
         // constructors (one with custom zoning, one without)
         MotionProfile(CubicHermiteSpline* path, double maxSpeed);
         MotionProfile(CubicHermiteSpline* path, std::vector<std::vector<Point>> zonePoints, double maxSpeed);
+        MotionProfile(std::vector<MPPoint>* pregeneratedProfile, double maxSpeed);
 
         // instance variables (data about profile)
         std::vector<MPPoint> profile;
@@ -132,27 +133,20 @@ class VelocityController {
         double linVel;
         double angVel;
         std::vector<double> FINDME;
-        VelocityController(double wheelDiameter, double distBetweenWheels, double gearRatio, double maxRPM);
-        void startQueuedProfile(bool RAMSETE, bool reverse);
-        void endProfile(void);
-        void queueProfile(MotionProfile* profile);
+        VelocityController(std::vector<std::function<void(void)>> actions = {}, std::vector<double> actionTs = {});
         void addAction(std::function<void(void)> action, double time);
+        void startProfile(MotionProfile* profile, bool reverse = false, bool RAMSETE = true);
 
 
     private:
-        std::vector<double> calculateOutputOfSides(double linearVelocityMPS, double angularVelocityRADPS);
+        std::vector<double> calculateOutputOfSides(double linearVelocityMPS, double angularVelocityRADPS, double profileMaxIPS);
         double calculateSingleDegree(double wheelDiameter);
-        void followProfile(MotionProfile profile, bool RAMSETE, bool reverse);
+        void followProfile(MotionProfile* profile, bool reverse, bool RAMSETE);
         
-        double wheelDiameter;
-        double distBetweenWheels;
         double timeToRun;
-        double gearRatio;
-        double maxRPM;
-        MotionProfile* queuedProfile;
         std::vector<double> actionTs;
         std::vector<std::function<void(void)>> actions;
-        // pros::Task* controlLoop_task_ptr = NULL;
+        std::vector<bool> actionCompleteds;
 };
 
 

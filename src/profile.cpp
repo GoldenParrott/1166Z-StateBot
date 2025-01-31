@@ -26,6 +26,15 @@ MotionProfile::MotionProfile(CubicHermiteSpline* path, std::vector<std::vector<P
 }
 
 
+// puts a previously generated profile into the motion profile class so it can be read as a normal motion profile
+MotionProfile::MotionProfile(std::vector<MPPoint>* pregeneratedProfile, double maxSpeed) {
+    this->path = NULL;
+    this->zones = {};
+    this->maxSpeed = maxSpeed;
+    this->profile = *pregeneratedProfile;
+}
+
+
 void MotionProfile::constructWithCustomZones(std::vector<std::vector<Point>> zoneLinePoints) {
     this->zones = {};
     Line currentZoneLine;

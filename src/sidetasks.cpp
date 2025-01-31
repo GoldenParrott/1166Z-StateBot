@@ -5,27 +5,29 @@ void ArmMacros() {
 	bool armMoving = false;
 	int armStartPoint = 0;
 	master.print(0, 0, "entered");
+	std::cout << "sup2\n";
+	ArmRotational.set_position(0);
     while (true) {
 		
 		int varSpeed = 128;
 		int slowdown = 2;
 		// scores the arm on a Wall Stake and then retracts to its original position
 		if (master.get_digital(DIGITAL_Y)) {
-            armStartPoint = ArmRotational.get_position();
-			while (ArmRotational.get_position() < 1500) {
+            armStartPoint = (ArmRotational.get_position() / 100);
+			while ((ArmRotational.get_position() / 100) < -140) {
                 arm.move(127);
             }
-            while (ArmRotational.get_position() > armStartPoint) {
+            while ((ArmRotational.get_position() / 100) > armStartPoint) {
                 arm.move(-127);
             }
 		}
 		// puts the arm in a scoring position
 		else if (master.get_digital(DIGITAL_B)) {
-			while ((ArmRotational.get_position() > (50 - 5)) && (ArmRotational.get_position() < (50 + 5))) {
-                if (ArmRotational.get_position() < 50) {
-                    arm.move(64);
+			while (((ArmRotational.get_position() / 100) > (-23 - 5)) && ((ArmRotational.get_position() / 100) < (-23 + 5))) {
+                if ((ArmRotational.get_position() / 100) < 50) {
+                    arm.move(127);
                 } else {
-                    arm.move(-64);
+                    arm.move(-127);
                 }
             }
         }
@@ -39,6 +41,7 @@ void eject() {
 	int ejectStartPoint = 0;
 	autonnumber = 1;
 	master.print(0, 0, "entered");
+	std::cout << "sup3\n";
 
 	if(autonnumber < 0){
 		master.print(0,0,"Scoring Red ",NULL);

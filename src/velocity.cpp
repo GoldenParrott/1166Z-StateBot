@@ -1,25 +1,22 @@
 #include "init.h"
 
-VelocityController::VelocityController(double wheelDiameter, double distBetweenWheels, double gearRatio, double maxRPM) {
-    this->wheelDiameter = wheelDiameter;
-    this->distBetweenWheels = distBetweenWheels;
-    this->gearRatio = gearRatio;
-    this->maxRPM = maxRPM;
-    this->actions = {[](){master.rumble(".");pros::lcd::print(0, "0.25");}, [](){master.rumble(".");pros::lcd::print(1, "0,5");intake.move(128);}, [](){master.rumble(".");pros::lcd::print(2, "0.9");}};
-    this->actionTs = {0.25, 0.5, 0.9};
+VelocityController::VelocityController(std::vector<std::function<void(void)>> actions, std::vector<double> actionTs) {
+    //this->actions = {[](){master.rumble(".");pros::lcd::print(0, "0.25");}, [](){master.rumble(".");pros::lcd::print(1, "0,5");intake.move(128);}, [](){master.rumble(".");pros::lcd::print(2, "0.9");}};
+    this->actions = actions;
+    this->actionTs = actionTs;
 }
 
 // uses the kinematic equations of a differential chassis and unit conversions to convert a linear and angular velocity to something that can be used
 // by each side of the drivetrain
-std::vector<double> VelocityController::calculateOutputOfSides(double linearVelocityIPS, double angularVelocityRADPS) {
+std::vector<double> VelocityController::calculateOutputOfSides(double linearVelocityIPS, double angularVelocityRADPS, double profileMaxIPS) {
     
-    double leftVelocityIPS = linearVelocityIPS - ((angularVelocityRADPS * this->distBetweenWheels) / 2); // lv = v - ((w * L) / 2)
-    double rightVelocityIPS = linearVelocityIPS + ((angularVelocityRADPS * this->distBetweenWheels) / 2); // rv = v + ((w * L) / 2)
+    double leftVelocityIPS = linearVelocityIPS - ((angularVelocityRADPS * g_distBetweenWheels) / 2); // lv = v - ((w * L) / 2)
+    double rightVelocityIPS = linearVelocityIPS + ((angularVelocityRADPS * g_distBetweenWheels) / 2); // rv = v + ((w * L) / 2)
 
-    double leftVelocityRPM = (leftVelocityIPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
-    double rightVelocityRPM = (rightVelocityIPS * 60 / (M_PI * this->wheelDiameter)) / this->gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
+    double leftVelocityRPM = (leftVelocityIPS * 60 / (M_PI * g_diameter)) / g_gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
+    double rightVelocityRPM = (rightVelocityIPS * 60 / (M_PI * g_diameter)) / g_gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
     
-    double profileMax = IPStoRPM(this->queuedProfile->maxSpeed, gearRatio, wheelDiameter);
+    double profileMax = IPStoRPM(profileMaxIPS);
 
     if (leftVelocityRPM > profileMax) {
         double scaling = profileMax / leftVelocityRPM;
@@ -46,11 +43,11 @@ double VelocityController::calculateSingleDegree(double wheelDiameter) {
 }
 
 // (private)
-void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RAMSETE, bool reverse)
+void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool RAMSETE, bool reverse)
 {
     // step-related variables
     double currentStep = 0;
-    double step = 1 / (double) currentlyFollowing.profile.size();
+    double step = 1 / (double) currentlyFollowing->profile.size();
     double sum = 0;
     // distance calculation variables
 
@@ -76,7 +73,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         delay = 5;
 
         // calculates the current point as the nearest point to the current step
-        currentPoint = currentlyFollowing.findNearestPoint(currentStep);
+        currentPoint = currentlyFollowing->findNearestPoint(currentStep);
         //std::cout << currentPoint.t << "\n";
 
         // sets linear and angular velocities to that of the current point - these are changed by RAMSETE if it is on
@@ -88,7 +85,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         // calculation of output of each side with error corrections from RAMSETE
         if (RAMSETE) {
             Pose location = {universalCurrentLocation.x * 0.0254, universalCurrentLocation.y * 0.0254, universalCurrentLocation.heading};
-            nextPoint = currentlyFollowing.findNearestPoint(currentStep + step);
+            nextPoint = currentlyFollowing->findNearestPoint(currentStep + step);
             nextPoint = {nextPoint.x * 0.0254, nextPoint.y * 0.0254, nextPoint.heading};
 
             if (reverse) {
@@ -185,7 +182,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         }
 
         // standard calculation of output of each side based on specifications of the motion profile
-        velocitiesRPM = this->calculateOutputOfSides(linVel, angVel);
+        velocitiesRPM = this->calculateOutputOfSides(linVel, angVel, currentlyFollowing->maxSpeed);
 
         // executes custom actions if the profile has reached or passed their t-point and have not yet been activated
         for (int i = 0; i < actions.size(); i++) {
@@ -197,7 +194,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 
         // converts the velocity in rpm to velocity in millivolts
         int maxVoltage = 12000; // innate max voltage of motors (in mV)
-        double rpmToV = maxVoltage / this->maxRPM; // multiplier to convert rpm to voltage (in units of millivoltage / rpm so multiplying it by rpm cancels to millivoltage)
+        double rpmToV = maxVoltage / g_maxRPM; // multiplier to convert rpm to voltage (in units of millivoltage / rpm so multiplying it by rpm cancels to millivoltage)
 
         // sends the output voltage to the motors
         if (reverse && !RAMSETE) {
@@ -237,7 +234,7 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
         if (currentStep >= 1 - step) {
             drivetrain.brake();
             //std::cout << (pros::millis() - startTime) / (double) 1000 << "\n";
-            //std::cout << currentlyFollowing.totalTime << "\n";
+            //std::cout << currentlyFollowing->totalTime << "\n";
             return;
         }
 
@@ -247,31 +244,12 @@ void VelocityController::followProfile(MotionProfile currentlyFollowing, bool RA
 }
 
 // starts the filter loop if it is not already active (public)
-void VelocityController::startQueuedProfile(bool RAMSETE, bool reverse) {
+void VelocityController::startProfile(MotionProfile* profile, bool reverse, bool RAMSETE) {
 
     // auto controlLoopFunction = [this, path, RAMSETE] () {return this->followProfile(*this->queuedProfile, path, RAMSETE);};
 
-    if (controlLoop_task_ptr == NULL) {
+    // if (controlLoop_task_ptr == NULL) {
         // pros::Task* controlLoop_task_ptr = new pros::Task(controlLoopFunction);
-        this->followProfile(*this->queuedProfile, RAMSETE, reverse);
-    }
-}
-
-// completely ends the filter loop if it is active (public)
-void VelocityController::endProfile() {
-    if (controlLoop_task_ptr != NULL) {
-        controlLoop_task_ptr->remove();
-        controlLoop_task_ptr = NULL;
-    }
-}
-
-void VelocityController::queueProfile(MotionProfile* profile) {
-    this->queuedProfile = profile;
-}
-
-void VelocityController::addAction(std::function<void(void)> action, double time) {
-    double t = time / this->timeToRun;
-    double actionT = this->queuedProfile->findNearestPoint(t).t;
-    this->actions.push_back(action);
-    this->actionTs.push_back(actionT);
+        this->followProfile(profile, RAMSETE, reverse);
+    // }
 }

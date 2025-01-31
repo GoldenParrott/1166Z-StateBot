@@ -96,4 +96,10 @@
 
     extern File logfile;
 
+    // robot config for motion profiling
+    extern double g_gearRatio;
+    extern double g_maxRPM;
+    extern double g_diameter;
+    extern double g_distBetweenWheels;
+
 #endif

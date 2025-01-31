@@ -178,8 +178,8 @@ Line findLineWithPoints(Point point1, Point point2);
 QuadraticPolyData derivativeOfCubicPoly(CubicPolyData cubicPoly);
 Line derivativeOfQuadratic(QuadraticPolyData quadPoly);
 double fixAngle(double originalAngle);
-double RPMtoIPS(double rpm, double gearRatio, double diameter);
-double IPStoRPM(double ips, double gearRatio, double diameter);
+double RPMtoIPS(double rpm);
+double IPStoRPM(double ips);
 
 
 // tracking.cpp

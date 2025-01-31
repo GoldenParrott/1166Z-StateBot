@@ -94,3 +94,9 @@
     std::vector<std::string> textToWrite;
 
     File logfile = File("log");
+
+    // robot config for motion profiling
+    double g_gearRatio = 0.75;
+    double g_maxRPM = 600;
+    double g_diameter = 3.25;
+    double g_distBetweenWheels = 10.5;

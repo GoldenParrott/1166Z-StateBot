@@ -117,36 +117,10 @@ void autonomous() {
 	Kalman1.startFilter();
 	Kalman2.startFilter();
 
-
-    // ROBOT CONFIG
-    double gearRatio = 0.75;
-    double maxRPM = 600;
-    double diameter = 3.25;
-    double distBetweenWheels = 10.5;
-
-    double maxSpeed = RPMtoIPS(300, gearRatio, diameter); // in meters per second
-
 	leftDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 	rightDrivetrain.set_brake_mode(pros::MotorBrake::hold);
-    
-    //CubicHermiteSpline mySpline = CubicHermiteSpline({0, 0}, {0, 200}, {48, 48}, {72, 48});
-	CubicHermiteSpline horizSpline = CubicHermiteSpline({0, 0}, {0, 0}, {-60, 0}, {-60, 0});
-	//CubicHermiteSpline uTurn = CubicHermiteSpline({0, 0}, {0, 300}, {48, 0}, {48, -12});
-    MotionProfile* myProfile = new MotionProfile(&horizSpline,
-	// {{{0, 0.2}, {0.2, 1}}, {{0.2, 1}, {0.3, 1}}, {{0.3, 1}, {0.5, 0.5}}, {{0.5, 0.5}, {0.7, 0.5}}, {{0.7, 0.5}, {0.8, 1}}, {{0.8, 1}, {1, 0}}},
-	// {{{0, 1}, {1, 1}}},
-	 maxSpeed);
-    VelocityController myController = VelocityController(diameter, distBetweenWheels, gearRatio, maxRPM);
-    myController.queueProfile(myProfile);
-	std::cout << "heading" << "\n";
-    myController.startQueuedProfile(true, false);
 
-
-	master.print(0, 0, "%d", (int) textToWrite.size());
-
-	for (int i = 0; i < textToWrite.size(); i++) {
-		std::cout << textToWrite[i];
-	}
+	redGoalside();
 }
 
 /**
@@ -168,6 +142,7 @@ void opcontrol() {
 	
 	//std::cout << logfile.readFile();
 	master.print(0, 0, "sup");
+	std::cout << "sup1\n";
 
 	// Front, Middle, Rear
 	leftDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -181,7 +156,7 @@ void opcontrol() {
 	int drvlr;
 	int drvtrdz = 10;
 	
-	//coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
+	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
 	//eject_task_ptr = new pros::Task(eject);
 	//macros_task_ptr = new pros::Task(ArmMacros);
 	while (true) {
