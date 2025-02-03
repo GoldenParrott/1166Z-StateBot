@@ -141,8 +141,6 @@ void opcontrol() {
 
 	
 	//std::cout << logfile.readFile();
-	master.print(0, 0, "sup");
-	std::cout << "sup1\n";
 
 	// Front, Middle, Rear
 	leftDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -157,11 +155,9 @@ void opcontrol() {
 	int drvtrdz = 10;
 	
 	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
-	//eject_task_ptr = new pros::Task(eject);
+	eject_task_ptr = new pros::Task(eject);
 	macros_task_ptr = new pros::Task(ArmMacros);
 	while (true) {
-
-		master.print(0,0,"%d \n",ArmRotational.get_position());
 	
 	//Drivetrain Control 
 		drvfb = master.get_analog(ANALOG_LEFT_Y);
@@ -179,21 +175,16 @@ void opcontrol() {
 	//Intake Control
 	//Arm up Y
 	//Arm down B
-		if(master.get_digital(DIGITAL_RIGHT))
-		{
-			intake.move(127);
-		}
-		else if(master.get_digital(DIGITAL_DOWN))
-		{
-			intake.move(-127);
-		}
-		else if(master.get_digital(DIGITAL_R2))
+		
+	//INTAKE CODE IS NOW IN THE TASK
+
+		if(master.get_digital(DIGITAL_R2))
 		{
 			preRoller.move(-127);
 		}
 		else
 		{
-			intake.brake();
+			preRoller.brake();
 		}
 
 	//Arm Control

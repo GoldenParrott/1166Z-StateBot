@@ -36,16 +36,14 @@ void ArmMacros() {
 }
 
 void eject() {
-	bool ejectOn = false;
 	int ejectStartPoint = 0;
 	autonnumber = 1;
-	master.print(0, 0, "entered");
-	std::cout << "sup3\n";
+	bool ejectOn = false;
 
 	if(autonnumber < 0){
-		master.print(0,0,"Scoring Red ",NULL);
+		master.print(0,0,"Scoring Red\n",NULL);
 	}else if(autonnumber > 0){
-		master.print(0,0,"Scoring Blue ",NULL);
+		master.print(0,0,"Scoring Blue\n",NULL);
 	}
 
 	while (true) {
@@ -54,9 +52,9 @@ void eject() {
 		if (master.get_digital_new_press(DIGITAL_X)){
 			autonnumber *= -1;
 			if(autonnumber < 0){
-				master.print(0,0,"Scoring Red ",NULL);
+				master.print(0,0,"Scoring Red\n",NULL);
 			}else if(autonnumber > 0){
-				master.print(0,0,"Scoring Blue ",NULL);
+				master.print(0,0,"Scoring Blue\n",NULL);
 			}
 		}
 		// handles the cases for if the eject is in the enabled state
@@ -66,34 +64,39 @@ void eject() {
 				// case 1a: if the difference between the starting point and the current point
 				// 			is greater than 700 (meaning that it has gone all the way),
 				//			turn off the 
-				if (abs(transport.get_position() - ejectStartPoint) >= 200) {
+				if (abs(transport.get_position() - ejectStartPoint) >= 300) {
 					ejectOn = false;
 					ejectStartPoint = 0;
 					transport.brake();
 				// case 1b: if case 1a is not true, then continue moving the intake down
 				} else {
-					intake.move(128);
+					intake.move(-128);
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
 			else if ((((colorSense.get_hue() > 180) && (autonnumber < 0)) || // blue
-				      ((colorSense.get_hue() < 35)  && (autonnumber > 0)) // red
+				      ((colorSense.get_hue() < 35)  && (autonnumber > 0))    // red
 					 )
 					&& (Distance.get() < 50)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
-				pros::delay(45); // the robot waits for the Ring to reach the proper point before starting the eject
-				transport.move(128);
+				pros::delay(10); // the robot waits for the Ring to reach the proper point before starting the eject
+				transport.move(-128);
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
 			}
 			// case 3: if the redirect is not on and should not be on, 
 			//		   then L2 moves the robot forward as normal
 			else {
-				intake.move(-128);
+				intake.move(128);
 			}
-		pros::delay(20);
+		} else if(master.get_digital(DIGITAL_DOWN)){
+			intake.move(-128);
+		} else if(master.get_digital(DIGITAL_R2)){
+			preRoller.move(-127);
+		} else{
+			intake.brake();
 		}
 	pros::delay(10);
 	}
@@ -143,33 +146,6 @@ void autoEject() {
 				ejectStartPoint = transport.get_position();
 			}
 	}
-}
-
-void unjam() {
-
-	while(true){
-		// Checks if Motor cannot move
-		if(transport.get_torque() > 1){
-			pros::delay(500);
-
-			// Secondary check to see if we are stuck
-			// or only caught for a moment
-			if (transport.get_torque() > 1){
-
-				// Mpve Transport Backwards
-				transport.move(128);
-				pros::delay(250);
-
-			}
-
-		}
-		else {
-			// No problems, continue moving
-			transport.move(128);
-		}
-	}
-
-	pros::delay(50);
 }
 
 void coords() {
