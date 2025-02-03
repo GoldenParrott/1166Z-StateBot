@@ -24,12 +24,13 @@ void redGoalside() {
     MotionProfile* ladderProfile = new MotionProfile(&RedMoGoPath::ladderProfile, RedMoGoPath::ladderSpeed);
 
     // profile following
-    follower.startProfile(rushProfile);
-    follower.startProfile(yoinkProfile);
+    //yoin.set_value(true);
+    //follower.startProfile(rushProfile);
+    //follower.startProfile(yoinkProfile);
     follower.startProfile(dropProfile);
-    follower.startProfile(grabProfile);
-    follower.startProfile(cornerProfile);
-    follower.startProfile(ladderProfile);
+    //follower.startProfile(grabProfile);
+    //follower.startProfile(cornerProfile);
+    //follower.startProfile(ladderProfile);
 }
 
 void blueGoalside() {}
