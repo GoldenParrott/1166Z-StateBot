@@ -37,7 +37,6 @@ void ArmMacros() {
 
 void eject() {
 	int ejectStartPoint = 0;
-	autonnumber = 1;
 	bool ejectOn = false;
 
 	if(autonnumber < 0){
