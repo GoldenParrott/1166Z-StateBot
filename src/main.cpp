@@ -75,7 +75,7 @@ void competition_initialize() {
 			}
 		}
 	status = pros::screen::touch_status();
-	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-23, -23}, 225);
+	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
 	pros::delay(10);
 
 	}
@@ -120,7 +120,7 @@ void autonomous() {
 	leftDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 	rightDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 
-	redGoalside();
+	autoTest();
 }
 
 /**

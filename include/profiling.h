@@ -105,12 +105,12 @@ class CubicHermiteSpline {
 class MotionProfile {
     public:
         // constructors (one with custom zoning, one without)
-        MotionProfile(CubicHermiteSpline* path, double maxSpeed);
-        MotionProfile(CubicHermiteSpline* path, std::vector<std::vector<Point>> zonePoints, double maxSpeed);
+        MotionProfile(CubicHermiteSpline* path, double maxSpeed, std::vector<std::vector<Point>> zonePoints = {});
         MotionProfile(std::vector<MPPoint>* pregeneratedProfile, double maxSpeed);
 
         // instance variables (data about profile)
         std::vector<MPPoint> profile;
+        std::vector<Zone> zones;
         double maxSpeed;
 
         // public methods (operations on points)
@@ -123,7 +123,6 @@ class MotionProfile {
 
         // private instance variables (used in profile generation)
         CubicHermiteSpline* path;
-        std::vector<Zone> zones;
 
 
 };

@@ -1,6 +1,6 @@
 #include "main.h"
 
-MotionProfile::MotionProfile(CubicHermiteSpline* path, double maxSpeed) {
+MotionProfile::MotionProfile(CubicHermiteSpline* path, double maxSpeed, std::vector<std::vector<Point>> zonePoints) {
     // assigns the passed-in values to instance variables
     this->path = path;
     this->maxSpeed = maxSpeed;
@@ -11,16 +11,10 @@ MotionProfile::MotionProfile(CubicHermiteSpline* path, double maxSpeed) {
         {0.1, 0.9, {0, 1}},
         {0.9, 1, {-10, 10}}
     };
-    // ends by creating the profile
-    this->generateVelocities();
-}
-
-MotionProfile::MotionProfile(CubicHermiteSpline* path, std::vector<std::vector<Point>> zonePoints, double maxSpeed) {
-    // assigns the passed-in values to instance variables
-    this->path = path;
-    this->maxSpeed = maxSpeed;
     // custom velocity zoning
-    this->constructWithCustomZones(zonePoints);
+    if (zonePoints.size() > 0) {
+        this->constructWithCustomZones(zonePoints);
+    }
     // ends by creating the profile
     this->generateVelocities();
 }

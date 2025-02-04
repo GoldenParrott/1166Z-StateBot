@@ -232,7 +232,9 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
         // if the current step is the final point (t = 1 - step), 
         // then the drivetrain is stopped and the function ends
         if (currentStep >= 1 - step) {
-            drivetrain.brake();
+            if (currentlyFollowing->zones[currentlyFollowing->zones.size() - 1].zoneLine.slope + currentlyFollowing->zones[currentlyFollowing->zones.size() - 1].zoneLine.yIntercept == 0) {
+                drivetrain.brake();
+            }
             //std::cout << (pros::millis() - startTime) / (double) 1000 << "\n";
             //std::cout << currentlyFollowing->totalTime << "\n";
             return;
