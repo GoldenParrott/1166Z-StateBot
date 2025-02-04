@@ -24,8 +24,14 @@ void ArmMacros() {
 					arm.move(32);
 				}
 			}else{
-				while (ArmRotational.get_position() < 0) {
-					arm.move(-32);
+				if(ArmRotational.get_position() < -3000){
+					while (ArmRotational.get_position() < -4000) {
+                		arm.move(-32);
+            		}
+				}else{
+					while (ArmRotational.get_position() < 0) {
+						arm.move(-32);
+					}
 				}
 			}
 			arm.brake();
