@@ -66,7 +66,7 @@
     int num;
     bool clampOn;
 
-    int autonnumber = 0;
+    int autonnumber = 1;
     bool globalAuton = true;
     int logoCount = 0;
 

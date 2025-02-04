@@ -30,12 +30,13 @@ void disabled() {}
 void competition_initialize() {
 
 	//autoSelector_task_ptr = new pros::Task(drawAutonSelector);
-	autonnumber = -5;
+	autonnumber = 1;
 	globalAuton = false;
 
 	pros::Task task(drawAutonSelector);
 
 	while (true) {
+		
 		if (globalAuton == true) {
 			switch (autonnumber) {
 				case 1: //Blue Mogo
@@ -74,8 +75,8 @@ void competition_initialize() {
 					break;
 			}
 		}
-	status = pros::screen::touch_status();
-	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
+		
+	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 270);
 	pros::delay(10);
 
 	}
@@ -157,6 +158,7 @@ void opcontrol() {
 	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
 	eject_task_ptr = new pros::Task(eject);
 	macros_task_ptr = new pros::Task(ArmMacros);
+
 	while (true) {
 	
 	//Drivetrain Control 
