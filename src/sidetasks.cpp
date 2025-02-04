@@ -20,7 +20,7 @@ void ArmMacros() {
 		else if (master.get_digital_new_press(DIGITAL_B)) {
 			armMoving = true;
 			if(ArmRotational.get_position() > -1100){
-				while (ArmRotational.get_position() > -2000) {
+				while (ArmRotational.get_position() > -1800) {
 					arm.move(32);
 				}
 			}else{
