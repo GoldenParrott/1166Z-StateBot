@@ -6,7 +6,9 @@ void drawAutonSelector(){
 
 	//Gif BOZO("/usd/[bozo].gif", lv_scr_act());
 	Gif Bozo("/usd/[Bozo].gif", lv_scr_act());
-	waitUntil(status.touch_status == 1);
+	while(status.touch_status != 1){
+		status = pros::screen::touch_status();
+	}
 	Bozo.~Gif();
 	while(1){
 		// Used when the AWP/ELIM button is pressed
