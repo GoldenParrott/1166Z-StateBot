@@ -79,8 +79,8 @@ void eject() {
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
-			else if ((((colorSense.get_hue() > 180) && (autonnumber < 0)) || // blue
-				      ((colorSense.get_hue() < 35)  && (autonnumber > 0))    // red
+			else if ((((colorSense.get_hue() > 70) && (autonnumber < 0)) || // blue
+				      ((colorSense.get_hue() < 45)  && (autonnumber > 0))    // red
 					 )
 					&& (Distance.get() < 50)
 					)

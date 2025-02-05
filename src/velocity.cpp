@@ -22,10 +22,18 @@ std::vector<double> VelocityController::calculateOutputOfSides(double linearVelo
         double scaling = profileMax / leftVelocityRPM;
         leftVelocityRPM *= scaling;
         rightVelocityRPM *= scaling;
+    } else if (leftVelocityRPM < -profileMax) {
+        double scaling = -profileMax / leftVelocityRPM;
+        leftVelocityRPM *= scaling;
+        rightVelocityRPM *= scaling;
     }
 
     if (rightVelocityRPM > profileMax) {
         double scaling = profileMax / rightVelocityRPM;
+        leftVelocityRPM *= scaling;
+        rightVelocityRPM *= scaling;
+    } else if (rightVelocityRPM < -profileMax) {
+        double scaling = -profileMax / rightVelocityRPM;
         leftVelocityRPM *= scaling;
         rightVelocityRPM *= scaling;
     }
@@ -150,6 +158,8 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
 
             linVel *= 39.37008;
 
+            linVel *= currentPoint.linVel / currentlyFollowing->maxSpeed;
+
         // recalculates the delay, as it may change due to the RAMSETE controller modifying the robot's movement
             double newDistance = std::fabs(error.heading * (linVel / angVel));
             double newDelay = newDistance / std::fabs(linVel);
@@ -209,8 +219,8 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
         //textToWrite.push_back("ix = " + std::to_string(currentPoint.x) + ", iy = " + std::to_string(currentPoint.y) + ", ihead = " + std::to_string(currentPoint.heading) + "\n" + "ax = " + std::to_string(location.x) + ", ay = " + std::to_string(location.y) + ", ahead = " + std::to_string(location.heading) + "\n" + std::to_string(currentPoint.t) + "\n\n");
         // textToWrite.push_back("il = " + std::to_string(currentPoint.linVel) + ", ia = " + std::to_string(currentPoint.angVel) + "\nal = " + std::to_string(linVel) + ", aa = " + std::to_string(angVel) + "\n\n");
         //std::cout << "lvol = " << velocitiesRPM[0] * rpmToV << ", rvol = " << velocitiesRPM[1] * rpmToV << "\n";
-        // std::cout << "lv = " << linVel << ", rv = " << angVel << "\n\n";
-        //std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
+        //std::cout << "lv = " << linVel << ", rv = " << angVel << "\n\n";
+        std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
         //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
         //std::cout << "step = " << currentStep << "\n";
         //std::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
