@@ -42,6 +42,7 @@ void ArmMacros() {
 }
 
 void eject() {
+	colorSense.set_led_pwm(100);
 	int ejectStartPoint = 0;
 	bool ejectOn = false;
 
@@ -52,6 +53,7 @@ void eject() {
 	}
 
 	while (true) {
+		// master.print(0,0,"%d\n",colorSense.get_proximity());
 		// distance sensor (eject)
 		// Changes the eject to be for the opposite color when the button is pressed
 		if (master.get_digital_new_press(DIGITAL_X)){
@@ -69,7 +71,7 @@ void eject() {
 				// case 1a: if the difference between the starting point and the current point
 				// 			is greater than 700 (meaning that it has gone all the way),
 				//			turn off the 
-				if (abs(transport.get_position() - ejectStartPoint) >= 300) {
+				if (abs(transport.get_position() - ejectStartPoint) >= 1000) {
 					ejectOn = false;
 					ejectStartPoint = 0;
 					transport.brake();
@@ -79,10 +81,9 @@ void eject() {
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
-			else if ((((colorSense.get_hue() > 70) && (autonnumber < 0)) || // blue
-				      ((colorSense.get_hue() < 45)  && (autonnumber > 0))    // red
-					 )
-					&& (Distance.get() < 50)
+			else if ((((colorSense.get_hue() > 53) && (autonnumber < 0)) || // blue
+				      ((colorSense.get_hue() < 50)  && (autonnumber > 0)))   // red
+					&& (Distance.get() < 999) && (colorSense.get_proximity() > 40)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
@@ -103,7 +104,7 @@ void eject() {
 		} else{
 			intake.brake();
 		}
-	pros::delay(10);
+		pros::delay(10);
 	}
 }
 
