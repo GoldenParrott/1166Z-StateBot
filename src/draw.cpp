@@ -6,9 +6,8 @@ void drawAutonSelector(){
 
 	//Gif BOZO("/usd/[bozo].gif", lv_scr_act());
 	Gif Bozo("/usd/[Bozo].gif", lv_scr_act());
-	while(status.touch_status != 1){
-		status = pros::screen::touch_status();
-	}
+	waitUntil(status.touch_status == 1)
+	status = pros::screen::touch_status();
 	Bozo.~Gif();
 	while(1){
 		// Used when the AWP/ELIM button is pressed
@@ -61,72 +60,56 @@ void drawAutonSelector(){
 				//RMA
 				Gif RMA("/usd/[Red_Mogo_AWP].gif", lv_scr_act());
 				waitUntil(status.touch_status == 0);
-				while(status.touch_status == 0){
-					status = pros::screen::touch_status();
-				}
+				waitUntil(status.touch_status == 1)
 				RMA.~Gif();
 				break;
 			}case 2:{
 				//BMA
 				Gif BMA("/usd/[Blue_Mogo_AWP].gif", lv_scr_act());
 				waitUntil(status.touch_status == 0);
-				while(status.touch_status == 0){
-					status = pros::screen::touch_status();
-				}
+				waitUntil(status.touch_status == 1)
 				BMA.~Gif();
 				break;
 			}case 3:{
 				//RRA
 				Gif RRA("/usd/[Red_Ring_AWP].gif", lv_scr_act());
 				waitUntil(status.touch_status == 0);
-				while(status.touch_status == 0){
-					status = pros::screen::touch_status();
-				}
+				waitUntil(status.touch_status == 1)
 				RRA.~Gif();
 				break;
 			}case 4:{
 				//BRA
 				Gif BRA("/usd/[Blue_Ring_AWP].gif", lv_scr_act());
 				waitUntil(status.touch_status == 0);
-				while(status.touch_status == 0){
-					status = pros::screen::touch_status();
-				}
+				waitUntil(status.touch_status == 1)
 				BRA.~Gif();
 				break;
 			}case -1:{
 				//RME
 				Gif RME("/usd/[Red_Mogo_ELIM].gif", lv_scr_act());
 				waitUntil(status.touch_status == 0);
-				while(status.touch_status == 0){
-					status = pros::screen::touch_status();
-				}
+				waitUntil(status.touch_status == 1)
 				RME.~Gif();
 				break;
 			}case -2:{
 				//BME
 				Gif BME("/usd/[Blue_Mogo_ELIM].gif", lv_scr_act());
 				waitUntil(status.touch_status == 0);
-				while(status.touch_status == 0){
-					status = pros::screen::touch_status();
-				}
+				waitUntil(status.touch_status == 1)
 				BME.~Gif();
 				break;
 			}case -3:{
 				//RRE
 				Gif RRE("/usd/[Red_Ring_ELIM].gif", lv_scr_act());
 				waitUntil(status.touch_status == 0);
-				while(status.touch_status == 0){
-					status = pros::screen::touch_status();
-				}
+				waitUntil(status.touch_status == 1)
 				RRE.~Gif();
 				break;
 			}case -4:{
 				//BRE
 				Gif BRE("/usd/[Blue_Ring_ELIM].gif", lv_scr_act());
 				waitUntil(status.touch_status == 0);
-				while(status.touch_status == 0){
-					status = pros::screen::touch_status();
-				}
+				waitUntil(status.touch_status == 1)
 				BRE.~Gif();
 				break;
 			}
