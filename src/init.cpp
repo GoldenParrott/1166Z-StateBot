@@ -1,4 +1,5 @@
 #include "init.h"
+#include "gif-pros/gifclass.hpp"
 
 //Controllers
     pros::Controller master(pros::E_CONTROLLER_MASTER);
@@ -60,7 +61,20 @@
     pros::Task* rotationalBinder_task_ptr = NULL;
     pros::Task* autoSelector_task_ptr = NULL;
     pros::Task* loggingEnabled_task_ptr = NULL;
-      
+
+// Image Definitions
+
+    Gif Bozo("/usd/[Bozo].gif", lv_scr_act());
+    Gif Logo("/usd/[Logo].gif", lv_scr_act());
+    Gif RMA("/usd/[Red_Mogo_AWP].gif", lv_scr_act());
+    Gif BMA("/usd/[Blue_Mogo_AWP].gif", lv_scr_act());
+    Gif RRA("/usd/[Red_Ring_AWP].gif", lv_scr_act());
+    Gif BRA("/usd/[Blue_Ring_AWP].gif", lv_scr_act());
+    Gif RME("/usd/[Red_Mogo_ELIM].gif", lv_scr_act());
+    Gif BME("/usd/[Blue_Mogo_ELIM].gif", lv_scr_act());
+    Gif RRE("/usd/[Red_Ring_ELIM].gif", lv_scr_act());
+    Gif BRE("/usd/[Blue_Ring_ELIM].gif", lv_scr_act());
+
 // Variables
 
     int num;
