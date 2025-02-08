@@ -2,17 +2,6 @@
 #include "gif-pros/gifclass.hpp"
 
 void drawAutonSelector(){
-	
-	Bozo._render();
-	Logo._render();
-	RMA._render();
-	BMA._render();
-	RRA._render();
-	BRA._render();
-	RME._render();
-	BME._render();
-	RRE._render();
-	BRE._render();
 
 	Bozo.pause();
 	Logo.pause();
