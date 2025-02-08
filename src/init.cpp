@@ -1,5 +1,4 @@
 #include "init.h"
-#include "gif-pros/gifclass.hpp"
 
 //Controllers
     pros::Controller master(pros::E_CONTROLLER_MASTER);

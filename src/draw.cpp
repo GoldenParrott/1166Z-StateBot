@@ -3,10 +3,21 @@
 
 void drawAutonSelector(){
 
-	Bozo._render();
+	Bozo.pause();
+	Logo.pause();
+	RMA.pause();
+	BMA.pause();
+	RRA.pause();
+	BRA.pause();
+	RME.pause();
+	BME.pause();
+	RRE.pause();
+	BRE.pause();
+
+	Bozo.resume();
 	waitUntil(status.touch_status == 1)
 	status = pros::screen::touch_status();
-	Bozo.~Gif();
+	Bozo.pause();
 	while(1){
 		// Used when the AWP/ELIM button is pressed
 		if ((status.x >= 253)&&(status.x <= 328)&&(status.y >= 127)&&(status.y <= 230)){
@@ -56,59 +67,59 @@ void drawAutonSelector(){
 		switch (autonnumber){
 			case 1:{
 				//RMA
-				RMA._render();
+				RMA.resume();
 				waitUntil(status.touch_status == 0);
 				waitUntil(status.touch_status == 1)
-				RMA.~Gif();
+				RMA.pause();
 				break;
 			}case 2:{
 				//BMA
-				BMA._render();
+				BMA.resume();
 				waitUntil(status.touch_status == 0);
 				waitUntil(status.touch_status == 1)
-				BMA.~Gif();
+				BMA.pause();
 				break;
 			}case 3:{
 				//RRA
-				RRA._render();
+				RRA.resume();
 				waitUntil(status.touch_status == 0);
 				waitUntil(status.touch_status == 1)
-				RRA.~Gif();
+				RRA.pause();
 				break;
 			}case 4:{
 				//BRA
-				BRA._render();
+				BRA.resume();
 				waitUntil(status.touch_status == 0);
 				waitUntil(status.touch_status == 1)
-				BRA.~Gif();
+				BRA.pause();
 				break;
 			}case -1:{
 				//RME
-				RME._render();
+				RME.resume();
 				waitUntil(status.touch_status == 0);
 				waitUntil(status.touch_status == 1)
-				RME.~Gif();
+				RME.pause();
 				break;
 			}case -2:{
 				//BME
-				BME._render();
+				BME.resume();
 				waitUntil(status.touch_status == 0);
 				waitUntil(status.touch_status == 1)
-				BME.~Gif();
+				BME.pause();
 				break;
 			}case -3:{
 				//RRE
-				RRE._render();
+				RRE.resume();
 				waitUntil(status.touch_status == 0);
 				waitUntil(status.touch_status == 1)
-				RRE.~Gif();
+				RRE.pause();
 				break;
 			}case -4:{
 				//BRE
-				BRE._render();
+				BRE.resume();
 				waitUntil(status.touch_status == 0);
 				waitUntil(status.touch_status == 1)
-				BRE.~Gif();
+				BRE.pause();
 				break;
 			}
 
