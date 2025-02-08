@@ -12,6 +12,11 @@ std::vector<double> VelocityController::calculateOutputOfSides(double linearVelo
     
     double leftVelocityIPS = linearVelocityIPS - ((angularVelocityRADPS * g_distBetweenWheels) / 2); // lv = v - ((w * L) / 2)
     double rightVelocityIPS = linearVelocityIPS + ((angularVelocityRADPS * g_distBetweenWheels) / 2); // rv = v + ((w * L) / 2)
+    
+    if (linearVelocityIPS < 0) {
+        double leftVelocityIPS = linearVelocityIPS + ((angularVelocityRADPS * g_distBetweenWheels) / 2); // lv = v - ((w * L) / 2)
+        double rightVelocityIPS = linearVelocityIPS - ((angularVelocityRADPS * g_distBetweenWheels) / 2); // rv = v + ((w * L) / 2)
+    }
 
     double leftVelocityRPM = (leftVelocityIPS * 60 / (M_PI * g_diameter)) / g_gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
     double rightVelocityRPM = (rightVelocityIPS * 60 / (M_PI * g_diameter)) / g_gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
@@ -69,7 +74,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
     uint32_t startTime = pros::millis();
     double delay;
     // action variables
-    std::vector<bool> actionCompleteds = {false, false, false};
+    std::vector<bool> actionCompleteds = {false, false, false, false, false, false};
 
     // control loop
     while (true) {
@@ -103,6 +108,11 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
                 } else {
                     nextPoint.heading += 180;
                 }
+                if (location.heading > 180) {
+                    location.heading -= 180;
+                } else {
+                    location.heading += 180;
+                }
             }
 
             double fixedOdomAngle = fixAngle(location.heading) * (M_PI / 180);
@@ -122,7 +132,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
 
             linVel *= 0.0254;
 
-        // bounds the error from 0-180 to prevent the correction from being an un-optimal turn direction (where going the other way would be faster)
+            // bounds the error from 0-180 to prevent the correction from being an un-optimal turn direction (where going the other way would be faster)
             if (error.heading < -M_PI) {
                 error.heading = error.heading + (2 * M_PI);
             } else if (error.heading > M_PI) {
@@ -264,4 +274,16 @@ void VelocityController::startProfile(MotionProfile* profile, bool reverse, bool
         // pros::Task* controlLoop_task_ptr = new pros::Task(controlLoopFunction);
         this->followProfile(profile, RAMSETE, reverse);
     // }
+}
+
+void VelocityController::addAction(std::function<void(void)> action, double time) {
+    double actionT = time;
+    this->actions.push_back(action);
+    this->actionTs.push_back(actionT);
+}
+
+void VelocityController::clearActions(void) {
+    this->actions.clear();
+    this->actionTs.clear();
+    this->actionCompleteds = {false, false, false, false, false, false};
 }

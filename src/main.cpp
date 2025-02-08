@@ -76,7 +76,8 @@ void competition_initialize() {
 			}
 		}
 		
-	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
+	// initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
+	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.25, -60}, 80);
 	pros::delay(10);
 
 	}

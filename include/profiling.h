@@ -134,6 +134,7 @@ class VelocityController {
         std::vector<double> FINDME;
         VelocityController(std::vector<std::function<void(void)>> actions = {}, std::vector<double> actionTs = {});
         void addAction(std::function<void(void)> action, double time);
+        void clearActions(void);
         void startProfile(MotionProfile* profile, bool reverse = false, bool RAMSETE = true);
 
 

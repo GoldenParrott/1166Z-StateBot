@@ -43,6 +43,7 @@ void blueRingside() {}
 
 void autoSkills() {}
 
+/*
 void autoTest() {
 
     // velocity controller class
@@ -50,19 +51,34 @@ void autoTest() {
 
     // profile setup with pregeneration
     MotionProfile* goalProfile = new MotionProfile(&SoloAWP::goalProfile, SoloAWP::goalSpeed);
-    MotionProfile* midringProfile = new MotionProfile(&SoloAWP::midringProfile, SoloAWP::midringSpeed);
+    MotionProfile* midringProfile1 = new MotionProfile(&SoloAWP::midring1Profile, SoloAWP::midring1Speed);
+    MotionProfile* midringProfile2 = new MotionProfile(&SoloAWP::midring2Profile, SoloAWP::midring2Speed);
     MotionProfile* crossP1Profile = new MotionProfile(&SoloAWP::crossP1Profile, SoloAWP::crossP1Speed);
     MotionProfile* crossP2Profile = new MotionProfile(&SoloAWP::crossP2Profile, SoloAWP::crossP2Speed);
     MotionProfile* goal2Profile = new MotionProfile(&SoloAWP::goal2Profile, SoloAWP::goal2Speed);
     MotionProfile* ring2Profile = new MotionProfile(&SoloAWP::ring2Profile, SoloAWP::ring2Speed);
     MotionProfile* ladderProfile = new MotionProfile(&SoloAWP::ladderProfile, SoloAWP::ladderSpeed);
 
-    // profile following
+
+    // score on Alliance Stake
+    drivetrain.move_relative(270, 100);
+    pros::delay(200);
+    arm.move(128);
+    waitUntil(ArmRotational.get_position() < -13000);
+    arm.brake();
+    follower.clearActions();
+    follower.addAction([](){arm.move(-128);}, 0.2);
+    follower.addAction([](){clamp.set_value(true);}, 0.725);
+    follower.addAction([](){arm.brake();}, 0.8);
     follower.startProfile(goalProfile, true);
-    pros::delay(500);
-    follower.startProfile(midringProfile, false);
-    pros::delay(500);
+    intake.move(128);
+    follower.clearActions();
+    follower.startProfile(midringProfile1, false);
+    follower.startProfile(midringProfile2, false);
+    drivetrain.brake();
+    pros::delay(1000);
     follower.startProfile(crossP1Profile, false);
+    /*
     pros::delay(500);
     follower.startProfile(crossP2Profile, false);
     pros::delay(500);
@@ -71,5 +87,52 @@ void autoTest() {
     follower.startProfile(ring2Profile, false);
     pros::delay(500);
     follower.startProfile(ladderProfile, true);
+    
+
+}
+*/
+
+void autoTest() {
+
+        // velocity controller class
+    VelocityController follower = VelocityController();
+
+    // profile setup with pregeneration
+    MotionProfile* rushProfile = new MotionProfile(&RedMoGoRush::rushProfile, RedMoGoRush::rushSpeed);
+    MotionProfile* yoinkProfile = new MotionProfile(&RedMoGoRush::yoinkProfile, RedMoGoRush::yoinkSpeed);
+    MotionProfile* dropProfile = new MotionProfile(&RedMoGoRush::dropProfile, RedMoGoRush::dropSpeed);
+    MotionProfile* grabProfile = new MotionProfile(&RedMoGoRush::grabProfile, RedMoGoRush::grabSpeed);
+    MotionProfile* cornerProfile = new MotionProfile(&RedMoGoRush::cornerProfile, RedMoGoRush::cornerSpeed);
+    MotionProfile* ladderProfile = new MotionProfile(&RedMoGoRush::ladderProfile, RedMoGoRush::ladderSpeed);
+
+
+    // score on Alliance Stake
+    yoin.set_value(true);
+    pros::delay(200);
+    intake.move(128);
+    follower.clearActions();
+    follower.startProfile(rushProfile, false);
+    ker.set_value(true);
+    pros::delay(200);
+    follower.addAction([](){ker.set_value(false);}, 0.8);
+    follower.addAction([](){clamp.set_value(true);}, 0.9);
+    follower.startProfile(yoinkProfile, true);
+    follower.clearActions();
+    /*
+    follower.startProfile(midringProfile2, false);
+    drivetrain.brake();
+    pros::delay(1000);
+    follower.startProfile(crossP1Profile, false);
+    */
+    /*
+    pros::delay(500);
+    follower.startProfile(crossP2Profile, false);
+    pros::delay(500);
+    follower.startProfile(goal2Profile, true);
+    pros::delay(500);
+    follower.startProfile(ring2Profile, false);
+    pros::delay(500);
+    follower.startProfile(ladderProfile, true);
+    */
 
 }
