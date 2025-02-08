@@ -114,12 +114,15 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
                     location.heading += 180;
                 }
             }
+            
+            std::cout << "fodom = " << fixAngle(location.heading) << "\n";
+            std::cout << "fnext = " << fixAngle(nextPoint.heading) << "\n";
+            std::cout << "fdiff = " << fixAngle(nextPoint.heading) - fixAngle(location.heading) << "\n\n";
 
             double fixedOdomAngle = fixAngle(location.heading) * (M_PI / 180);
             double fixedNextAngle = fixAngle(nextPoint.heading) * (M_PI / 180);
 
-            //std::cout << "fodom = " << fixedOdomAngle << "\n";
-            //std::cout << "fnext = " << fixedNextAngle << "\n\n";
+
 
         //textToWrite.push_back("odom = " + std::to_string(location.heading) + ", fodom = " + std::to_string(fixedOdomAngle) + "\n");
         //textToWrite.push_back("next = " + std::to_string(nextPoint.heading) + ", fnext = " + std::to_string(fixedNextAngle) + "\n\n");

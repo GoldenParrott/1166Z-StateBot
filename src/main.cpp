@@ -76,7 +76,8 @@ void competition_initialize() {
 			}
 		}
 		status = pros::screen::touch_status();
-		initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
+		// initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
+		initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 65);
 		pros::delay(10);
 
 	}
