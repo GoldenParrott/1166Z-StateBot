@@ -2,6 +2,7 @@
 #define _PROS_INIT_H_
 
 #include "main.h"
+#include "gif-pros/gifclass.hpp"
 
 //Controllers
     extern pros::Controller master;

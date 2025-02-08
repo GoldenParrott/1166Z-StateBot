@@ -29,6 +29,7 @@ void disabled() {}
  */
 void competition_initialize() {
 
+
 	autonnumber = 1;
 	globalAuton = false;
 
