@@ -33,7 +33,7 @@ void competition_initialize() {
 	autonnumber = 1;
 	globalAuton = false;
 
-	pros::Task task(drawAutonSelector);
+	autoSelector_task_ptr = new pros::Task(drawAutonSelector);
 
 	while (true) {
 		
@@ -75,9 +75,9 @@ void competition_initialize() {
 					break;
 			}
 		}
-		
-	initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
-	pros::delay(10);
+		status = pros::screen::touch_status();
+		initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
+		pros::delay(10);
 
 	}
 	
