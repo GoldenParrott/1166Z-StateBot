@@ -159,6 +159,7 @@ class File {
 
 // draw.cpp
 void drawAutonSelector(void);
+void drawBasicSelector(void);
 
 // odom.cpp
 void initializeRobotOnCoordinate(pros::Rotation *rotational, pros::Imu *imu1, pros::Imu *imu2, Point offset, int startHeading);

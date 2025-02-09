@@ -81,7 +81,7 @@ void eject() {
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
-			else if ((((colorSense.get_hue() > 53) && (autonnumber < 0)) || // blue
+			else if ((((colorSense.get_hue() > 60) && (autonnumber < 0)) || // blue
 				      ((colorSense.get_hue() < 50)  && (autonnumber > 0)))   // red
 					&& (Distance.get() < 999) && (colorSense.get_proximity() > 40)
 					)
@@ -102,6 +102,7 @@ void eject() {
 		} else if(master.get_digital(DIGITAL_R2)){
 			preRoller.move(-127);
 		} else{
+			ejectOn = false;
 			intake.brake();
 		}
 		pros::delay(10);
