@@ -12,11 +12,6 @@ std::vector<double> VelocityController::calculateOutputOfSides(double linearVelo
     
     double leftVelocityIPS = linearVelocityIPS - ((angularVelocityRADPS * g_distBetweenWheels) / 2); // lv = v - ((w * L) / 2)
     double rightVelocityIPS = linearVelocityIPS + ((angularVelocityRADPS * g_distBetweenWheels) / 2); // rv = v + ((w * L) / 2)
-    
-    if (linearVelocityIPS < 0) {
-        double leftVelocityIPS = linearVelocityIPS + ((angularVelocityRADPS * g_distBetweenWheels) / 2); // lv = v - ((w * L) / 2)
-        double rightVelocityIPS = linearVelocityIPS - ((angularVelocityRADPS * g_distBetweenWheels) / 2); // rv = v + ((w * L) / 2)
-    }
 
     double leftVelocityRPM = (leftVelocityIPS * 60 / (M_PI * g_diameter)) / g_gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
     double rightVelocityRPM = (rightVelocityIPS * 60 / (M_PI * g_diameter)) / g_gearRatio; // rpm = m/s * (60 s / min) * (1 rotation / (single degree travel * 360))
@@ -103,21 +98,22 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
 
             if (reverse) {
                 linVel *= -1;
-                if (nextPoint.heading > 180) {
-                    nextPoint.heading -= 180;
-                } else {
-                    nextPoint.heading += 180;
-                }
+                            
+            std::cout << "odom = " << fixAngle(location.heading) << "\n";
+            std::cout << "next = " << fixAngle(nextPoint.heading) << "\n";
+            std::cout << "diff = " << fixAngle(nextPoint.heading) - fixAngle(location.heading) << "\n\n";
+
                 if (location.heading > 180) {
                     location.heading -= 180;
                 } else {
                     location.heading += 180;
                 }
-            }
-            
+       
             std::cout << "fodom = " << fixAngle(location.heading) << "\n";
             std::cout << "fnext = " << fixAngle(nextPoint.heading) << "\n";
             std::cout << "fdiff = " << fixAngle(nextPoint.heading) - fixAngle(location.heading) << "\n\n";
+
+            }
 
             double fixedOdomAngle = fixAngle(location.heading) * (M_PI / 180);
             double fixedNextAngle = fixAngle(nextPoint.heading) * (M_PI / 180);
@@ -129,6 +125,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
         // rotation of the x, y, and heading errors to fit the local frame
             Pose error;
             error.x = (std::cos(fixedOdomAngle) * (nextPoint.x - location.x)) + (std::sin(fixedOdomAngle) * (nextPoint.y - location.y));
+            if (reverse) {error.x *= -1;}
             error.y = (std::cos(fixedOdomAngle) * (nextPoint.y - location.y)) - (std::sin(fixedOdomAngle) * (nextPoint.x - location.x));
             error.heading = fixedNextAngle - fixedOdomAngle;
             // std::cout << error.heading << "\n";
@@ -151,7 +148,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
 
         // gain values that serve as scaling multipliers for the outputs based on the profile's velocity and pre-set constants
             // k1/k3: the proportional gain value for both the local frame of x and heading
-            double k = 2 * zeta * std::sqrt(std::pow(currentPoint.angVel, 2) + (b * std::pow(currentPoint.linVel, 2)));
+            double k = 2 * zeta * std::sqrt(std::pow(angVel, 2) + (b * std::pow(linVel, 2)));
             // k2: the gain value for the y-value, which the robot cannot move directly on and is thus handled differently 
             double k2 = b * currentPoint.linVel;
 
@@ -188,12 +185,12 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
                 std::cout << ("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
                 std::cout << "ucl = " << location.heading << ", actual = " << getAggregatedHeading(Kalman1, Kalman2) << ", used = " << fixedOdomAngle << ", desired = " << fixedNextAngle << "\n\n";
             } else {
-                */std::cout << "nd = " << delay << "\n";/*
+                std::cout << "nd = " << delay << "\n";
             }
             */
             
                 delay = 5;
-            
+            /*
 
             std::cout << "ex = " << error.x << "\ney = " << error.y << "\neh = " << error.heading << "\n\n";
 
@@ -202,6 +199,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
             std::cout << "linv = " << linVel << ", prolinv = " << currentPoint.linVel << "\n";
             std::cout << "angv = " << angVel << ", proangv = " << currentPoint.angVel << "\n\n";
             
+            */
         }
 
         // standard calculation of output of each side based on specifications of the motion profile
@@ -254,7 +252,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
 
         // if the current step is the final point (t = 1 - step), 
         // then the drivetrain is stopped and the function ends
-        if (currentStep >= 1 - step) {
+        if (currentPoint.t == currentlyFollowing->profile[currentlyFollowing->profile.size() - 1].t) {
             if (currentlyFollowing->zones[currentlyFollowing->zones.size() - 1].zoneLine.slope + currentlyFollowing->zones[currentlyFollowing->zones.size() - 1].zoneLine.yIntercept == 0) {
                 drivetrain.brake();
             }

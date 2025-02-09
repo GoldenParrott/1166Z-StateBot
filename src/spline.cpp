@@ -204,17 +204,18 @@ double CubicHermiteSpline::calculateCurvature(double t) {
 // given a point, finds the nearest point to that point on the profile and returns its t
 double CubicHermiteSpline::findNearestPointOnSpline(Point givenPoint, double excludeBelow) {
     double closestT = -1;
-    double currentT = 0;
+    double currentT = excludeBelow;
     double closestDistance = 10000;
     double currentDistance = 0;
-    for (int i = 0; i < fullSampleSpline.size(); i++) {
-        currentDistance = calculateDistance(givenPoint, {fullSampleSpline[i].x, fullSampleSpline[i].y});
+    std::cout << currentT * fullSampleSpline.size() << "\n";
+    for (int i = (currentT * fullSampleSpline.size()); i < fullSampleSpline.size(); i++) {
+        currentDistance = std::pow((givenPoint.x - fullSampleSpline[i].x), 2) + std::pow((givenPoint.y - fullSampleSpline[i].y), 2);
         currentT = (i + 1) / (double) fullSampleSpline.size();
         if ((currentDistance < closestDistance) && (currentT > excludeBelow)) {
             closestT = currentT;
             closestDistance = currentDistance;
         }
-        if ((currentT - closestT > 0.01) && (closestT != -1)) {
+        if (currentDistance > closestDistance) {
             break;
         }
     }

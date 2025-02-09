@@ -2,7 +2,7 @@
 #include "gif-pros/gifclass.hpp"
 
 void drawAutonSelector(){
-
+	/*
 	Bozo.pause();
 	Logo.pause();
 	RMA.pause();
@@ -15,9 +15,10 @@ void drawAutonSelector(){
 	BRE.pause();
 
 	Bozo.resume();
+	*/
 	waitUntil(status.touch_status == 1)
 	status = pros::screen::touch_status();
-	Bozo.pause();
+	// Bozo.pause();
 	while(1){
 		// Used when the AWP/ELIM button is pressed
 		if ((status.x >= 253)&&(status.x <= 328)&&(status.y >= 127)&&(status.y <= 230)){
@@ -63,7 +64,7 @@ void drawAutonSelector(){
 		// Used when bottom right of the field is pressed 
 			autonnumber = 4;
 		}
-		
+		/*
 		switch (autonnumber){
 			case 1:{
 				//RMA
@@ -124,5 +125,6 @@ void drawAutonSelector(){
 			}
 
 		}
+		*/
 	}
 }

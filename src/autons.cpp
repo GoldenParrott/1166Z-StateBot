@@ -108,14 +108,14 @@ void autoTest() {
 
     // score on Alliance Stake
     yoin.set_value(true);
-    pros::delay(200);
-    intake.move(128);
+    preRoller.move(-128);
     follower.clearActions();
+    follower.addAction([](){ker.set_value(true);}, 0.62);
     follower.startProfile(rushProfile, false);
-    ker.set_value(true);
-    pros::delay(200);
-    follower.addAction([](){ker.set_value(false);}, 0.8);
-    follower.addAction([](){clamp.set_value(true);}, 0.9);
+    follower.clearActions();
+    follower.addAction([](){transport.move_relative(-270, 600);}, 0.3);
+    follower.addAction([](){ker.set_value(false);}, 0.5);
+    follower.addAction([](){clamp.set_value(true);}, 0.99);
     follower.startProfile(yoinkProfile, true);
     follower.clearActions();
     /*
