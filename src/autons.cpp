@@ -2,50 +2,8 @@
 #include "paths.h"
 #include "profiling.h"
 
-void globalBlueRing() {}
-
-void globalBlueGoal() {}
-
-void globalRedGoal() {}
-
-void globalRedRing() {}
-
-void redGoalside() {
-
-    // velocity controller class
-    VelocityController follower = VelocityController();
-
-    // profile setup with pregeneration
-    /*
-    MotionProfile* rushProfile = new MotionProfile(&RedMoGoPath::rushProfile, RedMoGoPath::rushSpeed);
-    MotionProfile* yoinkProfile = new MotionProfile(&RedMoGoPath::yoinkProfile, RedMoGoPath::yoinkSpeed);
-    MotionProfile* dropProfile = new MotionProfile(&RedMoGoPath::dropProfile, RedMoGoPath::dropSpeed);
-    MotionProfile* grabProfile = new MotionProfile(&RedMoGoPath::grabProfile, RedMoGoPath::grabSpeed);
-    MotionProfile* cornerProfile = new MotionProfile(&RedMoGoPath::cornerProfile, RedMoGoPath::cornerSpeed);
-    MotionProfile* ladderProfile = new MotionProfile(&RedMoGoPath::ladderProfile, RedMoGoPath::ladderSpeed);
-    */
-
-    // profile following
-    //yoin.set_value(true);
-    //follower.startProfile(rushProfile);
-    //follower.startProfile(yoinkProfile);
-    //follower.startProfile(dropProfile);
-    //follower.startProfile(grabProfile);
-    //follower.startProfile(cornerProfile);
-    //follower.startProfile(ladderProfile);
-}
-
-void blueGoalside() {}
-
-void redRingside() {}
-
-void blueRingside() {}
-
-void autoSkills() {}
-
+void globalBlueRing() {
 /*
-void autoTest() {
-
     // velocity controller class
     VelocityController follower = VelocityController();
 
@@ -87,24 +45,28 @@ void autoTest() {
     follower.startProfile(ring2Profile, false);
     pros::delay(500);
     follower.startProfile(ladderProfile, true);
-    
-
-}
 */
+}
 
-void autoTest() {
+void globalBlueGoal() {}
 
-        // velocity controller class
+void globalRedGoal() {}
+
+void globalRedRing() {}
+
+void redGoalside() {
+/*
+    // velocity controller class
     VelocityController follower = VelocityController();
 
     // profile setup with pregeneration
     MotionProfile* rushProfile = new MotionProfile(&RedMoGoRush::rushProfile, RedMoGoRush::rushSpeed);
     MotionProfile* yoinkProfile = new MotionProfile(&RedMoGoRush::yoinkProfile, RedMoGoRush::yoinkSpeed);
     MotionProfile* backProfile = new MotionProfile(&RedMoGoRush::backProfile, RedMoGoRush::backSpeed);
-    /*MotionProfile* dropProfile = new MotionProfile(&RedMoGoRush::dropProfile, RedMoGoRush::dropSpeed);
+    MotionProfile* dropProfile = new MotionProfile(&RedMoGoRush::dropProfile, RedMoGoRush::dropSpeed);
     MotionProfile* grabProfile = new MotionProfile(&RedMoGoRush::grabProfile, RedMoGoRush::grabSpeed);
     MotionProfile* cornerProfile = new MotionProfile(&RedMoGoRush::cornerProfile, RedMoGoRush::cornerSpeed);
-    MotionProfile* ladderProfile = new MotionProfile(&RedMoGoRush::ladderProfile, RedMoGoRush::ladderSpeed);*/
+    MotionProfile* ladderProfile = new MotionProfile(&RedMoGoRush::ladderProfile, RedMoGoRush::ladderSpeed);
 
 
     // score on Alliance Stake
@@ -131,6 +93,57 @@ void autoTest() {
     drivetrain.brake();
     pros::delay(1000);
     follower.startProfile(crossP1Profile, false);
+    
+    /*
+    pros::delay(500);
+    follower.startProfile(crossP2Profile, false);
+    pros::delay(500);
+    follower.startProfile(goal2Profile, true);
+    pros::delay(500);
+    follower.startProfile(ring2Profile, false);
+    pros::delay(500);
+    follower.startProfile(ladderProfile, true);
+*/
+}
+
+void blueGoalside() {
+    // velocity controller class
+    VelocityController follower = VelocityController();
+
+    // profile setup with pregeneration
+    MotionProfile* rushProfile = new MotionProfile(&BlueMoGoRush::rushProfile, BlueMoGoRush::rushSpeed);
+    MotionProfile* yoinkProfile = new MotionProfile(&BlueMoGoRush::yoinkProfile, BlueMoGoRush::yoinkSpeed);
+    MotionProfile* backProfile = new MotionProfile(&BlueMoGoRush::backProfile, BlueMoGoRush::backSpeed);
+    /*MotionProfile* dropProfile = new MotionProfile(&RedMoGoRush::dropProfile, RedMoGoRush::dropSpeed);
+    MotionProfile* grabProfile = new MotionProfile(&RedMoGoRush::grabProfile, RedMoGoRush::grabSpeed);
+    MotionProfile* cornerProfile = new MotionProfile(&RedMoGoRush::cornerProfile, RedMoGoRush::cornerSpeed);
+    MotionProfile* ladderProfile = new MotionProfile(&RedMoGoRush::ladderProfile, RedMoGoRush::ladderSpeed);*/
+
+
+    // score on Alliance Stake
+    yoin.set_value(true);
+    preRoller.move(-128);
+    follower.clearActions();
+    follower.addAction([](){ker.set_value(true);}, 0.64);
+    follower.startProfile(rushProfile, false);
+    follower.clearActions();
+    // follower.addAction([](){transport.move_relative(-360, 600);}, 0.3);
+    follower.addAction([](){ker.set_value(false);}, 0.7);
+    // follower.addAction([](){clamp.set_value(true);}, 0.99);
+    follower.startProfile(yoinkProfile, true);
+    follower.clearActions();
+    follower.startProfile(backProfile, true);
+    drivetrain.move_relative(-600, 150);
+    pros::delay(650);
+    clamp.set_value(true);
+    pros::delay(200);
+    yoin.set_value(false);
+    transport.move(-128);
+    /*
+    follower.startProfile(midringProfile2, false);
+    drivetrain.brake();
+    pros::delay(1000);
+    follower.startProfile(crossP1Profile, false);
     */
     /*
     pros::delay(500);
@@ -142,5 +155,12 @@ void autoTest() {
     pros::delay(500);
     follower.startProfile(ladderProfile, true);
     */
-
 }
+
+void redRingside() {}
+
+void blueRingside() {}
+
+void autoSkills() {}
+
+void autoTest() {}

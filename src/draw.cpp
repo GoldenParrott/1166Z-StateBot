@@ -15,8 +15,8 @@ void drawAutonSelector(){
 	BRE.pause();
 
 	Bozo.resume();
-	*/
-	waitUntil(status.touch_status == 1)
+	
+	waitUntil(status.touch_status == 1);
 	status = pros::screen::touch_status();
 	// Bozo.pause();
 	while(1){
@@ -125,10 +125,9 @@ void drawAutonSelector(){
 			}
 
 		}
-		*/
+		
 	}
 }
-
 */
 
 void drawBasicSelector(){

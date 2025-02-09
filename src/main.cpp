@@ -59,10 +59,10 @@ void competition_initialize() {
 		} else {
 			switch (autonnumber) {
 				case 1://Blue Mogo
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, -36}, 251);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -35.5}, 245);
 					break;
 				case -1:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-49.25, -60.325}, 69);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 65);
 					break;
 				case 2:
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 0);
@@ -77,7 +77,6 @@ void competition_initialize() {
 		}
 		status = pros::screen::touch_status();
 		// initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
-		initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 65);
 		pros::delay(10);
 
 	}
@@ -133,7 +132,7 @@ void autonomous() {
 	leftDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 	rightDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 
-	autoTest();
+	blueGoalside();
 }
 
 /**
