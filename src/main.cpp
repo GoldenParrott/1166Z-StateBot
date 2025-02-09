@@ -150,7 +150,6 @@ void autonomous() {
  */
 void opcontrol() {
 
-
 	
 	//std::cout << logfile.readFile();
 
