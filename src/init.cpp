@@ -62,7 +62,7 @@
     pros::Task* loggingEnabled_task_ptr = NULL;
 
 // Image Definitions
-
+/*
     Gif Bozo("/usd/[Bozo].gif", lv_scr_act());
     Gif Logo("/usd/[Logo].gif", lv_scr_act());
     Gif RMA("/usd/[Red_Mogo_AWP].gif", lv_scr_act());
@@ -73,7 +73,7 @@
     Gif BME("/usd/[Blue_Mogo_ELIM].gif", lv_scr_act());
     Gif RRE("/usd/[Red_Ring_ELIM].gif", lv_scr_act());
     Gif BRE("/usd/[Blue_Ring_ELIM].gif", lv_scr_act());
-
+*/
 // Variables
 
     int num;

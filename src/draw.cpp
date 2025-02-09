@@ -1,6 +1,6 @@
 #include "init.h"
 #include "gif-pros/gifclass.hpp"
-
+/*
 void drawAutonSelector(){
 
 	Bozo.pause();
@@ -126,6 +126,8 @@ void drawAutonSelector(){
 		}
 	}
 }
+
+*/
 
 void drawBasicSelector(){
 	while(1){

@@ -99,7 +99,7 @@ void autonomous() {
 	if (autoSelector_task_ptr != NULL) {
 		autoSelector_task_ptr->remove();
 	}
-
+/*
 	Bozo.clean();
 	Logo.clean();
 	RMA.clean();
@@ -110,7 +110,7 @@ void autonomous() {
 	BME.clean();
 	RRE.clean();
 	BRE.clean();
-
+*/
 	// starts the system that fixes the turning tracking wheel's heading
 	pros::Task updateRotational = pros::Task(bindTurnTrackingWheelHeading);
 
