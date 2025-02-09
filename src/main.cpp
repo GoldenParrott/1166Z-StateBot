@@ -30,7 +30,7 @@ void disabled() {}
 void competition_initialize() {
 
 
-	autonnumber = 1;
+	autonnumber = 1; 
 	globalAuton = false;
 
 	autoSelector_task_ptr = new pros::Task(drawAutonSelector);

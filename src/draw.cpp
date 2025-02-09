@@ -128,3 +128,7 @@ void drawAutonSelector(){
 		*/
 	}
 }
+
+void drawBasicSelector(){
+	
+}
