@@ -33,7 +33,7 @@ void competition_initialize() {
 	autonnumber = 1; 
 	globalAuton = false;
 
-	autoSelector_task_ptr = new pros::Task(drawAutonSelector);
+	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 
 	while (true) {
 		
@@ -150,7 +150,7 @@ void autonomous() {
  */
 void opcontrol() {
 
-	
+	master.rumble("-.-");
 	//std::cout << logfile.readFile();
 
 	// Front, Middle, Rear
