@@ -114,15 +114,17 @@ void autoTest() {
     follower.addAction([](){ker.set_value(true);}, 0.62);
     follower.startProfile(rushProfile, false);
     follower.clearActions();
-    follower.addAction([](){transport.move_relative(-360, 600);}, 0.3);
+    // follower.addAction([](){transport.move_relative(-360, 600);}, 0.3);
     follower.addAction([](){ker.set_value(false);}, 0.7);
     // follower.addAction([](){clamp.set_value(true);}, 0.99);
     follower.startProfile(yoinkProfile, true);
     follower.clearActions();
-    drivetrain.move_relative(-750, 200);
-    pros::delay(700);
+    follower.startProfile(backProfile, true);
+    drivetrain.move_relative(-500, 150);
+    pros::delay(550);
     clamp.set_value(true);
     pros::delay(200);
+    yoin.set_value(false);
     transport.move(-128);
     /*
     follower.startProfile(midringProfile2, false);
