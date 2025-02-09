@@ -100,10 +100,11 @@ void autoTest() {
     // profile setup with pregeneration
     MotionProfile* rushProfile = new MotionProfile(&RedMoGoRush::rushProfile, RedMoGoRush::rushSpeed);
     MotionProfile* yoinkProfile = new MotionProfile(&RedMoGoRush::yoinkProfile, RedMoGoRush::yoinkSpeed);
-    MotionProfile* dropProfile = new MotionProfile(&RedMoGoRush::dropProfile, RedMoGoRush::dropSpeed);
+    MotionProfile* backProfile = new MotionProfile(&RedMoGoRush::backProfile, RedMoGoRush::backSpeed);
+    /*MotionProfile* dropProfile = new MotionProfile(&RedMoGoRush::dropProfile, RedMoGoRush::dropSpeed);
     MotionProfile* grabProfile = new MotionProfile(&RedMoGoRush::grabProfile, RedMoGoRush::grabSpeed);
     MotionProfile* cornerProfile = new MotionProfile(&RedMoGoRush::cornerProfile, RedMoGoRush::cornerSpeed);
-    MotionProfile* ladderProfile = new MotionProfile(&RedMoGoRush::ladderProfile, RedMoGoRush::ladderSpeed);
+    MotionProfile* ladderProfile = new MotionProfile(&RedMoGoRush::ladderProfile, RedMoGoRush::ladderSpeed);*/
 
 
     // score on Alliance Stake
@@ -113,11 +114,16 @@ void autoTest() {
     follower.addAction([](){ker.set_value(true);}, 0.62);
     follower.startProfile(rushProfile, false);
     follower.clearActions();
-    follower.addAction([](){transport.move_relative(-270, 600);}, 0.3);
-    follower.addAction([](){ker.set_value(false);}, 0.5);
-    follower.addAction([](){clamp.set_value(true);}, 0.99);
+    follower.addAction([](){transport.move_relative(-360, 600);}, 0.3);
+    follower.addAction([](){ker.set_value(false);}, 0.7);
+    // follower.addAction([](){clamp.set_value(true);}, 0.99);
     follower.startProfile(yoinkProfile, true);
     follower.clearActions();
+    drivetrain.move_relative(-750, 200);
+    pros::delay(700);
+    clamp.set_value(true);
+    pros::delay(200);
+    transport.move(-128);
     /*
     follower.startProfile(midringProfile2, false);
     drivetrain.brake();
