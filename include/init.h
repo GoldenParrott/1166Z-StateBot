@@ -63,7 +63,7 @@
     extern pros::Task* loggingEnabled_task_ptr;
 
 // Image Definitions
-
+/*
     extern Gif Bozo;
     extern Gif Logo;
     extern Gif RMA;
@@ -74,7 +74,7 @@
     extern Gif BME;
     extern Gif RRE;
     extern Gif BRE;
-
+*/
 // Variables
 
     extern int num;

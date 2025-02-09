@@ -33,7 +33,7 @@ void competition_initialize() {
 	autonnumber = 1; 
 	globalAuton = false;
 
-	autoSelector_task_ptr = new pros::Task(drawAutonSelector);
+	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 
 	while (true) {
 		
@@ -100,7 +100,7 @@ void autonomous() {
 	if (autoSelector_task_ptr != NULL) {
 		autoSelector_task_ptr->remove();
 	}
-
+/*
 	Bozo.clean();
 	Logo.clean();
 	RMA.clean();
@@ -111,7 +111,7 @@ void autonomous() {
 	BME.clean();
 	RRE.clean();
 	BRE.clean();
-
+*/
 	// starts the system that fixes the turning tracking wheel's heading
 	pros::Task updateRotational = pros::Task(bindTurnTrackingWheelHeading);
 
@@ -151,8 +151,7 @@ void autonomous() {
  */
 void opcontrol() {
 
-
-	
+	master.rumble("-.-");
 	//std::cout << logfile.readFile();
 
 	// Front, Middle, Rear
