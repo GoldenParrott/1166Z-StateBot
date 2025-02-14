@@ -25,7 +25,7 @@ void ArmMacros() {
 				}
 			}else{
 				if(ArmRotational.get_position() < -3000){
-					while (ArmRotational.get_position() < -4000) {
+					while (ArmRotational.get_position() < -3000) {
                 		arm.move(-32);
             		}
 				}else{
@@ -130,25 +130,24 @@ void autoEject() {
 				// case 1a: if the difference between the starting point and the current point
 				// 			is greater than 700 (meaning that it has gone all the way),
 				//			turn off the 
-				if (abs(transport.get_position() - ejectStartPoint) >= 200) {
+				if (abs(transport.get_position() - ejectStartPoint) >= 1000) {
 					ejectOn = false;
 					ejectStartPoint = 0;
-					transport.move(-128);
+					intake.move(128);
 				// case 1b: if case 1a is not true, then continue moving the intake down
 				} else {
-					transport.move(128);
+					intake.move(-128);
 				}
 			}
 			// case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found the right color
-			else if ((((colorSense.get_hue() > 180) && (autonnumber < 0)) || // blue
-				      ((colorSense.get_hue() < 35)  && (autonnumber > 0)) // red
-					 )
-					&& (Distance.get() < 50)
+			else if ((((colorSense.get_hue() > 100) && (autonnumber < 0)) || // blue
+				      ((colorSense.get_hue() < 30)  && (autonnumber > 0)))   // red
+					&& (Distance.get() < 999) && (colorSense.get_proximity() > 40)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
-				pros::delay(65); // the robot waits for the Ring to reach the proper point before starting the eject
-				transport.move(128);
+				pros::delay(10); // the robot waits for the Ring to reach the proper point before starting the eject
+				transport.move(-128);
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
 			}

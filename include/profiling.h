@@ -83,6 +83,8 @@ class CubicHermiteSpline {
         void findSecondDerivative(void);
         double calculateCurvature(double t);
         double findNearestPointOnSpline(Point givenPoint, double excludeBelow);
+        double calculateCurveSpeed(double t);
+        double findNextT(double currentT, double distanceToMove);
 
         std::vector<CubicPolyData> functions;
         std::vector<QuadraticPolyData> derivative;

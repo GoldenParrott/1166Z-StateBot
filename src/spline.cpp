@@ -9,8 +9,6 @@ CubicHermiteSpline::CubicHermiteSpline(Point startPos, Point startV, Point endPo
     this->findFunction();
     this->findDerivative();
     this->findSecondDerivative();
-    
-    this->fullSampleSpline = this->entirePath(10000);
 }
 
 double CubicHermiteSpline::evaluateP0(double t) {
@@ -220,4 +218,18 @@ double CubicHermiteSpline::findNearestPointOnSpline(Point givenPoint, double exc
         }
     }
     return closestT;
+}
+
+double CubicHermiteSpline::calculateCurveSpeed(double t) {
+    double veloVecX = (this->derivative[1].a * std::pow(t, 2)) + (this->derivative[1].b * t) + (this->derivative[1].c);
+    double veloVecY = (this->derivative[0].a * std::pow(t, 2)) + (this->derivative[0].b * t) + (this->derivative[0].c);
+    double speed = (std::sqrt(std::pow(veloVecX, 2) + std::pow(veloVecY, 2)));
+
+    return speed;
+}
+
+double CubicHermiteSpline::findNextT(double currentT, double distanceToMove) {
+    double deltaT = distanceToMove / this->calculateCurveSpeed(currentT);
+    double nextT = currentT + deltaT;
+    return nextT;
 }

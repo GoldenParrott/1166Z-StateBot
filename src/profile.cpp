@@ -59,17 +59,17 @@ void MotionProfile::constructWithCustomZones(std::vector<std::vector<Point>> zon
             return;
         }
     }
-    for (int i = 0; i < zones.size(); i++) {
-        std::cout << "start t = " << zones[i].startT << ", end t = " << zones[i].endT << "; y = " << zones[i].zoneLine.slope << "x + " << zones[i].zoneLine.yIntercept << "\n";
-    }
     return;
 }
 
 void MotionProfile::generateVelocities() {
-    UltraPose currentPoint = this->path->findUltraPose(0, 0.0001);
+    Pose currentPoint = this->path->findPose(0, 0.0001);
     double currentT = 0;
     double prevT = -0.0001;
+    double distanceToNext = 0;
     while (true) {
+
+        currentPoint = this->path->findPose(currentT, 0.0001);
 
         Zone assignedZone = {NAN, NAN, {NAN, NAN}};
 
@@ -95,13 +95,10 @@ void MotionProfile::generateVelocities() {
         double linearVelocity = linearVelocityMultiplier * this->maxSpeed;
         // the angular velocity is the curvature of the current point multiplied by the current linear velocity
         double angularVelocity = linearVelocity * this->path->calculateCurvature(currentT) * dir; //* (double) curveDirection;
-
-        // notes the t from the current cycle for use in the profile list and for the next cycle
-        prevT = currentT;
         
         // adds the new velocities and point as the next profile point
-        profile.push_back({currentPoint.x, currentPoint.y, currentPoint.heading, linearVelocity, angularVelocity, prevT});
-
+        profile.push_back({currentPoint.x, currentPoint.y, currentPoint.heading, linearVelocity, angularVelocity, currentT});
+/*
         // redefines the current point to the next point for the next loop
         currentPoint.x = currentPoint.x + ((linearVelocity * 0.005) * std::cos(fixAngle(currentPoint.heading) * (M_PI / 180)));
         currentPoint.y = currentPoint.y + ((linearVelocity * 0.005) * std::sin(fixAngle(currentPoint.heading) * (M_PI / 180)));
@@ -109,17 +106,15 @@ void MotionProfile::generateVelocities() {
 
         // std::cout << "cx = " << currentT << ", cy = " << currentT << "\n";
 
-        std::cout << "r = " << (linearVelocity * 0.005) << "\n";
-
-        std::cout << "Working... t=" << currentT << "\n";
+        // std::cout << "Working... t=" << currentT << "\n";
 
         //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
-
-        currentPoint = this->path->findUltraPose(currentT, 0.0001);
-
-
-        //    std::cout << "Working... t = " << currentT << "\n";
-
+        // std::cout << "r = " << currentT - prevT << "\n";
+*/
+        if (linearVelocity < 1) {linearVelocity = 1;}
+        distanceToNext = linearVelocity * 0.005;
+        prevT = currentT;
+        currentT = this->path->findNextT(currentT, distanceToNext);
         if (currentT >= 1) {
             break;
         }

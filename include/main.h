@@ -94,6 +94,25 @@ struct Inequality {
     double yIntercept;
     int equality;
 };
+struct PIDReturn {
+    double prevError;
+    double prevIntegral; 
+    int power;
+};
+struct ConstantContainer {
+    double kP; 
+    double kI;
+    double kD;
+};
+
+// pid.cpp
+void PIDMoverBasic(void);
+void PIDMover(Point goalPosition, bool reverse = false,                 std::vector<std::function<void(void)>> custom = {}, std::vector<double> executeAts = {});
+void PIDTurner(int setPoint, int direction,                 std::vector<std::function<void(void)>> custom = {}, std::vector<int> executeAt = {});
+void PIDArc(int chordLength, int maxDist, int direction,                std::vector<std::function<void(void)>> custom = {}, std::vector<int> executeAt = {});
+
+PIDReturn PIDCalc(double distanceMoved, double setPoint, bool isPositive, ConstantContainer constants, PIDReturn lastCycle);
+
 //hif
 // kalman.cpp
 class KalmanFilter {
@@ -194,5 +213,6 @@ void bindTurnTrackingWheelHeading();
 // sidetasks.cpp
 void ArmMacros(void);
 void eject(void);
+void autoEject(void);
 
 #endif  // _PROS_MAIN_H_

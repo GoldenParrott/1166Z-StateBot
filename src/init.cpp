@@ -56,6 +56,7 @@
     pros::Task* controlLoop_task_ptr = NULL;
     pros::Task* coordinateUpdater_task_ptr = NULL;
     pros::Task* macros_task_ptr = NULL;
+    pros::Task* autoEject_task_ptr = NULL;
     pros::Task* eject_task_ptr = NULL;
     pros::Task* rotationalBinder_task_ptr = NULL;
     pros::Task* autoSelector_task_ptr = NULL;

@@ -189,7 +189,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
             }
             */
             
-                delay = 5;
+                delay = 10;
             /*
 
             std::cout << "ex = " << error.x << "\ney = " << error.y << "\neh = " << error.heading << "\n\n";

@@ -65,10 +65,10 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 65);
 					break;
 				case 2:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 0);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
 					break;
 				case -2:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54, 12.5}, 232);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 10}, 220);
 					break;
 				case -5:
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 90);
@@ -116,7 +116,8 @@ void autonomous() {
 
 	// starts the coordinate updating system
 	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
-
+	autoEject_task_ptr = new pros::Task(autoEject);
+//hif
 	// autonomous setup
 	colorSense.set_led_pwm(100);
 
@@ -132,7 +133,18 @@ void autonomous() {
 	leftDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 	rightDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 
-	blueGoalside();
+	switch (autonnumber) {
+		case 1:
+			blueGoalside();
+		case -1:
+			redGoalside();
+		case 2:
+			globalBlueRing();
+		case -2:
+			globalRedRing();
+		case -10:
+			autoTest();
+	}
 }
 
 /**
@@ -152,6 +164,11 @@ void opcontrol() {
 
 	master.rumble("-.-");
 	//std::cout << logfile.readFile();
+
+	if (autoEject_task_ptr != NULL) {
+		autoEject_task_ptr->remove();
+		autoEject_task_ptr = NULL;
+	}
 
 	// Front, Middle, Rear
 	leftDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
