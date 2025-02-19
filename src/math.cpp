@@ -250,6 +250,12 @@ Point findIntersection(
     Line line2 // the second line
 )
 {
+    if (std::isnan(line1.slope)) {
+        return {line1.yIntercept, ((line2.slope * line1.yIntercept) + line2.yIntercept)};
+    } else if (std::isnan(line2.slope)) {
+        return {line2.yIntercept, ((line1.slope * line2.yIntercept) + line1.yIntercept)};
+    }
+
     Point intersect = {0, 0};
     // first, the x-intersect is found with substitution
     // this starts with y = ax + b and y = cx + d, which can be substituted into ax + b = cx + d

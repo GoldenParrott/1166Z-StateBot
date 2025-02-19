@@ -7,10 +7,12 @@ void ArmMacros() {
 		// scores the arm on a Wall Stake and then retracts to its original position
 		if (master.get_digital(DIGITAL_Y)) {
 			armMoving = true;
-			while (ArmRotational.get_position() > -14000) {
+			double startTime = pros::millis();
+			while ((ArmRotational.get_position() > -14000) && ((pros::millis() - startTime) < 3000)) {
                 arm.move(127);
             }
-            while (ArmRotational.get_position() < -3000) {
+			startTime = pros::millis();
+            while ((ArmRotational.get_position() < -3000) && (pros::millis() - startTime) < 2000) {
                 arm.move(-32);
             }
 			arm.brake();

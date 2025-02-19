@@ -8,7 +8,6 @@
  */
 void initialize() {
 
-	
 }
 
 /**
@@ -29,11 +28,10 @@ void disabled() {}
  */
 void competition_initialize() {
 
-
-	autonnumber = 1; 
-	globalAuton = false;
-
-	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
+	
+	autonnumber = -3; 
+	globalAuton = true;
+	// autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 
 	while (true) {
 		
@@ -53,7 +51,7 @@ void competition_initialize() {
 					break;
 				case 3:
 				case -3: //Test (?)
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-48, -48}, 225);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {0, 0}, 90);
 					break;
 			}
 		} else {
@@ -81,6 +79,7 @@ void competition_initialize() {
 
 	}
 	
+	
 }
 
 /**
@@ -95,6 +94,7 @@ void competition_initialize() {
  * from where it left off.
  */
 void autonomous() {
+	
 	// disables the auto selector
 	if (autoSelector_task_ptr != NULL) {
 		autoSelector_task_ptr->remove();
@@ -111,6 +111,7 @@ void autonomous() {
 	RRE.clean();
 	BRE.clean();
 */
+
 	// starts the system that fixes the turning tracking wheel's heading
 	pros::Task updateRotational = pros::Task(bindTurnTrackingWheelHeading);
 
@@ -136,15 +137,22 @@ void autonomous() {
 	switch (autonnumber) {
 		case 1:
 			blueGoalside();
+			break;
 		case -1:
 			redGoalside();
+			break;
 		case 2:
 			globalBlueRing();
+			break;
 		case -2:
 			globalRedRing();
-		case -10:
+			break;
+		case 3:
+		case -3:
 			autoTest();
+			break;
 	}
+
 }
 
 /**
@@ -164,11 +172,20 @@ void opcontrol() {
 
 	master.rumble("-.-");
 	//std::cout << logfile.readFile();
-
+	std::cout << "test1\n";
+	
 	if (autoEject_task_ptr != NULL) {
 		autoEject_task_ptr->remove();
 		autoEject_task_ptr = NULL;
 	}
+	if (coordinateUpdater_task_ptr != NULL) {
+		coordinateUpdater_task_ptr->remove();
+		coordinateUpdater_task_ptr = NULL;
+	}
+	Kalman1.endFilter();
+	Kalman2.endFilter();
+	std::cout << "test2\n";
+	
 
 	// Front, Middle, Rear
 	leftDrivetrain.set_brake_mode(pros::E_MOTOR_BRAKE_COAST);
@@ -181,11 +198,10 @@ void opcontrol() {
 	int drvfb;
 	int drvlr;
 	int drvtrdz = 10;
-	
-	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
+
 	eject_task_ptr = new pros::Task(eject);
 	macros_task_ptr = new pros::Task(ArmMacros);
-
+	std::cout << "test3\n";
 	while (true) {
 	
 	//Drivetrain Control 

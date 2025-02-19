@@ -223,7 +223,11 @@ void blueGoalside() {
     MotionProfile* centerProfile = new MotionProfile(&centerSpline, RPMtoIPS(300));
     MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(300));
     std::cout << "time taken = " << (pros::millis() - start) << "\n";
-    return;
+
+    arm.move(128);
+    waitUntil(ArmRotational.get_position() < -5000);
+	arm.brake();
+        return;
     // score on Alliance Stake
     yoin.set_value(true);
     preRoller.move(-128);
@@ -266,5 +270,7 @@ void blueRingside() {}
 void autoSkills() {}
 
 void autoTest() {
+    PIDMover({-48, 1}, true);
+    PIDTurner(270, 1);
     intake.move(128);
 }

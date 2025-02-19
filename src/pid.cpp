@@ -24,7 +24,7 @@ void PIDMover(
 	// General Variables
 	double power = 0;
 
-	double tolerance = 1.5;
+	double tolerance = 1;
 	std::vector<bool> customsCompleted(customs.size(), false);
 	bool actionCompleted = false;
 	int cyclesAtGoal = 0;
@@ -32,9 +32,9 @@ void PIDMover(
 
 	// Constants (need to be tuned individually for every robot)
 	ConstantContainer moverConstants;
-		moverConstants.kP = 4.9; // 4
-		moverConstants.kI = 0.07; // 0.1
-		moverConstants.kD = 1; // 2.7
+		moverConstants.kP = 4; // 4
+		moverConstants.kI = 0.1; // 0.1
+		moverConstants.kD = 2.7; // 2.7
 	
 
 
@@ -120,37 +120,30 @@ void PIDMover(
 		// fifteen millisecond delay between cycles
 		pros::delay(15);
 
+		std::cout << "ucl = " << universalCurrentLocation.x << ", " << universalCurrentLocation.y << "\n";
+
 
 		if (std::isnan(findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, getAggregatedHeading(Kalman1, Kalman2)), {negativeSide.slope, negativeSide.yIntercept}).x) ||
 			std::isnan(findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, getAggregatedHeading(Kalman1, Kalman2)), {negativeSide.slope, negativeSide.yIntercept}).y)) {
 			continue;
 		}
 		// fixes the goal point to be in front of where we are facing
-		if (autonnumber == -5) {
-			goalPosition = findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, getAggregatedHeading(Kalman1, Kalman2)), {negativeSide.slope, negativeSide.yIntercept});
-			setPoint = calculateDistance(originalPosition, goalPosition);
-		}
+		goalPosition = findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, getAggregatedHeading(Kalman1, Kalman2)), {negativeSide.slope, negativeSide.yIntercept});
+		setPoint = calculateDistance(originalPosition, goalPosition);
 
 		// calculates the distance moved as the difference between the distance left to move
 		// and the total distance to move
 		remainingDistance = calculateDistance({universalCurrentLocation.x, universalCurrentLocation.y}, goalPosition);
 		currentDistanceMovedByWheel = setPoint - remainingDistance;
 
-		if (autonnumber != -5) {
-			// checks to see if the robot has completed the movement by checking if it is within a range of the perpendicular line of its goal point
-			if (( // handles the cases where the perpendicular line takes the form of y = mx + b or y = k
-				 (!std::isnan(negativeSide.slope)) && 
-				 ((universalCurrentLocation.y <= ((negativeSide.slope * universalCurrentLocation.x) + negativeSide.yIntercept) + tolerance) && 
-				 (universalCurrentLocation.y >= ((negativeSide.slope * universalCurrentLocation.x) + negativeSide.yIntercept) - tolerance))
-				) || ( // handles the case where the perpendicular line is vertical and takes the form of x = k
-				 (std::isnan(negativeSide.slope)) &&
-				 (universalCurrentLocation.x <= negativeSide.yIntercept + tolerance) &&
-				 (universalCurrentLocation.x >= negativeSide.yIntercept - tolerance)
-				)
-			   )
-			
+		std::cout << "remaining = " << remainingDistance << "\n";
+
+		pros::lcd::print(0, "remaining = %f", remainingDistance);
+
+		// checks to see if the robot has completed the movement by checking if it is within a range of the perpendicular line of its goal point
+		if (remainingDistance <= 0 + tolerance)
 			{
-				if (cyclesAtGoal >= 10) {
+				if (true) {
 					actionCompleted = true;
 					drivetrain.brake();
 				} else {
@@ -159,20 +152,6 @@ void PIDMover(
 			} else {
 				cyclesAtGoal = 0;
 			}
-		}
-		else {
-			if ((remainingDistance <= 0 + tolerance) && (remainingDistance >= 0 - tolerance)) 
-			{
-				if (cyclesAtGoal >= 10) {
-					actionCompleted = true;
-					drivetrain.brake();
-				} else {
-					cyclesAtGoal++;
-				}
-			} else {
-				cyclesAtGoal = 0;
-			}
-		}
 
 		
 
