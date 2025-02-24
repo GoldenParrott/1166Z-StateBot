@@ -1,124 +1,113 @@
 #include "init.h"
 #include "profiling.h"
 
-void globalBlueRing() {
-    /*
-    // velocity controller class
+void BlueAWP() {
+
     VelocityController follower = VelocityController();
 
-    // profile setup with pregeneration
-    MotionProfile* goalProfile = new MotionProfile(&BlueSoloAWP::goalProfile, BlueSoloAWP::goalSpeed);
-    MotionProfile* tempProfile = new MotionProfile(&BlueSoloAWP::tempProfile, BlueSoloAWP::tempSpeed);
-    */
-    /*MotionProfile* midringProfile1 = new MotionProfile(&SoloAWP::midring1Profile, SoloAWP::midring1Speed);
-    MotionProfile* midringProfile2 = new MotionProfile(&SoloAWP::midring2Profile, SoloAWP::midring2Speed);
-    MotionProfile* crossP1Profile = new MotionProfile(&SoloAWP::crossP1Profile, SoloAWP::crossP1Speed);
-    MotionProfile* crossP2Profile = new MotionProfile(&SoloAWP::crossP2Profile, SoloAWP::crossP2Speed);
-    MotionProfile* goal2Profile = new MotionProfile(&SoloAWP::goal2Profile, SoloAWP::goal2Speed);
-    MotionProfile* ring2Profile = new MotionProfile(&SoloAWP::ring2Profile, SoloAWP::ring2Speed);
-    MotionProfile* ladderProfile = new MotionProfile(&SoloAWP::ladderProfile, SoloAWP::ladderSpeed);
+    // spline setup
+    CubicHermiteSpline goalSpline = CubicHermiteSpline({-57.2, 10.6}, {-28.7, 45}, {-35.14, 29.54}, {-11.6, 17.9});
+    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({-20.54, 22}, {-35.07, 29.36}, {-23.71, 44.84}, {-22.6, 91.2});
+    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({-23.7, 44.85}, {-22.6, 91.4}, {-8.42, 40.2}, {-17.8, -41});
+    CubicHermiteSpline crossSpline = CubicHermiteSpline({-8.421, 40.198}, {-14.68, 21.02}, {-59.2, -7.8}, {-81.8, 6.5});
+    // profile setup
+    MotionProfile* goalProfile = new MotionProfile(&goalSpline, 400);
+    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, 600);
+    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, 400);
+    MotionProfile* crossProfile = new MotionProfile(&crossSpline, 600);
 
-
-    // score on Alliance Stake
-    drivetrain.move_relative(270, 300);
-    pros::delay(200);
+    // scores on Alliance Stake
     arm.move(128);
-    waitUntil(ArmRotational.get_position() < -13000);
+    waitUntil(ArmRotational.get_position() < -18000);
+    arm.move(-128);
+    waitUntil(ArmRotational.get_position() > 1000);
     arm.brake();
-    follower.clearActions();
-    follower.addAction([](){arm.move(-128);}, 0.2);
-    follower.addAction([](){clamp.set_value(true);}, 0.725);
-    follower.addAction([](){arm.brake();}, 0.8);
-    follower.startProfile(goalProfile, true);
-    intake.move(-128);
-    follower.clearActions();
-    follower.startProfile(tempProfile, false);
-    pros::delay(14000);
-    */
-    /*
-    follower.startProfile(midringProfile1, false);
-    follower.startProfile(midringProfile2, false);
-    drivetrain.brake();
-    pros::delay(1000);
-    follower.startProfile(crossP1Profile, false);
-    */
-    /*
-    pros::delay(500);
-    follower.startProfile(crossP2Profile, false);
-    pros::delay(500);
-    follower.startProfile(goal2Profile, true);
-    pros::delay(500);
-    follower.startProfile(ring2Profile, false);
-    pros::delay(500);
-    follower.startProfile(ladderProfile, true);
-    */
 
+    // moves to goal and grabs it
+    follower.startProfile(goalProfile, true);
+    PIDMover({-23.7, 44.85}, true, {[](){clamp.set_value(true);}}, {14});
+
+    // moves to inner Ring stack and takes the correct Ring
+    intake.move(-128);
+    follower.startProfile(innerRingProfile);
+
+    // moves to middle Ring stack and takes those Rings
+    follower.startProfile(outerRingProfile);
+
+    // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
+    follower.addAction([](){clamp.set_value(false);}, 0.7);
+    follower.startProfile(crossProfile);
+    follower.clearActions();
+
+    // moves to the other MoGo and grabs it
+    PIDMover({-20, -25}, true, {[](){clamp.set_value(true);}}, {38});
+
+    // moves to the other inner Ring and grabs it
+    PIDTurner(190, 2);
+    intake.move(128);
+    PIDMover({-24, -48});
+
+    // raises arm and moves to ladder to contact it
+    arm.move(128);
+    waitUntil(ArmRotational.get_position() < -5000);
+    arm.brake();
+    PIDMover({-18, -13.5}, true);
 }
 
-void globalRedRing() {
-    /*
-    // velocity controller class
+void RedAWP() {
+
     VelocityController follower = VelocityController();
 
-    // profile setup with pregeneration
-    MotionProfile* goalProfile = new MotionProfile(&RedSoloAWP::goalProfile, RedSoloAWP::goalSpeed);
-    MotionProfile* tempProfile = new MotionProfile(&RedSoloAWP::tempProfile, RedSoloAWP::tempSpeed);
-    */
-    /*MotionProfile* midringProfile1 = new MotionProfile(&SoloAWP::midring1Profile, SoloAWP::midring1Speed);
-    MotionProfile* midringProfile2 = new MotionProfile(&SoloAWP::midring2Profile, SoloAWP::midring2Speed);
-    MotionProfile* crossP1Profile = new MotionProfile(&SoloAWP::crossP1Profile, SoloAWP::crossP1Speed);
-    MotionProfile* crossP2Profile = new MotionProfile(&SoloAWP::crossP2Profile, SoloAWP::crossP2Speed);
-    MotionProfile* goal2Profile = new MotionProfile(&SoloAWP::goal2Profile, SoloAWP::goal2Speed);
-    MotionProfile* ring2Profile = new MotionProfile(&SoloAWP::ring2Profile, SoloAWP::ring2Speed);
-    MotionProfile* ladderProfile = new MotionProfile(&SoloAWP::ladderProfile, SoloAWP::ladderSpeed);*/
+    // spline setup
+    CubicHermiteSpline goalSpline = CubicHermiteSpline({57.2, 10.6}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
+    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({20.54, 22}, {35.07, 29.36}, {23.71, 44.84}, {22.6, 91.2});
+    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({23.7, 44.85}, {22.6, 91.4}, {8.42, 40.2}, {17.8, -41});
+    CubicHermiteSpline crossSpline = CubicHermiteSpline({8.421, 40.198}, {14.68, 21.02}, {59.2, -7.8}, {81.8, 6.5});
+    // profile setup
+    MotionProfile* goalProfile = new MotionProfile(&goalSpline, 400);
+    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, 600);
+    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, 400);
+    MotionProfile* crossProfile = new MotionProfile(&crossSpline, 600);
 
-/*
-    // score on Alliance Stake
-    drivetrain.move_relative(270, 100);
-    pros::delay(200);
+    // scores on Alliance Stake
     arm.move(128);
-    waitUntil(ArmRotational.get_position() < -13000);
+    waitUntil(ArmRotational.get_position() < -18000);
+    arm.move(-128);
+    waitUntil(ArmRotational.get_position() > 1000);
     arm.brake();
-    follower.clearActions();
-    follower.addAction([](){arm.move(-128);}, 0.2);
-    follower.addAction([](){clamp.set_value(true);}, 0.725);
-    follower.addAction([](){arm.brake();}, 0.8);
+
+    // moves to goal and grabs it
     follower.startProfile(goalProfile, true);
+    PIDMover({-23.7, 44.85}, true, {[](){clamp.set_value(true);}}, {14});
+
+    // moves to inner Ring stack and takes the correct Ring
     intake.move(-128);
+    follower.startProfile(innerRingProfile);
+
+    // moves to middle Ring stack and takes those Rings
+    follower.startProfile(outerRingProfile);
+
+    // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
+    follower.addAction([](){clamp.set_value(false);}, 0.7);
+    follower.startProfile(crossProfile);
     follower.clearActions();
-    follower.startProfile(tempProfile, false);
-    pros::delay(14000);
-*/
-    /*
-    follower.startProfile(midringProfile1, false);
-    follower.startProfile(midringProfile2, false);
-    drivetrain.brake();
-    pros::delay(1000);
-    follower.startProfile(crossP1Profile, false);
-    */
-    /*
-    pros::delay(500);
-    follower.startProfile(crossP2Profile, false);
-    pros::delay(500);
-    follower.startProfile(goal2Profile, true);
-    pros::delay(500);
-    follower.startProfile(ring2Profile, false);
-    pros::delay(500);
-    follower.startProfile(ladderProfile, true);
-    */
-    
+
+    // moves to the other MoGo and grabs it
+    PIDMover({20, -25}, true, {[](){clamp.set_value(true);}}, {38});
+
+    // moves to the other inner Ring and grabs it
+    PIDTurner(170, 1);
+    intake.move(128);
+    PIDMover({24, -48});
+
+    // raises arm and moves to ladder to contact it
+    arm.move(128);
+    waitUntil(ArmRotational.get_position() < -5000);
+    arm.brake();
+    PIDMover({18, -13.5}, true);
 }
 
-void globalBlueGoal() {
-    globalRedRing();
-}
-
-void globalRedGoal() {
-    globalBlueRing();
-}
-
-
-void redGoalside() {
+void RedGoalRush() {
 /*
     // velocity controller class
     VelocityController follower = VelocityController();
@@ -185,7 +174,7 @@ void redGoalside() {
     */
 }
 
-void blueGoalside() {
+void BlueGoalRush() {
     std::cout << "START!\n";
     // velocity controller class
     VelocityController follower = VelocityController();
@@ -270,7 +259,5 @@ void blueRingside() {}
 void autoSkills() {}
 
 void autoTest() {
-    PIDMover({-48, 1}, true);
-    PIDTurner(270, 1);
-    intake.move(128);
+
 }

@@ -162,16 +162,14 @@ class File {
 };
 
 // autons.cpp
-    // global autons
-    void globalBlueGoal(void);
-    void globalBlueRing(void);
-    void globalRedGoal(void);
-    void globalRedRing(void);
+    // AWP autons
+    void BlueAWP(void);
+    void RedAWP(void);
     void autoTest(void);
 
     // specific autons
-    void redGoalside(void);
-    void blueGoalside(void);
+    void RedGoalRush(void);
+    void BlueGoalRush(void);
     void redRingside(void);
     void blueRingside(void);
     void autoSkills(void);

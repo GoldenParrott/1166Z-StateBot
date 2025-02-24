@@ -142,10 +142,10 @@ void autonomous() {
 			redGoalside();
 			break;
 		case 2:
-			globalBlueRing();
+			BlueAWP();
 			break;
 		case -2:
-			globalRedRing();
+			RedAWP();
 			break;
 		case 3:
 		case -3:
