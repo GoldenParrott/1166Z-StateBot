@@ -7,7 +7,7 @@
  * to keep execution time for this mode under a few seconds.
  */
 void initialize() {
-
+	arm.set_zero_position(-46);
 }
 
 /**
@@ -29,9 +29,9 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -3; 
+	autonnumber = -2; 
 	globalAuton = true;
-	// autoSelector_task_ptr = new pros::Task(drawBasicSelector);
+	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 
 	while (true) {
 		
@@ -47,7 +47,7 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-49.25, -60.325}, 69);
 					break;
 				case -2: //Red Ring
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 12}, 148);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 13.5}, 229);
 					break;
 				case 3:
 				case -3: //Test (?)
@@ -136,10 +136,10 @@ void autonomous() {
 
 	switch (autonnumber) {
 		case 1:
-			blueGoalside();
+			BlueGoalRush();
 			break;
 		case -1:
-			redGoalside();
+			BlueGoalRush();
 			break;
 		case 2:
 			BlueAWP();

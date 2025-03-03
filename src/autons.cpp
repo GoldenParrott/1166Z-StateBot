@@ -18,9 +18,9 @@ void BlueAWP() {
 
     // scores on Alliance Stake
     arm.move(128);
-    waitUntil(ArmRotational.get_position() < -18000);
+    waitUntil(arm.get_position() < -180);
     arm.move(-128);
-    waitUntil(ArmRotational.get_position() > 1000);
+    waitUntil(arm.get_position() > 10);
     arm.brake();
 
     // moves to goal and grabs it
@@ -49,7 +49,7 @@ void BlueAWP() {
 
     // raises arm and moves to ladder to contact it
     arm.move(128);
-    waitUntil(ArmRotational.get_position() < -5000);
+    waitUntil(arm.get_position() < -50);
     arm.brake();
     PIDMover({-18, -13.5}, true);
 }
@@ -59,27 +59,33 @@ void RedAWP() {
     VelocityController follower = VelocityController();
 
     // spline setup
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({57.2, 10.6}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
+    // CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
+    CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {-10, 36}, {-20, 25}, {-10, 36});
     CubicHermiteSpline innerRingSpline = CubicHermiteSpline({20.54, 22}, {35.07, 29.36}, {23.71, 44.84}, {22.6, 91.2});
     CubicHermiteSpline outerRingSpline = CubicHermiteSpline({23.7, 44.85}, {22.6, 91.4}, {8.42, 40.2}, {17.8, -41});
     CubicHermiteSpline crossSpline = CubicHermiteSpline({8.421, 40.198}, {14.68, 21.02}, {59.2, -7.8}, {81.8, 6.5});
     // profile setup
-    MotionProfile* goalProfile = new MotionProfile(&goalSpline, 400);
-    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, 600);
-    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, 400);
-    MotionProfile* crossProfile = new MotionProfile(&crossSpline, 600);
+    MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
+    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, RPMtoIPS(600));
+    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, RPMtoIPS(400));
+    MotionProfile* crossProfile = new MotionProfile(&crossSpline, RPMtoIPS(600));
 
     // scores on Alliance Stake
-    arm.move(128);
-    waitUntil(ArmRotational.get_position() < -18000);
-    arm.move(-128);
-    waitUntil(ArmRotational.get_position() > 1000);
+    drivetrain.move_relative(220, 150);
+    arm.move(70);
+    waitUntil(arm.get_position() > 450);
+    pros::delay(250);
+    drivetrain.move_relative(-220, 150);
+    arm.move(-70);
+    waitUntil(arm.get_position() < 10);
     arm.brake();
 
     // moves to goal and grabs it
+    PIDTurner(250, 2);
     follower.startProfile(goalProfile, true);
-    PIDMover({-23.7, 44.85}, true, {[](){clamp.set_value(true);}}, {14});
-
+    //PIDTurner(247, 2);
+    //PIDMover({-20, 25}, true, {[](){clamp.set_value(true);}}, {20});
+/*
     // moves to inner Ring stack and takes the correct Ring
     intake.move(-128);
     follower.startProfile(innerRingProfile);
@@ -102,154 +108,132 @@ void RedAWP() {
 
     // raises arm and moves to ladder to contact it
     arm.move(128);
-    waitUntil(ArmRotational.get_position() < -5000);
+    waitUntil(arm.get_position() < -50);
     arm.brake();
     PIDMover({18, -13.5}, true);
+*/
 }
 
 void RedGoalRush() {
-/*
-    // velocity controller class
+
     VelocityController follower = VelocityController();
 
-    // profile setup with pregeneration
-    MotionProfile* rushProfile = new MotionProfile(&RedMoGoRush::rushProfile, RedMoGoRush::rushSpeed);
-    MotionProfile* yoinkProfile = new MotionProfile(&RedMoGoRush::yoinkProfile, RedMoGoRush::yoinkSpeed);
-    MotionProfile* backProfile = new MotionProfile(&RedMoGoRush::backProfile, RedMoGoRush::backSpeed);
-    MotionProfile* dropProfile = new MotionProfile(&RedMoGoRush::dropProfile, RedMoGoRush::dropSpeed);
-    MotionProfile* centerProfile = new MotionProfile(&RedMoGoRush::centerProfile, RedMoGoRush::centerSpeed);
-    MotionProfile* ladderProfile = new MotionProfile(&RedMoGoRush::ladderProfile, RedMoGoRush::ladderSpeed);
+    // spline setup
+    CubicHermiteSpline rushSpline = CubicHermiteSpline({-52.8, -58.6}, {22.4, -36.5}, {-16.8, -48}, {22.37, -36.3});
+    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({-26.98, -53.06}, {-56.3, -44}, {-32.66, -28.5}, {2.6, -10.6});
+    CubicHermiteSpline cornerSpline = CubicHermiteSpline({-21.9, -22.03}, {-73, -55.3}, {-62.2, -52.4}, {-69.1, -84.4});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-40.33, -55.9}, {-15.65, -59.76}, {-9.1, -28.1}, {-17.4, -8.6});
+    // profile setup
+    MotionProfile* rushProfile = new MotionProfile(&rushSpline, 600);
+    MotionProfile* secondGoalProfile = new MotionProfile(&secondGoalSpline, 400);
+    MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, 600);
+    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, 500);
 
-    // score on Alliance Stake
+    // rushes MoGo in middle
+    intake.move(128);
     yoin.set_value(true);
-    preRoller.move(-128);
-    follower.clearActions();
     follower.addAction([](){ker.set_value(true);}, 0.95);
-    follower.startProfile(rushProfile, false);
+    pros::Task armMovement = pros::Task([](){
+        arm.move(128);
+        waitUntil(arm.get_position() < 120);
+        arm.brake();
+    });
+    follower.startProfile(rushProfile);
     follower.clearActions();
-    // follower.addAction([](){transport.move_relative(-360, 600);}, 0.3);
-    follower.addAction([](){ker.set_value(false);}, 0.7);
-    follower.addAction([](){clamp.set_value(true);}, 0.8);
-    follower.startProfile(yoinkProfile, true);
-    follower.clearActions();
-    //follower.addAction([](){clamp.set_value(true);}, 0.08);
-    //follower.startProfile(backProfile, true);
-    drivetrain.brake();
-    pros::delay(200);
-    transport.move_relative(-300, 600);
-    pros::delay(550);
-    follower.clearActions();
-    clamp.set_value(false);
-    follower.addAction([](){yoin.set_value(false);}, 0.7);
-    // follower.addAction([](){clamp.set_value(false);}, 0.5);
-    follower.startProfile(dropProfile, false);
-    drivetrain.brake();
-    follower.clearActions();
-    drivetrain.move_relative(-1500, 200);
-    pros::delay(1300);
-    clamp.set_value(true);
-    transport.move_relative(-300, 600);
-    pros::delay(14000);
-    /*
-    pros::delay(600);
-    follower.clearActions();
-    inPutston.set_value(true);
-    follower.addAction([](){inPutston.set_value(false);}, 0.65);
-    follower.addAction([](){transport.brake();}, 0.85);
-    follower.startProfile(centerProfile, false);
-    drivetrain.move_relative(270, 100);
-    pros::delay(600);
-    rightDrivetrain.move_relative(120, 100);
-    pros::delay(300);
-    leftDrivetrain.move_relative(90, 100);
+    armMovement.remove();
+
+    // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
+    PIDMover({-30, -52}, true);
+    PIDTurner((universalCurrentLocation.heading + 25), 2);
     arm.move(128);
-    waitUntil(ArmRotational.get_position() < -13000);
-    drivetrain.move_relative(-120, 100);
-    arm.move(-128);
-    waitUntil(ArmRotational.get_position() > -1000);
+    drivetrain.move(80);
+    pros::delay(350);
     arm.brake();
+    drivetrain.brake();
+
+    // aligns with second MoGo via a curve and grabs that MoGo
+    follower.addAction([](){ker.set_value(false);}, 0.65);
+    follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
-    // follower.startProfile(ladderProfile, true);
-    pros::delay(14000);
-    */
+    PIDMover({-22, -22}, true, {[](){clamp.set_value(true);}}, {0.9});
+
+    // moves into Corner and gets its Rings
+    follower.addAction([](){yoin.set_value(true);}, 0.8);
+    follower.startProfile(cornerProfile);
+    follower.clearActions();
+    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-40.33, -55.9}), 1);
+    intake.move(-128);
+    PIDMover({-40.33, -55.9});
+
+    // raises arm and moves to ladder to contact it
+    armMovement = pros::Task([](){
+        arm.move(128);
+        waitUntil(arm.get_position() < -50);
+        arm.brake();
+    });
+    follower.startProfile(ladderProfile);
+    armMovement.remove();
 }
 
 void BlueGoalRush() {
-    std::cout << "START!\n";
-    // velocity controller class
+
     VelocityController follower = VelocityController();
-    double start = pros::millis();
-    // spline paths
-    CubicHermiteSpline rushSpline = CubicHermiteSpline({50.5, -35.5}, {-40.5, -19.5}, {17, -49}, {-40.5, -19.5});
-    //CubicHermiteSpline yoinkSpline = CubicHermiteSpline({-26.5, -49.5}, {-24, -11}, {-16, -17}, {100, 50});
-    double dilation = 2.2;
-    CubicHermiteSpline yoinkSpline = CubicHermiteSpline({12, -51}, {dilation * 40.5, dilation * 19.5}, {10 + (dilation * (25 - 10)), -52 + (dilation * (-28 - -52))}, {dilation * -20, dilation * -6});
-    CubicHermiteSpline backSpline = CubicHermiteSpline({25, -28}, {-12, 8}, {19, -20}, {-12, 8});
-    CubicHermiteSpline dropSpline = CubicHermiteSpline({19, -20}, {12, -8}, {55, -25}, {-15, 40});
-    /*CubicHermiteSpline grabSpline = CubicHermiteSpline({-55, -25}, {5, -40}, {-10.5, -52.5}, {0, -20});
-    CubicHermiteSpline cornerSpline = CubicHermiteSpline({-21, -47}, {-10, -20}, {-57, -57.5}, {-15, -15});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-57, -57.5}, {15, 15}, {-11, -30}, {10, 10});*/
-    CubicHermiteSpline centerSpline = CubicHermiteSpline({16.5, -53.25}, {120, 20}, {60, 5}, {100, -40});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({63, -3}, {-15, 10}, {22, -9}, {-22, 9});
 
-    // profile generation
-    MotionProfile* rushProfile = new MotionProfile(
-        &rushSpline,
-        RPMtoIPS(600),
-        {{{0, 0.1}, {0.2, 1}}, {{0.2, 1}, {0.6, 1}}, {{0.6, 1}, {1, 0.25}}}
-    );
-    MotionProfile* yoinkProfile = new MotionProfile(
-        &yoinkSpline, 
-        RPMtoIPS(400),
-        {{{0, 1}, {0.9, 1}}, {{0.5, 1}, {1, 0.25}}}
-    );
-    MotionProfile* backProfile = new MotionProfile(
-        &backSpline,
-        RPMtoIPS(200),
-        {{{0, 1}, {0.8, 1}}, {{0.25, 1}, {1, 0}}});
-    MotionProfile* dropProfile = new MotionProfile(&dropSpline, RPMtoIPS(600));
-    //MotionProfile* grabProfile = new MotionProfile(&grabSpline, RPMtoIPS(300));
-    MotionProfile* centerProfile = new MotionProfile(&centerSpline, RPMtoIPS(300));
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(300));
-    std::cout << "time taken = " << (pros::millis() - start) << "\n";
+    // spline setup
+    CubicHermiteSpline rushSpline = CubicHermiteSpline({52.3, -32.8}, {-17.2, -54.1}, {16.89, -43.68}, {-17.2, -54.2});
+    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({27.03, -42}, {54.95, -37.2}, {32.66, -28.5}, {-2.6, -10.6});
+    CubicHermiteSpline cornerSpline = CubicHermiteSpline({21.9, -22.03}, {73, -55.3}, {53.3, -62.2}, {82.1, -72.3});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({60, -46.9}, {45, -94.6}, {9.1, -28.1}, {17.4, -8.6});
+    // profile setup
+    MotionProfile* rushProfile = new MotionProfile(&rushSpline, RPMtoIPS(600));
+    MotionProfile* secondGoalProfile = new MotionProfile(&secondGoalSpline, RPMtoIPS(400));
+    MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, RPMtoIPS(600));
+    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(500));
 
-    arm.move(128);
-    waitUntil(ArmRotational.get_position() < -5000);
-	arm.brake();
-        return;
-    // score on Alliance Stake
+    // rushes MoGo in middle
+    intake.move(128);
     yoin.set_value(true);
-    preRoller.move(-128);
+    follower.addAction([](){ker.set_value(true);}, 0.95);
+    pros::Task armMovement = pros::Task([](){
+        arm.move(128);
+        waitUntil(arm.get_position() < 120);
+        arm.brake();
+    });
+    follower.startProfile(rushProfile);
     follower.clearActions();
-    // follower.addAction([](){ker.set_value(true);}, 0.99);
-    follower.startProfile(rushProfile, false);
-    ker.set_value(true);
-    follower.clearActions();
-    // follower.addAction([](){transport.move_relative(-360, 600);}, 0.3);
-    follower.addAction([](){ker.set_value(false);}, 0.8);
-    //follower.addAction([](){clamp.set_value(true);}, 0.98);
-    follower.startProfile(yoinkProfile, true);
-    follower.clearActions();
-    //follower.addAction([](){clamp.set_value(true);}, 0.08);
-    //follower.startProfile(backProfile, true);
-    pros::delay(100);
-    clamp.set_value(true);
-    transport.move_relative(-600, 600);
-    pros::delay(150);
+    armMovement.remove();
+
+    // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
+    PIDMover({30, -39.65}, true);
+    PIDTurner((universalCurrentLocation.heading + 25), 2);
+    arm.move(128);
+    drivetrain.move(80);
+    pros::delay(350);
+    arm.brake();
     drivetrain.brake();
-    pros::delay(750);
+
+    // aligns with second MoGo via a curve and grabs that MoGo
+    follower.addAction([](){ker.set_value(false);}, 0.65);
+    follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
-    clamp.set_value(false);
-    follower.addAction([](){yoin.set_value(false);}, 0.6);
-    // follower.addAction([](){clamp.set_value(false);}, 0.5);
-    follower.startProfile(dropProfile, false);
-    drivetrain.brake();
+    PIDMover({-22, -22}, true, {[](){clamp.set_value(true);}}, {0.9});
+
+    // moves into Corner and gets its Rings
+    follower.addAction([](){yoin.set_value(true);}, 0.8);
+    follower.startProfile(cornerProfile);
     follower.clearActions();
-    drivetrain.move_relative(-1250, 200);
-    pros::delay(1200);
-    clamp.set_value(true);
-    transport.move(-128);
-    pros::delay(14000);
+    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-40.33, -55.9}), 1);
+    intake.move(-128);
+    PIDMover({40.33, -55.9});
+
+    // raises arm and moves to ladder to contact it
+    armMovement = pros::Task([](){
+        arm.move(128);
+        waitUntil(arm.get_position() < -50);
+        arm.brake();
+    });
+    follower.startProfile(ladderProfile);
+    armMovement.remove();
 }
 
 void redRingside() {}

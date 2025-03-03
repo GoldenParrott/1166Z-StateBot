@@ -8,11 +8,11 @@ void ArmMacros() {
 		if (master.get_digital(DIGITAL_Y)) {
 			armMoving = true;
 			double startTime = pros::millis();
-			while ((ArmRotational.get_position() > -14000) && ((pros::millis() - startTime) < 3000)) {
+			while ((arm.get_position() > -140) && ((pros::millis() - startTime) < 30)) {
                 arm.move(127);
             }
 			startTime = pros::millis();
-            while ((ArmRotational.get_position() < -3000) && (pros::millis() - startTime) < 2000) {
+            while ((arm.get_position() < -30) && (pros::millis() - startTime) < 20) {
                 arm.move(-32);
             }
 			arm.brake();
@@ -21,17 +21,17 @@ void ArmMacros() {
 		// puts the arm in a scoring position
 		else if (master.get_digital_new_press(DIGITAL_B)) {
 			armMoving = true;
-			if(ArmRotational.get_position() > -1100){
-				while (ArmRotational.get_position() > -1800) {
+			if(arm.get_position() > -11){
+				while (arm.get_position() > -18) {
 					arm.move(32);
 				}
 			}else{
-				if(ArmRotational.get_position() < -3000){
-					while (ArmRotational.get_position() < -3000) {
+				if(arm.get_position() < -30){
+					while (arm.get_position() < -30) {
                 		arm.move(-32);
             		}
 				}else{
-					while (ArmRotational.get_position() < 0) {
+					while (arm.get_position() < 0) {
 						arm.move(-32);
 					}
 				}

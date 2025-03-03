@@ -39,7 +39,6 @@
     // Rotational Sensors
         pros::Rotation Rotational(6);
         pros::Rotation RotationalTurn(9);
-        pros::Rotation ArmRotational(1);
 
     // Other Sensors
         pros::Optical colorSense(18);

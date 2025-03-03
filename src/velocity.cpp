@@ -84,6 +84,8 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
         currentPoint = currentlyFollowing->findNearestPoint(currentStep);
         //std::cout << currentPoint.t << "\n";
 
+        // std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << ", h = " << currentPoint.heading << ", lv = " << currentPoint.linVel << ", av = " << currentPoint.angVel << ", t = " << currentPoint.t << "\n";
+
         // sets linear and angular velocities to that of the current point - these are changed by RAMSETE if it is on
         double linVel = currentPoint.linVel;
         double angVel = currentPoint.angVel;
@@ -98,21 +100,12 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
 
             if (reverse) {
                 linVel *= -1;
-                            
-            std::cout << "odom = " << fixAngle(location.heading) << "\n";
-            std::cout << "next = " << fixAngle(nextPoint.heading) << "\n";
-            std::cout << "diff = " << fixAngle(nextPoint.heading) - fixAngle(location.heading) << "\n\n";
 
                 if (location.heading > 180) {
                     location.heading -= 180;
                 } else {
                     location.heading += 180;
                 }
-       
-            std::cout << "fodom = " << fixAngle(location.heading) << "\n";
-            std::cout << "fnext = " << fixAngle(nextPoint.heading) << "\n";
-            std::cout << "fdiff = " << fixAngle(nextPoint.heading) - fixAngle(location.heading) << "\n\n";
-
             }
 
             double fixedOdomAngle = fixAngle(location.heading) * (M_PI / 180);
@@ -150,7 +143,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
             // k1/k3: the proportional gain value for both the local frame of x and heading
             double k = 2 * zeta * std::sqrt(std::pow(angVel, 2) + (b * std::pow(linVel, 2)));
             // k2: the gain value for the y-value, which the robot cannot move directly on and is thus handled differently 
-            double k2 = b * currentPoint.linVel;
+            double k2 = b * linVel;
 
         // control inputs that determine the controller's influence on the velocity based on the error
             // simply the normal gain value multiplied by the x-error because that can be directly moved upon (input for linear velocity)
@@ -162,7 +155,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
 
         // actual calculations of modified linear and angular velocities as additions/subtractions to the profile's original values
             // the original linear velocity is also transformed to follow the robot's error in heading before having the control input subtracted from it
-            linVel = ((currentPoint.linVel * 0.0254) * std::cos(error.heading)) + u1;
+            linVel = ((linVel * 0.0254) * std::cos(error.heading)) + u1;
             // the angular velocity does not need to be transformed in the same way that the linear velocity needs to because it is already angular in reference to the robot
             angVel = currentPoint.angVel + u2;
 
@@ -200,6 +193,8 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
             std::cout << "angv = " << angVel << ", proangv = " << currentPoint.angVel << "\n\n";
             
             */
+
+            std::cout << "eh = " << error.heading * (180 / M_PI) << "\n";
         }
 
         // standard calculation of output of each side based on specifications of the motion profile
@@ -231,11 +226,11 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
         // textToWrite.push_back("il = " + std::to_string(currentPoint.linVel) + ", ia = " + std::to_string(currentPoint.angVel) + "\nal = " + std::to_string(linVel) + ", aa = " + std::to_string(angVel) + "\n\n");
         //std::cout << "lvol = " << velocitiesRPM[0] * rpmToV << ", rvol = " << velocitiesRPM[1] * rpmToV << "\n";
         //std::cout << "lv = " << linVel << ", rv = " << angVel << "\n\n";
-        std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
+        //std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
         //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
         //std::cout << "step = " << currentStep << "\n";
-        //std::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
-        // std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
+        std::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
+        //std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
         //logfile.appendFile("x = " + std::to_string(location.x) + ", should be " + std::to_string(currentPoint.x) + "\n");
         //logfile.appendFile("y = " + std::to_string(location.y) + ", should be " + std::to_string(currentPoint.y) + "\n");
         //logfile.appendFile("h = " + std::to_string(location.heading + ", should be " + std::to_string(currentPoint.heading));

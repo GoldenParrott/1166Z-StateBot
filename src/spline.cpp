@@ -224,7 +224,6 @@ double CubicHermiteSpline::calculateCurveSpeed(double t) {
     double veloVecX = (this->derivative[1].a * std::pow(t, 2)) + (this->derivative[1].b * t) + (this->derivative[1].c);
     double veloVecY = (this->derivative[0].a * std::pow(t, 2)) + (this->derivative[0].b * t) + (this->derivative[0].c);
     double speed = (std::sqrt(std::pow(veloVecX, 2) + std::pow(veloVecY, 2)));
-
     return speed;
 }
 

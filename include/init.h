@@ -40,7 +40,6 @@
     // Rotational Sensors
         extern pros::Rotation Rotational;
         extern pros::Rotation RotationalTurn;
-        extern pros::Rotation ArmRotational;
 
     // Other Sensors
         extern pros::Optical colorSense;
