@@ -60,15 +60,35 @@ void RedAWP() {
 
     // spline setup
     // CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {-10, 36}, {-20, 25}, {-10, 36});
-    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({20.54, 22}, {35.07, 29.36}, {23.71, 44.84}, {22.6, 91.2});
-    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({23.7, 44.85}, {22.6, 91.4}, {8.42, 40.2}, {17.8, -41});
-    CubicHermiteSpline crossSpline = CubicHermiteSpline({8.421, 40.198}, {14.68, 21.02}, {59.2, -7.8}, {81.8, 6.5});
+    CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {10, 36}, {-20, 25}, {10, 36});
+    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({-20, 25}, {-25, 51}, {-23, 42}, {-29, 83});
+    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({-23, 42}, {-34, 77}, {-50, 39}, {-49, 20});
+    CubicHermiteSpline crossSpline = CubicHermiteSpline({-49.5, 39}, {-50, 20}, {-50, -12}, {-38, -39.5});
+    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({-50, -12}, {-31.5, -50.3}, {-22, -49.5}, {-22, -69});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-21.8, -49.7}, {-38, 6.7}, {-16, -12.3}, {8.3, 14.4});
+
     // profile setup
     MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
-    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, RPMtoIPS(600));
-    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, RPMtoIPS(400));
-    MotionProfile* crossProfile = new MotionProfile(&crossSpline, RPMtoIPS(600));
+    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, RPMtoIPS(600), 
+        {
+            {{0, 0.1}, {0.05, 1}}, 
+            {{0.05, 1}, {1, 1}}
+        }
+    );
+    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, RPMtoIPS(600),
+        {
+            {{0, 0.1}, {0.1, 1}}, 
+            {{0.1, 1}, {1, 1}}
+        }
+    );
+    MotionProfile* crossProfile = new MotionProfile(&crossSpline, RPMtoIPS(600),
+        {
+            {{0, 1}, {0.9, 1}}, 
+            {{0.9, 1}, {1, 0}}
+        }
+    );
+    MotionProfile* southernRingProfile = new MotionProfile(&southernRingSpline, RPMtoIPS(600));
+    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(600));
 
     // scores on Alliance Stake
     drivetrain.move_relative(220, 150);
@@ -76,42 +96,34 @@ void RedAWP() {
     waitUntil(arm.get_position() > 450);
     pros::delay(250);
     drivetrain.move_relative(-220, 150);
+    pros::delay(200);
     arm.move(-70);
     waitUntil(arm.get_position() < 10);
     arm.brake();
 
     // moves to goal and grabs it
     PIDTurner(250, 2);
+    follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
-    //PIDTurner(247, 2);
-    //PIDMover({-20, 25}, true, {[](){clamp.set_value(true);}}, {20});
-/*
+    follower.clearActions();
+
     // moves to inner Ring stack and takes the correct Ring
-    intake.move(-128);
+    intake.move(128);
+    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-24, 48}), 2);
     follower.startProfile(innerRingProfile);
 
     // moves to middle Ring stack and takes those Rings
     follower.startProfile(outerRingProfile);
 
     // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
-    follower.addAction([](){clamp.set_value(false);}, 0.7);
+    //follower.addAction([](){clamp.set_value(false);}, 0.7);
+    follower.addAction([](){inPutston.set_value(true);}, 0.5);
     follower.startProfile(crossProfile);
     follower.clearActions();
 
-    // moves to the other MoGo and grabs it
-    PIDMover({20, -25}, true, {[](){clamp.set_value(true);}}, {38});
+    // moves to the southern Ring stack (on the Goal side)
+    follower.startProfile(southernRingProfile);
 
-    // moves to the other inner Ring and grabs it
-    PIDTurner(170, 1);
-    intake.move(128);
-    PIDMover({24, -48});
-
-    // raises arm and moves to ladder to contact it
-    arm.move(128);
-    waitUntil(arm.get_position() < -50);
-    arm.brake();
-    PIDMover({18, -13.5}, true);
-*/
 }
 
 void RedGoalRush() {

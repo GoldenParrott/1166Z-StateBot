@@ -2,9 +2,9 @@
 
 CubicHermiteSpline::CubicHermiteSpline(Point startPos, Point startV, Point endPos, Point endV) {
     this->startPos = startPos;
-    this->startV = startV;
+    this->startV = {startV.x - startPos.x, startV.y - startPos.y};
     this->endPos = endPos;
-    this->endV = endV;
+    this->endV = {endV.x - endPos.x, endV.y - endPos.y};
 
     this->findFunction();
     this->findDerivative();
