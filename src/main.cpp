@@ -29,8 +29,8 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -2; 
-	globalAuton = true;
+	autonnumber = -5; 
+	globalAuton = false;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 
 	while (true) {
@@ -69,7 +69,7 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 10}, 220);
 					break;
 				case -5:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 90);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-56, 0}, 270);
 					break;
 			}
 		}
@@ -150,6 +150,9 @@ void autonomous() {
 		case 3:
 		case -3:
 			autoTest();
+			break;
+		case -5:
+			autoSkills();
 			break;
 	}
 

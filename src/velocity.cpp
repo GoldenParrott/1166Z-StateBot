@@ -163,38 +163,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
 
             linVel *= currentPoint.linVel / currentlyFollowing->maxSpeed;
 
-        // recalculates the delay, as it may change due to the RAMSETE controller modifying the robot's movement
-            double newDistance = std::fabs(error.heading * (linVel / angVel));
-            double newDelay = newDistance / std::fabs(linVel);
-            delay = newDelay * 1000;
-
-            // textToWrite.push_back("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
-            //std::cout << ("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
-            /*
-            if (delay > 100) {
-                std::cout << "PSYCHOPATH VALUES AHEAD: \n";
-                std::cout << "nd = " << delay << "\n";
-                std::cout << "t = " << sum << "\n";
-                std::cout << ("ex = " + std::to_string(error.x) + ", ey = " + std::to_string(error.y) + ", eh = " + std::to_string(error.heading) + "\n");
-                std::cout << "ucl = " << location.heading << ", actual = " << getAggregatedHeading(Kalman1, Kalman2) << ", used = " << fixedOdomAngle << ", desired = " << fixedNextAngle << "\n\n";
-            } else {
-                std::cout << "nd = " << delay << "\n";
-            }
-            */
-            
-                delay = 10;
-            /*
-
-            std::cout << "ex = " << error.x << "\ney = " << error.y << "\neh = " << error.heading << "\n\n";
-
-            std::cout << "k = " << k << "\nk2 = " << k2 << "\n\n";
-
-            std::cout << "linv = " << linVel << ", prolinv = " << currentPoint.linVel << "\n";
-            std::cout << "angv = " << angVel << ", proangv = " << currentPoint.angVel << "\n\n";
-            
-            */
-
-            std::cout << "eh = " << error.heading * (180 / M_PI) << "\n";
+            delay = 10;
         }
 
         // standard calculation of output of each side based on specifications of the motion profile
@@ -220,24 +189,6 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
             leftDrivetrain.move_voltage(velocitiesRPM[0] * rpmToV);
             rightDrivetrain.move_voltage(velocitiesRPM[1] * rpmToV);
         }
-        // LOGGING FOR TEST PURPOSES
-        //std::cout << timeAtCurrentVelocity << "\n";
-        //textToWrite.push_back("ix = " + std::to_string(currentPoint.x) + ", iy = " + std::to_string(currentPoint.y) + ", ihead = " + std::to_string(currentPoint.heading) + "\n" + "ax = " + std::to_string(location.x) + ", ay = " + std::to_string(location.y) + ", ahead = " + std::to_string(location.heading) + "\n" + std::to_string(currentPoint.t) + "\n\n");
-        // textToWrite.push_back("il = " + std::to_string(currentPoint.linVel) + ", ia = " + std::to_string(currentPoint.angVel) + "\nal = " + std::to_string(linVel) + ", aa = " + std::to_string(angVel) + "\n\n");
-        //std::cout << "lvol = " << velocitiesRPM[0] * rpmToV << ", rvol = " << velocitiesRPM[1] * rpmToV << "\n";
-        //std::cout << "lv = " << linVel << ", rv = " << angVel << "\n\n";
-        //std::cout << "lrpm = " << velocitiesRPM[0] << ", rrpm = " << velocitiesRPM[1] << "\n";
-        //std::cout << "x = " << currentPoint.x << ", y = " << currentPoint.y << "\n";
-        //std::cout << "step = " << currentStep << "\n";
-        std::cout << " lvel = " << currentPoint.linVel << ", avel = " << currentPoint.angVel << "\n\n";
-        //std::cout << "ct = " << currentPoint.t << ", nt = " << nextPoint.t << "\n";
-        //logfile.appendFile("x = " + std::to_string(location.x) + ", should be " + std::to_string(currentPoint.x) + "\n");
-        //logfile.appendFile("y = " + std::to_string(location.y) + ", should be " + std::to_string(currentPoint.y) + "\n");
-        //logfile.appendFile("h = " + std::to_string(location.heading + ", should be " + std::to_string(currentPoint.heading));
-        //logfile.appendFile("lvol = " + std::to_string(leftDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[0] * rpmToV) + "\n" + "rvol = " + std::to_string(rightDrivetrain.get_voltage()) + ", should be " + std::to_string(velocitiesRPM[1] * rpmToV) + "\n\n");
-        //std::cout << "t = " << std::to_string(currentPoint.t) << ", time = " << std::to_string(((double) pros::millis() - (double) startTime) / 1000) << "\n";
-        //std::cout << (pros::micros() - timeTrack) / 1000 << " is calc\n";
-        //std::cout << timeAtCurrentVelocity * 1000 << " is delay\n";
         
         // computes the calculation time using the timer and converts it to ms
         double calcTime = (pros::micros() - timeSinceStartOfLoop) / 1000;
