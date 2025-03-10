@@ -2,71 +2,17 @@
 #include "profiling.h"
 
 void BlueAWP() {
-
-    VelocityController follower = VelocityController();
-
-    // spline setup
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({-57.2, 10.6}, {-28.7, 45}, {-35.14, 29.54}, {-11.6, 17.9});
-    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({-20.54, 22}, {-35.07, 29.36}, {-23.71, 44.84}, {-22.6, 91.2});
-    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({-23.7, 44.85}, {-22.6, 91.4}, {-8.42, 40.2}, {-17.8, -41});
-    CubicHermiteSpline crossSpline = CubicHermiteSpline({-8.421, 40.198}, {-14.68, 21.02}, {-59.2, -7.8}, {-81.8, 6.5});
-    // profile setup
-    MotionProfile* goalProfile = new MotionProfile(&goalSpline, 400);
-    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, 600);
-    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, 400);
-    MotionProfile* crossProfile = new MotionProfile(&crossSpline, 600);
-
-    // scores on Alliance Stake
-    arm.move(128);
-    waitUntil(arm.get_position() < -180);
-    arm.move(-128);
-    waitUntil(arm.get_position() > 10);
-    arm.brake();
-
-    // moves to goal and grabs it
-    follower.startProfile(goalProfile, true);
-    PIDMover({-23.7, 44.85}, true, {[](){clamp.set_value(true);}}, {14});
-
-    // moves to inner Ring stack and takes the correct Ring
-    intake.move(-128);
-    follower.startProfile(innerRingProfile);
-
-    // moves to middle Ring stack and takes those Rings
-    follower.startProfile(outerRingProfile);
-
-    // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
-    follower.addAction([](){clamp.set_value(false);}, 0.7);
-    follower.startProfile(crossProfile);
-    follower.clearActions();
-
-    // moves to the other MoGo and grabs it
-    PIDMover({-20, -25}, true, {[](){clamp.set_value(true);}}, {38});
-
-    // moves to the other inner Ring and grabs it
-    PIDTurner(190, 2);
-    intake.move(128);
-    PIDMover({-24, -48});
-
-    // raises arm and moves to ladder to contact it
-    arm.move(128);
-    waitUntil(arm.get_position() < -50);
-    arm.brake();
-    PIDMover({-18, -13.5}, true);
-}
-
-void RedAWP() {
-
     VelocityController follower = VelocityController();
 
     // spline setup
     // CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {10, 36}, {-20, 25}, {10, 36});
-    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({-20, 25}, {-25, 51}, {-23, 42}, {-29, 83});
-    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({-23, 42}, {-34, 77}, {-50, 39}, {-49, 20});
-    CubicHermiteSpline crossSpline = CubicHermiteSpline({-49.5, 39}, {-50, 20}, {-50, -12}, {-43, -41.5});
-    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({-50, -12}, {-43, -81.5}, {-23, -51}, {-23.5, -90});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-23, -51}, {-24, -32.5}, {-23.5, -25.2}, {-21, 6.5});
-    CubicHermiteSpline ladder2Spline = CubicHermiteSpline({-23.5, -25.2}, {-22.06, -5.33}, {-11, -15}, {-2, -13});
+    CubicHermiteSpline goalSpline = CubicHermiteSpline({54.75, 13.25}, {-10, 36}, {20, 25}, {-10, 36});
+    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({20, 25}, {25, 51}, {23, 42}, {29, 83});
+    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({23, 42}, {34, 77}, {50, 39}, {49, 20});
+    CubicHermiteSpline crossSpline = CubicHermiteSpline({49.5, 39}, {50, 20}, {50, 12}, {43, 41.5});
+    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({50, -12}, {38, -125.5}, {22, -56}, {13.5, -83});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({26, -56}, {24.5, -22.5}, {32.5, -23}, {32, 5});
+    CubicHermiteSpline ladder2Spline = CubicHermiteSpline({32.5, -23}, {32, 5}, {11, -15}, {-2, -13});
 
     // profile setup
     MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
@@ -85,11 +31,110 @@ void RedAWP() {
     MotionProfile* crossProfile = new MotionProfile(&crossSpline, RPMtoIPS(600),
         {
             {{0, 1}, {0.9, 1}},
-            {{0.5, 1}, {0.6, 0.8}},
-            {{0.9, 0.8}, {1, 0}}
+            {{0.5, 1}, {0.6, 0.4}},
+            {{0.9, 0.4}, {1, 0.4}}
         }
     );
-    MotionProfile* southernRingProfile = new MotionProfile(&southernRingSpline, RPMtoIPS(600));
+    MotionProfile* southernRingProfile = new MotionProfile(&southernRingSpline, RPMtoIPS(600), {
+        {
+            {{0, 0.4}, {0.4, 0.4}},
+            {{0.4, 0.4}, {0.5, 1}},
+            {{0.5, 1}, {0.9, 1}},
+            {{0.9, 1}, {1, 0}}
+        }
+    });
+    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(600));
+    MotionProfile* ladder2Profile = new MotionProfile(&ladder2Spline, RPMtoIPS(600));
+
+    // scores on Alliance Stake
+    drivetrain.move_relative(200, 150);
+    arm.move(70);
+    waitUntil(arm.get_position() > 450);
+    pros::delay(250);
+    drivetrain.move_relative(-220, 150);
+    pros::delay(200);
+    arm.move(-70);
+    waitUntil(arm.get_position() < 230);
+    arm.brake();
+
+    // moves to goal and grabs it
+    PIDTurner(107, 1);
+    follower.addAction([](){clamp.set_value(true);}, 0.98);
+    follower.startProfile(goalProfile, true);
+    follower.clearActions();
+
+    // moves to inner Ring stack and takes the correct Ring
+    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {24, 48}), 1);
+    intake.move(128);
+    transport.move(96);
+    follower.startProfile(innerRingProfile);
+
+    // moves to middle Ring stack and takes those Rings
+    follower.startProfile(outerRingProfile);
+    transport.move(128);
+
+    // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
+    follower.addAction([](){inPutston.set_value(true);}, 0.6);
+    follower.startProfile(crossProfile);
+    follower.clearActions();
+
+    // moves to the southern Ring stack (on the Goal side)
+    follower.addAction([](){inPutston.set_value(false);}, 0.05);
+    follower.addAction([](){clamp.set_value(false); transport.brake();}, 0.6);
+    follower.startProfile(southernRingProfile);
+    follower.clearActions();
+
+    // grabs the third MoGo and touches the Ladder with it
+    follower.addAction([](){clamp.set_value(true);}, 0.98);
+    follower.startProfile(ladderProfile, true);
+    follower.clearActions();
+    pros::delay(2000);
+    follower.startProfile(ladder2Profile, true);
+    arm.move_relative(-180, 200);
+}
+
+void RedAWP() {
+    VelocityController follower = VelocityController();
+
+    // spline setup
+    // CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
+    CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {10, 36}, {-20, 25}, {10, 36});
+    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({-20, 25}, {-25, 51}, {-23, 42}, {-29, 83});
+    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({-23, 42}, {-34, 77}, {-50, 39}, {-49, 20});
+    CubicHermiteSpline crossSpline = CubicHermiteSpline({-49.5, 39}, {-50, 20}, {-50, -12}, {-43, -41.5});
+    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({-50, -12}, {-38, -125.5}, {-22, -56}, {-13.5, -83});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-26, -56}, {-24.5, -22.5}, {-28.3, -20}, {-32, 5});
+    CubicHermiteSpline ladder2Spline = CubicHermiteSpline({-28.25, -20}, {-32, 5}, {-11, -15}, {-2, -13});
+
+    // profile setup
+    MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
+    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, RPMtoIPS(600), 
+        {
+            {{0, 0.1}, {0.05, 1}}, 
+            {{0.05, 1}, {1, 1}}
+        }
+    );
+    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, RPMtoIPS(600),
+        {
+            {{0, 0.1}, {0.1, 1}}, 
+            {{0.1, 1}, {1, 1}}
+        }
+    );
+    MotionProfile* crossProfile = new MotionProfile(&crossSpline, RPMtoIPS(600),
+        {
+            {{0, 1}, {0.9, 1}},
+            {{0.5, 1}, {0.6, 0.3}},
+            {{0.9, 0.3}, {1, 0.3}}
+        }
+    );
+    MotionProfile* southernRingProfile = new MotionProfile(&southernRingSpline, RPMtoIPS(600), {
+        {
+            {{0, 0.3}, {0.4, 0.3}},
+            {{0.4, 0.3}, {0.5, 1}},
+            {{0.5, 1}, {0.9, 1}},
+            {{0.9, 1}, {1, 0}}
+        }
+    });
     MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(600));
     MotionProfile* ladder2Profile = new MotionProfile(&ladder2Spline, RPMtoIPS(600));
 
@@ -101,11 +146,11 @@ void RedAWP() {
     drivetrain.move_relative(-220, 150);
     pros::delay(200);
     arm.move(-70);
-    waitUntil(arm.get_position() < 180);
+    waitUntil(arm.get_position() < 230);
     arm.brake();
 
     // moves to goal and grabs it
-    PIDTurner(253, 2);
+    PIDTurner(255, 2);
     follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
     follower.clearActions();
@@ -127,18 +172,17 @@ void RedAWP() {
 
     // moves to the southern Ring stack (on the Goal side)
     follower.addAction([](){inPutston.set_value(false);}, 0.05);
-    follower.addAction([](){clamp.set_value(false); transport.brake();}, 0.6);
+    follower.addAction([](){clamp.set_value(false); transport.brake();}, 0.4);
     follower.startProfile(southernRingProfile);
     follower.clearActions();
 
     // grabs the third MoGo and touches the Ladder with it
-    follower.addAction([](){clamp.set_value(true); intake.move(128);}, 0.98);
+    follower.addAction([](){clamp.set_value(true); transport.move(128);}, 0.98);
     follower.startProfile(ladderProfile, true);
     follower.clearActions();
-    pros::delay(1000);
+    pros::delay(750);
     follower.startProfile(ladder2Profile, true);
     arm.move_relative(-180, 200);
-
 }
 
 void RedGoalRush() {
@@ -266,7 +310,7 @@ void BlueGoalRush() {
 void redRingside() {}
 
 void blueRingside() {}
-
+/*
 void autoSkills() {
     /*
     VelocityController follower = VelocityController();
@@ -317,6 +361,171 @@ void autoSkills() {
     raiseArm->remove();
     */
    
+}
+*/
+
+void autoSkills() {
+    // QUADRANT 1
+	// sets the time from initialization that the code starts at
+	int startTime = pros::millis();
+
+	// mid-PID actions
+	auto gripMoGoM = []() {clamp.set_value(true);};
+	
+	// scores on the Alliance Stake
+	double initialPos = transport.get_position();
+	transport.move_relative(340, 200);
+	waitUntil((transport.get_position() >= initialPos - 340) || ((pros::millis() - startTime) / 1000 >= 0.7));
+	transport.move_relative(-100, 200);
+	pros::delay(300);
+	
+	// moves forward from the Alliance Stake
+	auto posFN = []() {return (rightRear.get_position() + leftRear.get_position() + rightFront.get_position() + leftFront.get_position()) / 4;};
+	initialPos = posFN();
+	drivetrain.move_relative(530, 200);
+	waitUntil(posFN() >= initialPos + 530);
+
+	// turns to a MoGo and moves to it, then grabs it
+	CutoffTurnPID({-49, -19}, true, 1000, 1);
+	PIDMover({-49, -19.5}, true, {gripMoGoM}, {18});
+
+	// turns and moves to a Ring, then grabs it
+	CutoffTurnPID({-26, -24}, false, 800, 2);
+	intake.move(-128);
+	arm.move_relative(380, 200);
+	CutoffPID({-26, -24}, false, 900);
+
+	// turns and moves to the Ring on the line, then grabs it
+	PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-8, -48}), 2);
+	CutoffPID({-8, -48}, false, 2200);
+
+	// turns and moves to the next three Rings in a line, automatically grabbing them along the way
+	transport.brake();
+	PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-57, -45}), 2);
+	transport.move(128);
+	CutoffPID({-36, -49}, false, 1800);
+	CutoffPID({-57, -43}, false, 1850);
+	pros::delay(500);
+
+	// turns and moves to the final Ring in this quadrant, then grabs it automatically
+	transport.brake();
+	CutoffTurnPID({-49.5, -55.5}, false, 1000, 1);
+	transport.move(128);
+	CutoffPID({-49.5, -53.5}, false, 1500);
+
+	// turns to the Corner and places the Mobile Goal there
+	CutoffTurnPID({-58, -57.5}, true, 1300, 1);
+	CutoffPID({-58, -57.5}, true, 500);
+	clamp.set_value(false);
+	transport.move_relative(-600, 200);
+	pros::delay(200);
+
+
+
+// QUADRANT 2
+		// moves forward from the Corner
+		initialPos = posFN();
+		drivetrain.move_relative(200, 200);
+		waitUntil(posFN() >= initialPos + 200);
+
+		// turns to face the MoGo on the opposite quadrant, then moves to it and grabs it
+		PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-44, 10}) - 180, 2);
+		transport.move(-128);
+		PIDMover({-44, 10}, true);
+		transport.brake();
+		drivetrain.move(-80);
+		pros::delay(500);
+		clamp.set_value(true);
+		pros::delay(20);
+		drivetrain.brake();
+
+		// turns and moves to a Ring, then grabs it
+		PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-26, 16}), 1);
+		intake.move(-128);
+		CutoffPID({-26, 24}, false, 1500);
+
+
+		// turns and moves to the Ring on the line, then grabs it
+		PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-5, 48}), 1);
+		CutoffPID({-5, 48}, false, 1800);
+		
+
+		// turns and moves to the next three Rings in a line, automatically grabbing them along the way
+		transport.brake();
+		PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-57, 48}), 1);
+		transport.move(128);
+		CutoffPID({-38, 58}, false, 1750);
+		CutoffPID({-57, 48}, false, 1800);
+		pros::delay(500);
+
+		// turns and moves to the final Ring in this quadrant, then grabs it automatically
+		CutoffTurnPID({-49.5, 55.5}, false, 1000, 2);
+		CutoffPID({-49.5, 55.5}, false, 1000);
+
+		// turns to the Corner and places the Mobile Goal there
+		CutoffTurnPID({-54, 59}, true, 1000, 2);
+		CutoffPID({-54, 59}, true, 1000);
+		transport.move_relative(-600, 200);
+		clamp.set_value(false);
+		pros::delay(200);
+
+		// moves forward from the Corner
+		initialPos = posFN();
+		drivetrain.move_relative(200, 200);
+		waitUntil(posFN() >= initialPos + 200);
+
+// QUADRANT 3
+			// hi
+			// hello
+			// sup
+			// Drives to quadrant 3 to get the Ring at (24,48)
+			preRoller.move(128);
+			PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {13.5, 45}), 1);
+			//PIDMover({13.5, 45});
+			CutoffPID({13.5, 45}, false, 2250);
+
+			// Drives to get the Ring at (24,24)
+			transport.move_relative(480,100);
+			PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {19, 19}), 2);
+			CutoffPID({19, 19}, false, 2000);
+			transport.move_relative(300,100);
+
+			// Move and grab the Goal at (48,0)
+			PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {30, 4}) - 180, 1);
+			//PIDMover({30, 4}, true);
+			initialPos = posFN();
+			drivetrain.move_relative(-1740,150);
+			waitUntil(posFN() <= initialPos - 1740);
+			clamp.set_value(true);
+			drivetrain.brake();
+			transport.move(128);
+
+			// Move to grab the middle Ring in the corner
+			CutoffTurnPID({38, 36}, false, 1000, 2);
+			CutoffPID({38, 36}, false, 1250);
+
+			CutoffTurnHeadingPID(90, false, 1000, 2);
+			initialPos = posFN();
+			drivetrain.move_relative(450, 600);
+			waitUntil(posFN() >= initialPos + 450);
+
+			// turns and moves to Corner
+			//CutoffTurnHeadingPID(220, false, 1500, 2);
+			PIDTurner(220, 2);
+			clamp.set_value(false);
+			drivetrain.move(-64);
+			pros::delay(600);
+			drivetrain.brake();
+			pros::delay(300);
+
+			// moves forward from the Corner
+			CutoffPID({37, 35}, false, 1000);
+			PIDTurner(351, 2);
+			drivetrain.move(-128);
+			pros::delay(3000);
+			drivetrain.move(70);
+			pros::delay(750);
+			drivetrain.brake();
 }
 
 void autoTest() {

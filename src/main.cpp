@@ -29,8 +29,8 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -5; 
-	globalAuton = false;
+	autonnumber = -2; 
+	globalAuton = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 
 	while (true) {
@@ -47,7 +47,7 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-49.25, -60.325}, 69);
 					break;
 				case -2: //Red Ring
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 13.5}, 229);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
 					break;
 				case 3:
 				case -3: //Test (?)
@@ -69,7 +69,7 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 10}, 220);
 					break;
 				case -5:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-56, 0}, 270);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 90);
 					break;
 			}
 		}
