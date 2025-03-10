@@ -135,10 +135,10 @@ void autoEject() {
 				if (abs(transport.get_position() - ejectStartPoint) >= 1000) {
 					ejectOn = false;
 					ejectStartPoint = 0;
-					intake.move(128);
+					transport.move(128);
 				// case 1b: if case 1a is not true, then continue moving the intake down
 				} else {
-					intake.move(-128);
+					transport.move(-128);
 				}
 			}
 			// case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found the right color
@@ -165,4 +165,53 @@ void coords() {
 		pros::delay(100);
 	}
 	
+}
+
+
+void CutoffPID(Point goalPoint, bool reverse, double maxAllowableTime) {
+	endCoords = goalPoint;
+	endReverse = reverse;
+	pros::Task movement = pros::Task(PIDMoverBasic);
+	
+	
+}
+
+void CutoffTurnPID(Point goalPoint, bool reverse, double maxAllowableTime, int direction) {
+	// the turn movement
+	auto movement = [goalPoint, direction] () {PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, goalPoint), direction);};
+	// finds the heading's inverse when it is positive
+	auto determineInverse = [] (double angle) -> double {
+		return angle > 180 ? angle - 180 : angle + 180;
+	};
+	// the reversed form of the turn movement
+	auto revMovement = [goalPoint, direction, determineInverse] () {PIDTurner(determineInverse(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, goalPoint)), direction);};
+	pros::Task* movement_task = NULL;
+	if (!reverse) {
+		movement_task = new pros::Task(movement);
+	} else {
+		movement_task = new pros::Task(revMovement);
+	}
+	pros::delay(maxAllowableTime);
+	movement_task->remove();
+	drivetrain.brake();
+}
+
+void CutoffTurnHeadingPID(int goalHeading, bool reverse, double maxAllowableTime, int direction) {
+	// the turn movement
+	auto movement = [goalHeading, direction] () {PIDTurner(goalHeading, direction);};
+	// finds the heading's inverse when it is positive
+	auto determineInverse = [] (double angle) -> double {
+		return angle > 180 ? angle - 180 : angle + 180;
+	};
+	// the reversed form of the turn movement
+	auto revMovement = [goalHeading, direction, determineInverse] () {PIDTurner(determineInverse(goalHeading), direction);};
+	pros::Task* movement_task = NULL;
+	if (!reverse) {
+		movement_task = new pros::Task(movement);
+	} else {
+		movement_task = new pros::Task(revMovement);
+	}
+	pros::delay(maxAllowableTime);
+	movement_task->remove();
+	drivetrain.brake();
 }
