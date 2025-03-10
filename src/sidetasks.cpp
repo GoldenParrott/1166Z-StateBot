@@ -2,40 +2,29 @@
 
 void ArmMacros() {
     while (true) {
-		
-	
-		// scores the arm on a Wall Stake and then retracts to its original position
+		/*
+		Scoring 65 - 550
+		Passive 0 - 45
+		*/
+		// Puts arm in scroing position
 		if (master.get_digital(DIGITAL_Y)) {
 			armMoving = true;
 			double startTime = pros::millis();
-			while ((arm.get_position() > -140) && ((pros::millis() - startTime) < 30)) {
-                arm.move(127);
-            }
-			startTime = pros::millis();
-            while ((arm.get_position() < -30) && (pros::millis() - startTime) < 20) {
-                arm.move(-32);
+			
+            while (((arm.get_position() > 65)||(arm.get_position() < 45)) && ((pros::millis() - startTime) < 2000)) {
+                arm.move_absolute(55,32);
             }
 			arm.brake();
 			armMoving = false;
 		}
-		// puts the arm in a scoring position
+		// Puts arm in passive position
 		else if (master.get_digital_new_press(DIGITAL_B)) {
 			armMoving = true;
-			if(arm.get_position() > -11){
-				while (arm.get_position() > -18) {
-					arm.move(32);
-				}
-			}else{
-				if(arm.get_position() < -30){
-					while (arm.get_position() < -30) {
-                		arm.move(-32);
-            		}
-				}else{
-					while (arm.get_position() < 0) {
-						arm.move(-32);
-					}
-				}
-			}
+			double startTime = pros::millis();
+			
+            while ((arm.get_position() > 5) && ((pros::millis() - startTime) < 2000)) {
+                arm.move_absolute(0,32);
+            }
 			arm.brake();
 			armMoving = false;
         }
