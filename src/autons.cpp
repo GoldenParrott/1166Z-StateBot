@@ -4,50 +4,17 @@
 void BlueAWP() {
     VelocityController follower = VelocityController();
 
-    // spline setup
-    // CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({54.75, 13.25}, {-10, 36}, {20, 25}, {-10, 36});
-    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({20, 25}, {25, 51}, {23, 42}, {29, 83});
-    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({23, 42}, {34, 77}, {50, 39}, {49, 20});
-    CubicHermiteSpline crossSpline = CubicHermiteSpline({49.5, 39}, {50, 20}, {50, 12}, {43, 41.5});
-    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({50, -12}, {38, -125.5}, {22, -56}, {13.5, -83});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({26, -56}, {24.5, -22.5}, {32.5, -23}, {32, 5});
-    CubicHermiteSpline ladder2Spline = CubicHermiteSpline({32.5, -23}, {32, 5}, {11, -15}, {-2, -13});
-
     // profile setup
-    MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
-    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, RPMtoIPS(600), 
-        {
-            {{0, 0.1}, {0.05, 1}}, 
-            {{0.05, 1}, {1, 1}}
-        }
-    );
-    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, RPMtoIPS(600),
-        {
-            {{0, 0.1}, {0.1, 1}}, 
-            {{0.1, 1}, {1, 1}}
-        }
-    );
-    MotionProfile* crossProfile = new MotionProfile(&crossSpline, RPMtoIPS(600),
-        {
-            {{0, 1}, {0.9, 1}},
-            {{0.5, 1}, {0.6, 0.4}},
-            {{0.9, 0.4}, {1, 0.4}}
-        }
-    );
-    MotionProfile* southernRingProfile = new MotionProfile(&southernRingSpline, RPMtoIPS(600), {
-        {
-            {{0, 0.4}, {0.4, 0.4}},
-            {{0.4, 0.4}, {0.5, 1}},
-            {{0.5, 1}, {0.9, 1}},
-            {{0.9, 1}, {1, 0}}
-        }
-    });
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(600));
-    MotionProfile* ladder2Profile = new MotionProfile(&ladder2Spline, RPMtoIPS(600));
+    MotionProfile* goalProfile = path[0];
+    MotionProfile* innerRingProfile = path[1];
+    MotionProfile* outerRingProfile = path[2];
+    MotionProfile* crossProfile = path[3];
+    MotionProfile* southernRingProfile = path[4];
+    MotionProfile* ladderProfile = path[5];
+    MotionProfile* ladder2Profile = path[6];
 
     // scores on Alliance Stake
-    drivetrain.move_relative(200, 150);
+    drivetrain.move_relative(220, 150);
     arm.move(70);
     waitUntil(arm.get_position() > 450);
     pros::delay(250);
@@ -58,7 +25,7 @@ void BlueAWP() {
     arm.brake();
 
     // moves to goal and grabs it
-    PIDTurner(107, 1);
+    PIDTurner(105, 1);
     follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
     follower.clearActions();
@@ -80,15 +47,17 @@ void BlueAWP() {
 
     // moves to the southern Ring stack (on the Goal side)
     follower.addAction([](){inPutston.set_value(false);}, 0.05);
-    follower.addAction([](){clamp.set_value(false); transport.brake();}, 0.6);
+    follower.addAction([](){clamp.set_value(false); transport.brake();}, 0.4);
+    follower.addAction([](){transport.move(128);}, 0.5);
+    follower.addAction([](){transport.brake();}, 0.8);
     follower.startProfile(southernRingProfile);
     follower.clearActions();
 
     // grabs the third MoGo and touches the Ladder with it
-    follower.addAction([](){clamp.set_value(true);}, 0.98);
+    follower.addAction([](){clamp.set_value(true); transport.move(128);}, 0.98);
     follower.startProfile(ladderProfile, true);
     follower.clearActions();
-    pros::delay(2000);
+    pros::delay(750);
     follower.startProfile(ladder2Profile, true);
     arm.move_relative(-180, 200);
 }
@@ -96,47 +65,14 @@ void BlueAWP() {
 void RedAWP() {
     VelocityController follower = VelocityController();
 
-    // spline setup
-    // CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {10, 36}, {-20, 25}, {10, 36});
-    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({-20, 25}, {-25, 51}, {-23, 42}, {-29, 83});
-    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({-23, 42}, {-34, 77}, {-50, 39}, {-49, 20});
-    CubicHermiteSpline crossSpline = CubicHermiteSpline({-49.5, 39}, {-50, 20}, {-50, -12}, {-43, -41.5});
-    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({-50, -12}, {-38, -125.5}, {-22, -56}, {-13.5, -83});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-26, -56}, {-24.5, -22.5}, {-28.3, -20}, {-32, 5});
-    CubicHermiteSpline ladder2Spline = CubicHermiteSpline({-28.25, -20}, {-32, 5}, {-11, -15}, {-2, -13});
-
     // profile setup
-    MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
-    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, RPMtoIPS(600), 
-        {
-            {{0, 0.1}, {0.05, 1}}, 
-            {{0.05, 1}, {1, 1}}
-        }
-    );
-    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, RPMtoIPS(600),
-        {
-            {{0, 0.1}, {0.1, 1}}, 
-            {{0.1, 1}, {1, 1}}
-        }
-    );
-    MotionProfile* crossProfile = new MotionProfile(&crossSpline, RPMtoIPS(600),
-        {
-            {{0, 1}, {0.9, 1}},
-            {{0.5, 1}, {0.6, 0.3}},
-            {{0.9, 0.3}, {1, 0.3}}
-        }
-    );
-    MotionProfile* southernRingProfile = new MotionProfile(&southernRingSpline, RPMtoIPS(600), {
-        {
-            {{0, 0.3}, {0.4, 0.3}},
-            {{0.4, 0.3}, {0.5, 1}},
-            {{0.5, 1}, {0.9, 1}},
-            {{0.9, 1}, {1, 0}}
-        }
-    });
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(600));
-    MotionProfile* ladder2Profile = new MotionProfile(&ladder2Spline, RPMtoIPS(600));
+    MotionProfile* goalProfile = path[0];
+    MotionProfile* innerRingProfile = path[1];
+    MotionProfile* outerRingProfile = path[2];
+    MotionProfile* crossProfile = path[3];
+    MotionProfile* southernRingProfile = path[4];
+    MotionProfile* ladderProfile = path[5];
+    MotionProfile* ladder2Profile = path[6];
 
     // scores on Alliance Stake
     drivetrain.move_relative(220, 150);
@@ -146,7 +82,7 @@ void RedAWP() {
     drivetrain.move_relative(-220, 150);
     pros::delay(200);
     arm.move(-70);
-    waitUntil(arm.get_position() < 230);
+    waitUntil(arm.get_position() < 270);
     arm.brake();
 
     // moves to goal and grabs it
@@ -166,6 +102,7 @@ void RedAWP() {
     transport.move(128);
 
     // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
+    //follower.addAction([](){transport.move(64);}, 0.6);
     follower.addAction([](){inPutston.set_value(true);}, 0.6);
     follower.startProfile(crossProfile);
     follower.clearActions();
@@ -173,6 +110,8 @@ void RedAWP() {
     // moves to the southern Ring stack (on the Goal side)
     follower.addAction([](){inPutston.set_value(false);}, 0.05);
     follower.addAction([](){clamp.set_value(false); transport.brake();}, 0.4);
+    follower.addAction([](){transport.move(128);}, 0.5);
+    follower.addAction([](){transport.brake();}, 0.8);
     follower.startProfile(southernRingProfile);
     follower.clearActions();
 
@@ -181,24 +120,19 @@ void RedAWP() {
     follower.startProfile(ladderProfile, true);
     follower.clearActions();
     pros::delay(750);
+    arm.set_brake_mode(pros::MotorBrake::coast);
+    follower.addAction([](){arm.move_relative(-180, 100);}, 0.5);
     follower.startProfile(ladder2Profile, true);
-    arm.move_relative(-180, 200);
 }
 
 void RedGoalRush() {
 
     VelocityController follower = VelocityController();
 
-    // spline setup
-    CubicHermiteSpline rushSpline = CubicHermiteSpline({-52.8, -58.6}, {22.4, -36.5}, {-16.8, -48}, {22.37, -36.3});
-    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({-26.98, -53.06}, {-56.3, -44}, {-32.66, -28.5}, {2.6, -10.6});
-    CubicHermiteSpline cornerSpline = CubicHermiteSpline({-21.9, -22.03}, {-73, -55.3}, {-62.2, -52.4}, {-69.1, -84.4});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-40.33, -55.9}, {-15.65, -59.76}, {-9.1, -28.1}, {-17.4, -8.6});
-    // profile setup
-    MotionProfile* rushProfile = new MotionProfile(&rushSpline, 600);
-    MotionProfile* secondGoalProfile = new MotionProfile(&secondGoalSpline, 400);
-    MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, 600);
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, 500);
+    MotionProfile* rushProfile = path[0];
+    MotionProfile* secondGoalProfile = path[1];
+    MotionProfile* cornerProfile = path[2];
+    MotionProfile* ladderProfile = path[3];
 
     // rushes MoGo in middle
     intake.move(128);
@@ -223,20 +157,19 @@ void RedGoalRush() {
     drivetrain.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
-    follower.addAction([](){ker.set_value(false);}, 0.65);
+    follower.addAction([](){ker.set_value(false);}, 0.4);
+    follower.addAction([](){clamp.set_value(true);}, 0.9);
     follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
-    PIDMover({-22, -22}, true, {[](){clamp.set_value(true);}}, {0.9});
 
-    // moves into Corner and gets its Rings
+    // moves into Corner and sweeps it
     follower.addAction([](){yoin.set_value(true);}, 0.8);
     follower.startProfile(cornerProfile);
     follower.clearActions();
     PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-40.33, -55.9}), 1);
-    intake.move(-128);
-    PIDMover({-40.33, -55.9});
+    intake.move(128);
 
-    // raises arm and moves to ladder to contact it
+    // grabs Corner Rings, raises arm, and moves to ladder to contact it
     armMovement = pros::Task([](){
         arm.move(128);
         waitUntil(arm.get_position() < -50);
@@ -250,16 +183,10 @@ void BlueGoalRush() {
 
     VelocityController follower = VelocityController();
 
-    // spline setup
-    CubicHermiteSpline rushSpline = CubicHermiteSpline({52.3, -32.8}, {-17.2, -54.1}, {16.89, -43.68}, {-17.2, -54.2});
-    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({27.03, -42}, {54.95, -37.2}, {32.66, -28.5}, {-2.6, -10.6});
-    CubicHermiteSpline cornerSpline = CubicHermiteSpline({21.9, -22.03}, {73, -55.3}, {53.3, -62.2}, {82.1, -72.3});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({60, -46.9}, {45, -94.6}, {9.1, -28.1}, {17.4, -8.6});
-    // profile setup
-    MotionProfile* rushProfile = new MotionProfile(&rushSpline, RPMtoIPS(600));
-    MotionProfile* secondGoalProfile = new MotionProfile(&secondGoalSpline, RPMtoIPS(400));
-    MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, RPMtoIPS(600));
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(500));
+    MotionProfile* rushProfile = path[0];
+    MotionProfile* secondGoalProfile = path[1];
+    MotionProfile* cornerProfile = path[2];
+    MotionProfile* ladderProfile = path[3];
 
     // rushes MoGo in middle
     intake.move(128);
@@ -284,18 +211,17 @@ void BlueGoalRush() {
     drivetrain.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
-    follower.addAction([](){ker.set_value(false);}, 0.65);
+    follower.addAction([](){ker.set_value(false);}, 0.4);
+    follower.addAction([](){clamp.set_value(true);}, 0.9);
     follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
-    PIDMover({-22, -22}, true, {[](){clamp.set_value(true);}}, {0.9});
 
     // moves into Corner and gets its Rings
     follower.addAction([](){yoin.set_value(true);}, 0.8);
     follower.startProfile(cornerProfile);
     follower.clearActions();
     PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-40.33, -55.9}), 1);
-    intake.move(-128);
-    PIDMover({40.33, -55.9});
+    intake.move(128);
 
     // raises arm and moves to ladder to contact it
     armMovement = pros::Task([](){

@@ -81,8 +81,11 @@
     extern bool clampOn;
 
     extern int autonnumber;
+    extern bool confirm;
     extern bool globalAuton;
     extern int logoCount;
+
+    extern std::vector<MotionProfile*> path;
 
     extern int drvtrDZ;
     extern int drvtrFB;

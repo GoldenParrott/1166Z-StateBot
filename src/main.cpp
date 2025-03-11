@@ -31,6 +31,7 @@ void competition_initialize() {
 	
 	autonnumber = -2; 
 	globalAuton = true;
+	confirm = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 
 	while (true) {
@@ -75,11 +76,18 @@ void competition_initialize() {
 		}
 		status = pros::screen::touch_status();
 		// initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
+		if (confirm = true) {
+			break;
+		}
 		pros::delay(10);
-
 	}
+
 	
-	
+	switch (autonnumber) {
+		case -2:
+			path = RedAWPSetup();
+			break;
+	}
 }
 
 /**
@@ -145,6 +153,7 @@ void autonomous() {
 			BlueAWP();
 			break;
 		case -2:
+			autoEject_task_ptr->suspend();
 			RedAWP();
 			break;
 		case 3:

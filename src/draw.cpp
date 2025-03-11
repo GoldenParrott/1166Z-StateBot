@@ -198,6 +198,7 @@ void drawBasicSelector(){
 		}
 		
 		pros::screen::print(TEXT_MEDIUM_CENTER,330,173,"UNIQUE",NULL);
+		pros::screen::print(TEXT_MEDIUM_CENTER,400,120,"CONFIRM",NULL);
 	
 		/* Guides
 		pros::screen::set_pen(COLOR_WHITE);
@@ -236,6 +237,11 @@ void drawBasicSelector(){
 		}else if((status.x >= 120)&&(status.x <= 244)&&(status.y >= 0)&&(status.y <= 120)){
 		// Used when bottom right of the field is pressed 
 			autonnumber = 2;
+		}
+		if ((status.x >= 244)) {
+			confirm = true;
+			pros::screen::set_pen(0x00FF00);
+			pros::screen::fill_rect(0, 0, 480, 240);
 		}
 		pros::delay(10);
 	}

@@ -81,7 +81,10 @@
 
     int autonnumber = 1;
     bool globalAuton = true;
+    bool confirm = false;
     int logoCount = 0;
+
+    std::vector<MotionProfile*> path = {};
 
     int drvtrDZ = 10;
     int drvtrFB;

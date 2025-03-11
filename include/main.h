@@ -216,4 +216,7 @@ void CutoffPID(Point goalPoint, bool reverse, double maxAllowableTime);
 void CutoffTurnPID(Point goalPoint, bool reverse, double maxAllowableTime, int direction);
 void CutoffTurnHeadingPID(int goalHeading, bool reverse, double maxAllowableTime, int direction);
 
+// profiles.cpp
+std::vector<MotionProfile*> RedAWPSetup(void);
+
 #endif  // _PROS_MAIN_H_
