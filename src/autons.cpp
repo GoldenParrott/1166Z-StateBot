@@ -21,11 +21,11 @@ void BlueAWP() {
     drivetrain.move_relative(-220, 150);
     pros::delay(200);
     arm.move(-70);
-    waitUntil(arm.get_position() < 230);
+    waitUntil(arm.get_position() < 270);
     arm.brake();
 
     // moves to goal and grabs it
-    PIDTurner(105, 1);
+    PIDTurner(110, 1);
     follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
     follower.clearActions();
@@ -33,11 +33,9 @@ void BlueAWP() {
     // moves to inner Ring stack and takes the correct Ring
     PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {24, 48}), 1);
     intake.move(128);
-    transport.move(96);
     follower.startProfile(innerRingProfile);
 
     // moves to middle Ring stack and takes those Rings
-    follower.startProfile(outerRingProfile);
     transport.move(128);
 
     // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
@@ -58,8 +56,9 @@ void BlueAWP() {
     follower.startProfile(ladderProfile, true);
     follower.clearActions();
     pros::delay(750);
+    arm.set_brake_mode(pros::MotorBrake::coast);
+    follower.addAction([](){arm.move_relative(-180, 100);}, 0.5);
     follower.startProfile(ladder2Profile, true);
-    arm.move_relative(-180, 200);
 }
 
 void RedAWP() {
@@ -102,7 +101,6 @@ void RedAWP() {
     transport.move(128);
 
     // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
-    //follower.addAction([](){transport.move(64);}, 0.6);
     follower.addAction([](){inPutston.set_value(true);}, 0.6);
     follower.startProfile(crossProfile);
     follower.clearActions();
@@ -189,18 +187,19 @@ void BlueGoalRush() {
     MotionProfile* ladderProfile = path[3];
 
     // rushes MoGo in middle
-    intake.move(128);
+    preRoller.move(-128);
     yoin.set_value(true);
-    follower.addAction([](){ker.set_value(true);}, 0.95);
+    follower.addAction([](){ker.set_value(true);}, 0.98);
     pros::Task armMovement = pros::Task([](){
         arm.move(128);
-        waitUntil(arm.get_position() < 120);
+        waitUntil(arm.get_position() > 120);
         arm.brake();
     });
     follower.startProfile(rushProfile);
     follower.clearActions();
     armMovement.remove();
-
+    drivetrain.brake();
+/*
     // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
     PIDMover({30, -39.65}, true);
     PIDTurner((universalCurrentLocation.heading + 25), 2);
@@ -231,6 +230,7 @@ void BlueGoalRush() {
     });
     follower.startProfile(ladderProfile);
     armMovement.remove();
+*/
 }
 
 void redRingside() {}

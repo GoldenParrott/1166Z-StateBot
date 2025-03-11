@@ -218,5 +218,7 @@ void CutoffTurnHeadingPID(int goalHeading, bool reverse, double maxAllowableTime
 
 // profiles.cpp
 std::vector<MotionProfile*> RedAWPSetup(void);
+std::vector<MotionProfile*> BlueAWPSetup(void);
+std::vector<MotionProfile*> BlueGoalRushSetup(void);
 
 #endif  // _PROS_MAIN_H_

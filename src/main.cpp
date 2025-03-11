@@ -29,7 +29,7 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -2; 
+	autonnumber = 1; 
 	globalAuton = true;
 	confirm = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
@@ -39,10 +39,10 @@ void competition_initialize() {
 		if (globalAuton == true) {
 			switch (autonnumber) {
 				case 1: //Blue Mogo
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, -36}, 251);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -35.5}, 246);
 					break;
 				case 2:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {54.5, 13.125}, 208);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {54.75, 14.25}, 131);
 					break;
 				case -1:
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-49.25, -60.325}, 69);
@@ -87,6 +87,11 @@ void competition_initialize() {
 		case -2:
 			path = RedAWPSetup();
 			break;
+		case 2:
+			path = BlueAWPSetup();
+			break;
+		case 1:
+			path = BlueGoalRushSetup();
 	}
 }
 
@@ -150,6 +155,7 @@ void autonomous() {
 			BlueGoalRush();
 			break;
 		case 2:
+			autoEject_task_ptr->suspend();
 			BlueAWP();
 			break;
 		case -2:
