@@ -238,6 +238,7 @@ void redRingside() {}
 void blueRingside() {}
 /*
 void autoSkills() {
+    /*
     VelocityController follower = VelocityController();
 
     // spline setup
@@ -284,6 +285,8 @@ void autoSkills() {
     follower.addAction([raiseArm](){raiseArm->resume();}, 0.6);
     follower.startProfile(southWallProfile);
     raiseArm->remove();
+    */
+   
 }
 */
 
