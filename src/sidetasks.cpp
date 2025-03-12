@@ -72,14 +72,15 @@ void eject() {
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
-			else if ((((colorSense.get_hue() > 100) && (autonnumber < 0)) || // blue
-				      ((colorSense.get_hue() < 30)  && (autonnumber > 0)))   // red
-					&& (Distance.get() < 999) && (colorSense.get_proximity() > 40)
+			else if ((((colorSense.get_hue() > 60) && (autonnumber < 0)) || // blue
+				      ((colorSense.get_hue() < 55)  && (autonnumber > 0)))   // red
+					&& (Distance.get() < 100)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
 				pros::delay(10); // the robot waits for the Ring to reach the proper point before starting the eject
 				transport.move(-128);
+				
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
 			}
