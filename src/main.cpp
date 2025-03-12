@@ -29,7 +29,7 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = 1; 
+	autonnumber = -1; 
 	globalAuton = true;
 	confirm = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
@@ -45,7 +45,7 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {54.75, 14.25}, 131);
 					break;
 				case -1:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-49.25, -60.325}, 69);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 64);
 					break;
 				case -2: //Red Ring
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
@@ -92,6 +92,10 @@ void competition_initialize() {
 			break;
 		case 1:
 			path = BlueGoalRushSetup();
+			break;
+		case -1:
+			path = RedGoalRushSetup();
+			break;
 	}
 }
 
@@ -152,7 +156,7 @@ void autonomous() {
 			BlueGoalRush();
 			break;
 		case -1:
-			BlueGoalRush();
+			RedGoalRush();
 			break;
 		case 2:
 			autoEject_task_ptr->suspend();

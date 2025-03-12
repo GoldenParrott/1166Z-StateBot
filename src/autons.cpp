@@ -133,32 +133,31 @@ void RedGoalRush() {
     MotionProfile* ladderProfile = path[3];
 
     // rushes MoGo in middle
-    intake.move(128);
+    preRoller.move(-128);
     yoin.set_value(true);
-    follower.addAction([](){ker.set_value(true);}, 0.95);
-    pros::Task armMovement = pros::Task([](){
-        arm.move(128);
-        waitUntil(arm.get_position() < 120);
-        arm.brake();
-    });
+    follower.addAction([](){ker.set_value(true);}, 0.98);
     follower.startProfile(rushProfile);
     follower.clearActions();
-    armMovement.remove();
+    drivetrain.brake();
 
     // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
     PIDMover({-30, -52}, true);
-    PIDTurner((universalCurrentLocation.heading + 25), 2);
-    arm.move(128);
+    
+    ker.set_value(false);
+    PIDTurner((universalCurrentLocation.heading + 19), 2);
+    yoin.set_value(false);
+    arm.move(96);
     drivetrain.move(80);
-    pros::delay(350);
-    arm.brake();
+    pros::delay(200);
     drivetrain.brake();
+    pros::delay(800);
+    arm.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
-    follower.addAction([](){ker.set_value(false);}, 0.4);
     follower.addAction([](){clamp.set_value(true);}, 0.9);
     follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
+    transport.move(128);
 
     // moves into Corner and sweeps it
     follower.addAction([](){yoin.set_value(true);}, 0.8);
@@ -167,14 +166,19 @@ void RedGoalRush() {
     PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-40.33, -55.9}), 1);
     intake.move(128);
 
-    // grabs Corner Rings, raises arm, and moves to ladder to contact it
-    armMovement = pros::Task([](){
+    // raises arm and moves to ladder to contact it
+    follower.addAction([](){inPutston.set_value(true);}, 0.4);
+    follower.addAction([](){inPutston.set_value(false);}, 0.8);
+    follower.startProfile(ladderProfile);
+    follower.clearActions();
+    pros::Task armMovement = pros::Task([](){
         arm.move(128);
         waitUntil(arm.get_position() < -50);
         arm.brake();
     });
-    follower.startProfile(ladderProfile);
+    pros::delay(1000);
     armMovement.remove();
+
 }
 
 void BlueGoalRush() {
@@ -190,47 +194,50 @@ void BlueGoalRush() {
     preRoller.move(-128);
     yoin.set_value(true);
     follower.addAction([](){ker.set_value(true);}, 0.98);
-    pros::Task armMovement = pros::Task([](){
-        arm.move(128);
-        waitUntil(arm.get_position() > 120);
-        arm.brake();
-    });
     follower.startProfile(rushProfile);
+    // PIDMover({13.5, -44.7}, false, {[](){ker.set_value(true);}}, {18});
     follower.clearActions();
-    armMovement.remove();
-    drivetrain.brake();
-/*
-    // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
-    PIDMover({30, -39.65}, true);
-    PIDTurner((universalCurrentLocation.heading + 25), 2);
-    arm.move(128);
-    drivetrain.move(80);
-    pros::delay(350);
-    arm.brake();
     drivetrain.brake();
 
+    // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
+    PIDMover({30, -39.65}, true);
+    ker.set_value(false);
+    PIDTurner((universalCurrentLocation.heading + 19), 2);
+    yoin.set_value(false);
+    arm.move(96);
+    drivetrain.move(80);
+    pros::delay(200);
+    drivetrain.brake();
+    pros::delay(800);
+    arm.brake();
+
     // aligns with second MoGo via a curve and grabs that MoGo
-    follower.addAction([](){ker.set_value(false);}, 0.4);
     follower.addAction([](){clamp.set_value(true);}, 0.9);
     follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
+    transport.move(128);
 
     // moves into Corner and gets its Rings
     follower.addAction([](){yoin.set_value(true);}, 0.8);
     follower.startProfile(cornerProfile);
     follower.clearActions();
-    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-40.33, -55.9}), 1);
+    CutoffTurnPID({60, -47}, false, 1000, 1);
+    //PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {60, -47}), 1);
     intake.move(128);
 
     // raises arm and moves to ladder to contact it
-    armMovement = pros::Task([](){
+    follower.addAction([](){inPutston.set_value(true);}, 0.4);
+    follower.addAction([](){inPutston.set_value(false);}, 0.8);
+    follower.startProfile(ladderProfile);
+    follower.clearActions();
+    pros::Task armMovement = pros::Task([](){
         arm.move(128);
         waitUntil(arm.get_position() < -50);
         arm.brake();
     });
-    follower.startProfile(ladderProfile);
+    pros::delay(1000);
     armMovement.remove();
-*/
+
 }
 
 void redRingside() {}
@@ -286,9 +293,7 @@ void autoSkills() {
     follower.startProfile(southWallProfile);
     raiseArm->remove();
     */
-   
-}
-*/
+
 
 void autoSkills() {
     // QUADRANT 1

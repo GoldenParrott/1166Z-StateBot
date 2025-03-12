@@ -176,7 +176,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
                 actionCompleteds[i] = true;
             }
         }
-
+        
         // converts the velocity in rpm to velocity in millivolts
         int maxVoltage = 12000; // innate max voltage of motors (in mV)
         double rpmToV = maxVoltage / g_maxRPM; // multiplier to convert rpm to voltage (in units of millivoltage / rpm so multiplying it by rpm cancels to millivoltage)

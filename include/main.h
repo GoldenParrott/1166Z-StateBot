@@ -215,10 +215,12 @@ void autoEject(void);
 void CutoffPID(Point goalPoint, bool reverse, double maxAllowableTime);
 void CutoffTurnPID(Point goalPoint, bool reverse, double maxAllowableTime, int direction);
 void CutoffTurnHeadingPID(int goalHeading, bool reverse, double maxAllowableTime, int direction);
+void coords(void);
 
 // profiles.cpp
 std::vector<MotionProfile*> RedAWPSetup(void);
 std::vector<MotionProfile*> BlueAWPSetup(void);
 std::vector<MotionProfile*> BlueGoalRushSetup(void);
+std::vector<MotionProfile*> RedGoalRushSetup(void);
 
 #endif  // _PROS_MAIN_H_
