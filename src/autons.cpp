@@ -142,9 +142,8 @@ void RedGoalRush() {
 
     // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
     PIDMover({-30, -52}, true);
-    
     ker.set_value(false);
-    PIDTurner((universalCurrentLocation.heading + 19), 2);
+    CutoffTurnHeadingPID((universalCurrentLocation.heading + 19), false, 500, 2);
     yoin.set_value(false);
     arm.move(96);
     drivetrain.move(80);
@@ -202,7 +201,7 @@ void BlueGoalRush() {
     // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
     PIDMover({30, -39.65}, true);
     ker.set_value(false);
-    PIDTurner((universalCurrentLocation.heading + 19), 2);
+    CutoffTurnHeadingPID((universalCurrentLocation.heading + 19), false, 500, 2);
     yoin.set_value(false);
     arm.move(96);
     drivetrain.move(80);

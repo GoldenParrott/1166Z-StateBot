@@ -22,7 +22,7 @@
         pros::MotorGroup drivetrain({-11,-3,-4,20,7,17}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
 
     //Intake
-        pros::Motor preRoller(-19,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);
+        pros::Motor preRoller(19,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);
         pros::Motor transport(8,pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
 
         pros::MotorGroup intake({19,8}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);

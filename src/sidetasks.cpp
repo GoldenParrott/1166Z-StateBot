@@ -7,23 +7,23 @@ void ArmMacros() {
 		Passive 0 - 45
 		*/
 		// Puts arm in scroing position
-		if (master.get_digital(DIGITAL_Y)) {
+		if (master.get_digital(DIGITAL_UP)) {
 			armMoving = true;
 			double startTime = pros::millis();
 			
-            while (((arm.get_position() > 65)||(arm.get_position() < 45)) && ((pros::millis() - startTime) < 2000)) {
-                arm.move_absolute(55,32);
+            while (((arm.get_position() > 45)||(arm.get_position() < 25)) && ((pros::millis() - startTime) < 2000)) {
+                arm.move_absolute(55,96);
             }
 			arm.brake();
 			armMoving = false;
 		}
 		// Puts arm in passive position
-		else if (master.get_digital_new_press(DIGITAL_B)) {
+		else if (master.get_digital_new_press(DIGITAL_LEFT)) {
 			armMoving = true;
 			double startTime = pros::millis();
 			
             while ((arm.get_position() > 5) && ((pros::millis() - startTime) < 2000)) {
-                arm.move_absolute(0,32);
+                arm.move_absolute(0,96);
             }
 			arm.brake();
 			armMoving = false;
@@ -91,7 +91,7 @@ void eject() {
 		} else if(master.get_digital(DIGITAL_DOWN)){
 			intake.move(-128);
 		} else if(master.get_digital(DIGITAL_R2)){
-			preRoller.move(-127);
+			preRoller.move(128);
 		} else{
 			ejectOn = false;
 			intake.brake();
