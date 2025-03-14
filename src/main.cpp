@@ -29,7 +29,7 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -1; 
+	autonnumber = 1; 
 	globalAuton = true;
 	confirm = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
@@ -159,11 +159,9 @@ void autonomous() {
 			RedGoalRush();
 			break;
 		case 2:
-			autoEject_task_ptr->suspend();
 			BlueAWP();
 			break;
 		case -2:
-			autoEject_task_ptr->suspend();
 			RedAWP();
 			break;
 		case 3:

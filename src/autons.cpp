@@ -133,7 +133,7 @@ void RedGoalRush() {
     MotionProfile* ladderProfile = path[3];
 
     // rushes MoGo in middle
-    preRoller.move(-128);
+    preRoller.move(128);
     yoin.set_value(true);
     follower.addAction([](){ker.set_value(true);}, 0.98);
     follower.startProfile(rushProfile);
@@ -153,25 +153,27 @@ void RedGoalRush() {
     arm.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
-    follower.addAction([](){clamp.set_value(true);}, 0.9);
+    follower.addAction([](){clamp.set_value(true);}, 0.95);
     follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
     transport.move(128);
 
     // moves into Corner and sweeps it
-    follower.addAction([](){yoin.set_value(true);}, 0.8);
+    follower.addAction([](){yoin.set_value(true);}, 0.6);
     follower.startProfile(cornerProfile);
     follower.clearActions();
-    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-40.33, -55.9}), 1);
+    CutoffTurnPID({-40.33, -55.9}, false, 1000, 1);
     intake.move(128);
 
     // raises arm and moves to ladder to contact it
     follower.addAction([](){inPutston.set_value(true);}, 0.4);
+    follower.addAction([](){yoin.set_value(false);}, 0.4);
     follower.addAction([](){inPutston.set_value(false);}, 0.8);
     follower.startProfile(ladderProfile);
+    drivetrain.brake();
     follower.clearActions();
     pros::Task armMovement = pros::Task([](){
-        arm.move(128);
+        arm.move(-128);
         waitUntil(arm.get_position() < -50);
         arm.brake();
     });
@@ -190,7 +192,7 @@ void BlueGoalRush() {
     MotionProfile* ladderProfile = path[3];
 
     // rushes MoGo in middle
-    preRoller.move(-128);
+    preRoller.move(128);
     yoin.set_value(true);
     follower.addAction([](){ker.set_value(true);}, 0.98);
     follower.startProfile(rushProfile);
@@ -207,7 +209,7 @@ void BlueGoalRush() {
     drivetrain.move(80);
     pros::delay(200);
     drivetrain.brake();
-    pros::delay(800);
+    pros::delay(1000);
     arm.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
@@ -217,7 +219,7 @@ void BlueGoalRush() {
     transport.move(128);
 
     // moves into Corner and gets its Rings
-    follower.addAction([](){yoin.set_value(true);}, 0.8);
+    follower.addAction([](){yoin.set_value(true);}, 0.6);
     follower.startProfile(cornerProfile);
     follower.clearActions();
     CutoffTurnPID({60, -47}, false, 1000, 1);
@@ -226,11 +228,13 @@ void BlueGoalRush() {
 
     // raises arm and moves to ladder to contact it
     follower.addAction([](){inPutston.set_value(true);}, 0.4);
+    follower.addAction([](){yoin.set_value(false);}, 0.4);
     follower.addAction([](){inPutston.set_value(false);}, 0.8);
     follower.startProfile(ladderProfile);
+    drivetrain.brake();
     follower.clearActions();
     pros::Task armMovement = pros::Task([](){
-        arm.move(128);
+        arm.move(-128);
         waitUntil(arm.get_position() < -50);
         arm.brake();
     });

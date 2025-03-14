@@ -68,18 +68,23 @@ void eject() {
 					transport.brake();
 				// case 1b: if case 1a is not true, then continue moving the intake down
 				} else {
-					intake.move(128);
+					transport.move(-128);
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
-			else if ((((colorSense.get_hue() > 60) && (autonnumber < 0)) || // blue
-				      ((colorSense.get_hue() < 55)  && (autonnumber > 0)))   // red
+			else if ((((colorSense.get_hue() > 100) && (autonnumber < 0)) || // blue
+				      ((colorSense.get_hue() < 30)  && (autonnumber > 0)))   // red
 					&& (Distance.get() < 100)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
+				if (autonnumber < 0) {
+					pros::delay(10);
+				} else if (autonnumber > 0) {
+					pros::delay(50);
+				}
 				pros::delay(10); // the robot waits for the Ring to reach the proper point before starting the eject
-				transport.move(128);
+				transport.move(-128);
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
 			}
@@ -130,14 +135,18 @@ void autoEject() {
 					transport.move(-128);
 				}
 			}
-			// case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found the right color
+			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
 			else if ((((colorSense.get_hue() > 100) && (autonnumber < 0)) || // blue
 				      ((colorSense.get_hue() < 30)  && (autonnumber > 0)))   // red
-					&& (Distance.get() < 999) && (colorSense.get_proximity() > 40)
+					&& (Distance.get() < 100)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
-				pros::delay(10); // the robot waits for the Ring to reach the proper point before starting the eject
+				if (autonnumber < 0) {
+					pros::delay(90);
+				} else if (autonnumber > 0) {
+					pros::delay(90);
+				}
 				transport.move(-128);
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
