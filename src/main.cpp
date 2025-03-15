@@ -67,7 +67,7 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
 					break;
 				case -2:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 10}, 220);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
 					break;
 				case -5:
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 90);
@@ -82,20 +82,30 @@ void competition_initialize() {
 		pros::delay(10);
 	}
 
-	
-	switch (autonnumber) {
-		case -2:
-			path = RedAWPSetup();
-			break;
-		case 2:
-			path = BlueAWPSetup();
-			break;
-		case 1:
-			path = BlueGoalRushSetup();
-			break;
-		case -1:
-			path = RedGoalRushSetup();
-			break;
+	if (globalAuton) {
+		switch (autonnumber) {
+			case -2:
+				path = RedAWPSetup();
+				break;
+			case 2:
+				path = BlueAWPSetup();
+				break;
+			case 1:
+				path = BlueGoalRushSetup();
+				break;
+			case -1:
+				path = RedGoalRushSetup();
+				break;
+			case -5:
+				path = SkillsSetup();
+				break;
+		}
+	} else {
+		switch (autonnumber) {
+			case -2:
+				path = RedAWPSetup();
+				break;
+		}
 	}
 }
 
@@ -151,28 +161,35 @@ void autonomous() {
 	leftDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 	rightDrivetrain.set_brake_mode(pros::MotorBrake::hold);
 
-	switch (autonnumber) {
-		case 1:
-			BlueGoalRush();
-			break;
-		case -1:
-			RedGoalRush();
-			break;
-		case 2:
-			BlueAWP();
-			break;
-		case -2:
-			RedAWP();
-			break;
-		case 3:
-		case -3:
-			autoTest();
-			break;
-		case -5:
-			autoSkills();
-			break;
+	if (globalAuton) {
+		switch (autonnumber) {
+			case 1:
+				BlueGoalRush();
+				break;
+			case -1:
+				RedGoalRush();
+				break;
+			case 2:
+				BlueAWP();
+				break;
+			case -2:
+				RedAWP();
+				break;
+			case 3:
+			case -3:
+				autoTest();
+				break;
+			case -5:
+				autoSkills();
+				break;
+		}
+	} else {
+		switch (autonnumber) {
+			case -2:
+				redRingside();
+				break;
+		}
 	}
-
 }
 
 /**

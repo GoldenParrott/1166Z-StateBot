@@ -223,7 +223,6 @@ void BlueGoalRush() {
     follower.startProfile(cornerProfile);
     follower.clearActions();
     CutoffTurnPID({60, -47}, false, 1000, 1);
-    //PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {60, -47}), 1);
     intake.move(128);
 
     // raises arm and moves to ladder to contact it
@@ -243,7 +242,56 @@ void BlueGoalRush() {
 
 }
 
-void redRingside() {}
+void redRingside() {
+    VelocityController follower = VelocityController();
+
+    // profile setup
+    MotionProfile* goalProfile = path[0];
+    MotionProfile* centerRingProfile = path[1];
+    MotionProfile* centerStakeProfile = path[2];
+    MotionProfile* ladderProfile = path[3];
+
+    // scores on Alliance Stake
+    drivetrain.move_relative(220, 150);
+    arm.move(70);
+    waitUntil(arm.get_position() > 450);
+    pros::delay(250);
+    drivetrain.move_relative(-220, 150);
+    pros::delay(200);
+    arm.move(-70);
+    waitUntil(arm.get_position() < 270);
+    arm.brake();
+
+    // moves to goal and grabs it
+    PIDTurner(255, 2);
+    follower.addAction([](){clamp.set_value(true);}, 0.98);
+    follower.startProfile(goalProfile, true);
+    follower.clearActions();
+
+    // moves to inner Ring stack and takes the correct Ring
+    PIDTurner(universalCurrentLocation.heading - 180, 2);
+    intake.move(128);
+    follower.startProfile(centerRingProfile);
+    pros::delay(1000);
+
+    // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
+    PIDTurner(225, 1);
+    follower.addAction([](){inPutston.set_value(true);}, 0.6);
+    follower.startProfile(centerStakeProfile);
+    follower.clearActions();
+
+    // touches Ladder
+    follower.startProfile(ladderProfile);
+    drivetrain.brake();
+    follower.clearActions();
+    pros::Task armMovement = pros::Task([](){
+        arm.move(-128);
+        waitUntil(arm.get_position() < -50);
+        arm.brake();
+    });
+    pros::delay(1000);
+    armMovement.remove();
+}
 
 void blueRingside() {}
 /*
@@ -297,7 +345,7 @@ void autoSkills() {
     raiseArm->remove();
     */
 
-
+/*
 void autoSkills() {
     // QUADRANT 1
 	// sets the time from initialization that the code starts at
@@ -460,6 +508,11 @@ void autoSkills() {
 			drivetrain.move(70);
 			pros::delay(750);
 			drivetrain.brake();
+}
+*/
+
+void Skills() {
+
 }
 
 void autoTest() {

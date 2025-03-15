@@ -79,11 +79,10 @@ void eject() {
 			{
 				// in this case, the redirect is started and the starting point is stored for later
 				if (autonnumber < 0) {
-					pros::delay(10);
+					pros::delay(90);
 				} else if (autonnumber > 0) {
-					pros::delay(50);
+					pros::delay(10);
 				}
-				pros::delay(10); // the robot waits for the Ring to reach the proper point before starting the eject
 				transport.move(-128);
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
@@ -145,7 +144,7 @@ void autoEject() {
 				if (autonnumber < 0) {
 					pros::delay(90);
 				} else if (autonnumber > 0) {
-					pros::delay(90);
+					pros::delay(10);
 				}
 				transport.move(-128);
 				ejectOn = true;

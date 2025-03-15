@@ -122,7 +122,7 @@ std::vector<MotionProfile*> BlueGoalRushSetup() {
     CubicHermiteSpline rushSpline = CubicHermiteSpline({50.5, -35.5}, {-17.2, -54.1}, {13.5, -44.7}, {-17.2, -54.2});
     CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({27.03, -42}, {28, -18.5}, {22, -10}, {0, 50});
     CubicHermiteSpline cornerSpline = CubicHermiteSpline({22.7, -10.2}, {42, -80}, {56.6, -62.2}, {82.1, -72.3});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({56.6, -62.3}, {117.8, 45.8}, {10, -20}, {-2.4, 12.4});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({56.6, -62.3}, {129, 130}, {10, -20}, {-2.4, 12.4});
     // profile setup
     MotionProfile* rushProfile = new MotionProfile(&rushSpline, RPMtoIPS(600),
         {
@@ -134,26 +134,62 @@ std::vector<MotionProfile*> BlueGoalRushSetup() {
     MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, RPMtoIPS(600));
     MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(500),
         {
-            {{0, 0.1}, {0.1, 1}},
-            {{0.1, 1}, {0.4, 0.5}},
-            {{0.4, 0.5}, {1, 0.5}}
+            {{0, 0.1}, {0.1, 0.3}},
+            {{0.1, 0.3}, {0.4, 0.6}},
+            {{0.4, 0.6}, {1, 0.6}}
         }
     );
 
     return {rushProfile, secondGoalProfile, cornerProfile, ladderProfile};
 }
 
-std::vector<MotionProfile*> RedRingSetup() {
+std::vector<MotionProfile*> SkillsSetup() {
     // spline setup
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {10, 36}, {-20, 25}, {10, 36});
-    CubicHermiteSpline centerRingSpline = CubicHermiteSpline({-20, 25}, {17.6, 41.6}, {-8.35, 55}, {-7, 113});
-    CubicHermiteSpline centerStakeSpline = CubicHermiteSpline({-8.35, 55}, {-144, -18}, {-52.7, -11.8}, {-48.8, -99.4});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-52.5, -11.6}, {-62.5, 56.7}, {-15.2, 8.5}, {9, -58});
-    // profile setup
-    MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
-    MotionProfile* centerRingProfile = new MotionProfile(&centerRingSpline, RPMtoIPS(600));
-    MotionProfile* centerStakeProfile = new MotionProfile(&centerStakeSpline, RPMtoIPS(600));
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(600));
+    CubicHermiteSpline goalQ3Spline = CubicHermiteSpline({-47, 0}, {-47, -35}, {-47.5, -28.34}, {-47, -35});
+    CubicHermiteSpline ringMidQ3Spline = CubicHermiteSpline({-47.5, -28}, {-14, -23}, {-22, -23.5}, {-14, -23});
+    CubicHermiteSpline wallQ3Spline = CubicHermiteSpline({-22, -23}, {25, -82}, {3, -62}, {1, -128.5});
+    CubicHermiteSpline ring3Q3Spline = CubicHermiteSpline({3.5, -47.5}, {-87, -46}, {-56, -47}, {-86.5, -46.5});
+    CubicHermiteSpline ringFarQ3Spline = CubicHermiteSpline({-56, -46.5}, {-64.5, -96}, {-37, -60}, {-8, -59});
+    CubicHermiteSpline cornerQ3Spline = CubicHermiteSpline({-37, -60}, {-80.5, -60}, {-63.5, -63.5}, {-80.3, -80});
 
-    return {goalProfile, centerRingProfile, centerStakeProfile, ladderProfile};
+    CubicHermiteSpline crossQ34Spline = CubicHermiteSpline({-63.5, -63.5}, {-8.5, 44.5}, {-23.5, 23.5}, {-8.7, 43.5});
+
+    CubicHermiteSpline goalQ4Spline = CubicHermiteSpline({-23.5, 23.5}, {-62, 22.5}, {-49.5, 23.5}, {-62, 22.5});
+    CubicHermiteSpline wallQ4Spline = CubicHermiteSpline({-49.5, 23.5}, {-17, 18}, {5.5, 60}, {1, 142});
+    CubicHermiteSpline ring3Q4Spline = CubicHermiteSpline({5.5, 47.5}, {-78, 47}, {-56.5, 47}, {-77.5, 47.5});
+    CubicHermiteSpline ringFarQ4Spline = CubicHermiteSpline({-56.5, 47}, {-60, 90}, {-47, 60}, {37, 60.5});
+    CubicHermiteSpline cornerQ4Spline = CubicHermiteSpline({-47, 60}, {-71, 61.5}, {-63.5, 62}, {-72.5, 73});
+
+    CubicHermiteSpline crossQ41Spline = CubicHermiteSpline({-63, 62}, {18.5, 9.5}, {23, 47}, {53, 46.5});
+
+    CubicHermiteSpline sweepGoalQ12Spline = CubicHermiteSpline({23, 47}, {69, 53}, {63, -64}, {58, -138});
+    CubicHermiteSpline goalQ12Spline = CubicHermiteSpline({23, 47}, {69, 53}, {63, -64.5}, {58, -138});
+    // CubicHermiteSpline cornerQ1Spline = CubicHermiteSpline();
+
+    // profile setup
+    MotionProfile* goalQ3Profile = new MotionProfile(&goalQ3Spline, RPMtoIPS(600));
+    MotionProfile* ringMidQ3Profile = new MotionProfile(&ringMidQ3Spline, RPMtoIPS(600));
+    MotionProfile* wallQ3Profile = new MotionProfile(&wallQ3Spline, RPMtoIPS(600));
+    MotionProfile* ring3Q3Profile = new MotionProfile(&ring3Q3Spline, RPMtoIPS(600));
+    MotionProfile* ringFarQ3Profile = new MotionProfile(&ringFarQ3Spline, RPMtoIPS(600));
+    MotionProfile* cornerQ3Profile = new MotionProfile(&cornerQ3Spline, RPMtoIPS(600));
+
+    MotionProfile* crossQ34Profile = new MotionProfile(&crossQ34Spline, RPMtoIPS(600));
+
+    MotionProfile* goalQ4Profile = new MotionProfile(&goalQ4Spline, RPMtoIPS(600));
+    MotionProfile* wallQ4Profile = new MotionProfile(&wallQ4Spline, RPMtoIPS(600));
+    MotionProfile* ring3Q4Profile = new MotionProfile(&ring3Q4Spline, RPMtoIPS(600));
+    MotionProfile* ringFarQ4Profile = new MotionProfile(&ringFarQ4Spline, RPMtoIPS(600));
+    MotionProfile* cornerQ4Profile = new MotionProfile(&cornerQ4Spline, RPMtoIPS(600));
+
+    MotionProfile* crossQ41Profile = new MotionProfile(&crossQ41Spline, RPMtoIPS(600));
+
+    MotionProfile* sweepGoalQ12Profile = new MotionProfile(&sweepGoalQ12Spline, RPMtoIPS(600));
+    MotionProfile* goalQ12Profile = new MotionProfile(&goalQ12Spline, RPMtoIPS(600));
+    // MotionProfile* cornerQ1Profile = new MotionProfile(&cornerQ1Spline, RPMtoIPS(600));
+
+    return {goalQ3Profile, ringMidQ3Profile, wallQ3Profile, ring3Q3Profile, ringFarQ3Profile, 
+            cornerQ3Profile, crossQ34Profile, goalQ4Profile, wallQ4Profile, ring3Q4Profile, 
+            ringFarQ4Profile, cornerQ4Profile, crossQ41Profile, sweepGoalQ12Profile, goalQ12Profile, 
+            goalQ12Profile};
 }
