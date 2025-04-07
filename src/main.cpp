@@ -29,20 +29,19 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = 1; 
+	autonnumber = -3; 
 	globalAuton = true;
-	confirm = true;
+	confirm = false;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
-
 	while (true) {
-		
+		std::cout << confirm << "\n";
 		if (globalAuton == true) {
 			switch (autonnumber) {
 				case 1: //Blue Mogo
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -35.5}, 246);
 					break;
 				case 2:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {54.75, 14.25}, 131);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
 					break;
 				case -1:
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 64);
@@ -70,13 +69,13 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
 					break;
 				case -5:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 90);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 270);
 					break;
 			}
 		}
 		status = pros::screen::touch_status();
 		// initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
-		if (confirm = true) {
+		if (confirm == true) {
 			break;
 		}
 		pros::delay(10);
@@ -88,7 +87,7 @@ void competition_initialize() {
 				path = RedAWPSetup();
 				break;
 			case 2:
-				path = BlueAWPSetup();
+				path = RedAWPSetup();
 				break;
 			case 1:
 				path = BlueGoalRushSetup();
@@ -96,14 +95,16 @@ void competition_initialize() {
 			case -1:
 				path = RedGoalRushSetup();
 				break;
-			case -5:
-				path = SkillsSetup();
-				break;
 		}
 	} else {
 		switch (autonnumber) {
 			case -2:
 				path = RedAWPSetup();
+				break;
+			case -5:
+				std::cout << "start!\n";
+				path = SkillsSetup();
+				std::cout << "end!\n";
 				break;
 		}
 	}
@@ -170,7 +171,7 @@ void autonomous() {
 				RedGoalRush();
 				break;
 			case 2:
-				BlueAWP();
+				RedAWP();
 				break;
 			case -2:
 				RedAWP();
@@ -179,14 +180,14 @@ void autonomous() {
 			case -3:
 				autoTest();
 				break;
-			case -5:
-				autoSkills();
-				break;
 		}
 	} else {
 		switch (autonnumber) {
 			case -2:
 				redRingside();
+				break;
+			case -5:
+				autoSkills();
 				break;
 		}
 	}
@@ -239,6 +240,10 @@ void opcontrol() {
 	eject_task_ptr = new pros::Task(eject);
 	macros_task_ptr = new pros::Task(ArmMacros);
 	std::cout << "test3\n";
+
+	intake.brake();
+	transport.brake();
+	preRoller.brake();
 	while (true) {
 	
 	//Drivetrain Control 

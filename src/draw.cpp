@@ -217,7 +217,7 @@ void drawBasicSelector(){
 		}
 	
 		// Used when the AWP/ELIM button is pressed
-		if (status.x >= 245){
+		if ((status.x >= 245) && (status.x <= 360)) {
 		
 			if(status.y > 120){
 				globalAuton = false;
@@ -238,10 +238,11 @@ void drawBasicSelector(){
 		// Used when bottom right of the field is pressed 
 			autonnumber = 2;
 		}
-		if ((status.x >= 244)) {
+		if ((status.x >= 366)) {
 			confirm = true;
 			pros::screen::set_pen(0x00FF00);
 			pros::screen::fill_rect(0, 0, 480, 240);
+			pros::delay(1000);
 		}
 		pros::delay(10);
 	}

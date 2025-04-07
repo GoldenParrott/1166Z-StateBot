@@ -25,13 +25,13 @@ void BlueAWP() {
     arm.brake();
 
     // moves to goal and grabs it
-    PIDTurner(110, 1);
+    CutoffTurnHeadingPID(110, false, 1000, 1);
     follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
     follower.clearActions();
 
     // moves to inner Ring stack and takes the correct Ring
-    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {24, 48}), 1);
+    CutoffTurnPID({24, 48}, false, 1000, 1);
     intake.move(128);
     follower.startProfile(innerRingProfile);
 
@@ -85,13 +85,13 @@ void RedAWP() {
     arm.brake();
 
     // moves to goal and grabs it
-    PIDTurner(255, 2);
+    CutoffTurnHeadingPID(255, false, 1000, 2);
     follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
     follower.clearActions();
 
     // moves to inner Ring stack and takes the correct Ring
-    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {-24, 48}), 2);
+    CutoffTurnPID({-24, 48}, false, 1000, 2);
     intake.move(128);
     transport.move(96);
     follower.startProfile(innerRingProfile);
@@ -153,12 +153,13 @@ void RedGoalRush() {
     arm.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
-    follower.addAction([](){clamp.set_value(true);}, 0.95);
+    follower.addAction([](){clamp.set_value(true);transport.move_relative(-500, 600);}, 0.95);
     follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
     transport.move(128);
 
     // moves into Corner and sweeps it
+    follower.addAction([](){transport.move(128);}, 0.3);
     follower.addAction([](){yoin.set_value(true);}, 0.6);
     follower.startProfile(cornerProfile);
     follower.clearActions();
@@ -172,14 +173,6 @@ void RedGoalRush() {
     follower.startProfile(ladderProfile);
     drivetrain.brake();
     follower.clearActions();
-    pros::Task armMovement = pros::Task([](){
-        arm.move(-128);
-        waitUntil(arm.get_position() < -50);
-        arm.brake();
-    });
-    pros::delay(1000);
-    armMovement.remove();
-
 }
 
 void BlueGoalRush() {
@@ -213,22 +206,23 @@ void BlueGoalRush() {
     arm.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
-    follower.addAction([](){clamp.set_value(true);}, 0.9);
+    follower.addAction([](){clamp.set_value(true);transport.move_relative(-500, 600);}, 0.95);
     follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
-    transport.move(128);
 
     // moves into Corner and gets its Rings
+    follower.addAction([](){transport.move(128);}, 0.3);
     follower.addAction([](){yoin.set_value(true);}, 0.6);
     follower.startProfile(cornerProfile);
     follower.clearActions();
+    intake.brake();
     CutoffTurnPID({60, -47}, false, 1000, 1);
     intake.move(128);
 
     // raises arm and moves to ladder to contact it
-    follower.addAction([](){inPutston.set_value(true);}, 0.4);
-    follower.addAction([](){yoin.set_value(false);}, 0.4);
-    follower.addAction([](){inPutston.set_value(false);}, 0.8);
+    follower.addAction([](){inPutston.set_value(true);}, 0.2);
+    follower.addAction([](){yoin.set_value(false);}, 0.1);
+    follower.addAction([](){inPutston.set_value(false);}, 0.4);
     follower.startProfile(ladderProfile);
     drivetrain.brake();
     follower.clearActions();
@@ -247,9 +241,13 @@ void redRingside() {
 
     // profile setup
     MotionProfile* goalProfile = path[0];
-    MotionProfile* centerRingProfile = path[1];
-    MotionProfile* centerStakeProfile = path[2];
-    MotionProfile* ladderProfile = path[3];
+    MotionProfile* innerRingProfile = path[1];
+    MotionProfile* outerRingProfile = path[2];
+    MotionProfile* crossProfile = path[3];
+    MotionProfile* southernRingProfile = path[4];
+    MotionProfile* ladderProfile = path[5];
+    MotionProfile* ladder2Profile = path[6];
+    MotionProfile* newLadderProfile = path[7];
 
     // scores on Alliance Stake
     drivetrain.move_relative(220, 150);
@@ -263,34 +261,21 @@ void redRingside() {
     arm.brake();
 
     // moves to goal and grabs it
-    PIDTurner(255, 2);
+    CutoffTurnHeadingPID(255, false, 1000, 2);
     follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
     follower.clearActions();
 
     // moves to inner Ring stack and takes the correct Ring
-    PIDTurner(universalCurrentLocation.heading - 180, 2);
+    CutoffTurnPID({-24, 48}, false, 1000, 2);
     intake.move(128);
-    follower.startProfile(centerRingProfile);
-    pros::delay(1000);
-
-    // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
-    PIDTurner(225, 1);
-    follower.addAction([](){inPutston.set_value(true);}, 0.6);
-    follower.startProfile(centerStakeProfile);
-    follower.clearActions();
+    transport.move(96);
+    follower.startProfile(innerRingProfile);
 
     // touches Ladder
-    follower.startProfile(ladderProfile);
+    follower.startProfile(newLadderProfile, true);
     drivetrain.brake();
     follower.clearActions();
-    pros::Task armMovement = pros::Task([](){
-        arm.move(-128);
-        waitUntil(arm.get_position() < -50);
-        arm.brake();
-    });
-    pros::delay(1000);
-    armMovement.remove();
 }
 
 void blueRingside() {}
@@ -511,7 +496,81 @@ void autoSkills() {
 }
 */
 
-void Skills() {
+void autoSkills() {
+    VelocityController follower = VelocityController();
+
+    // profile setup
+    MotionProfile* goalQ3Profile = path[0];
+    MotionProfile* ringMidQ3Profile = path[1];
+    MotionProfile* wallQ3Profile = path[2];
+    MotionProfile* ring3Q3Profile = path[3];
+    MotionProfile* ringFarQ3Profile = path[4];
+    MotionProfile* cornerQ3Profile = path[5];
+
+    MotionProfile* crossQ34Profile = path[6];
+
+    MotionProfile* goalQ4Profile = path[7];
+    MotionProfile* wallQ4Profile = path[8];
+    MotionProfile* ring3Q4Profile = path[9];
+    MotionProfile* ringFarQ4Profile = path[10];
+    MotionProfile* cornerQ4Profile = path[11];
+
+    MotionProfile* crossQ41Profile = path[12];
+
+    MotionProfile* sweepGoalQ12Profile = path[13];
+    MotionProfile* goalQ12Profile = path[14];
+
+    // QUADRANT 1
+    // scores on Alliance Stake
+    arm.move(70);
+    waitUntil(arm.get_position() > 450);
+    pros::delay(250);
+    drivetrain.move_relative(-220, 150);
+    pros::delay(200);
+    arm.move(-70);
+    waitUntil(arm.get_position() < 270);
+    arm.brake();
+
+	// turns to a MoGo and moves to it, then grabs it
+	CutoffTurnPID({-50, -30}, true, 1000, 2);
+    follower.addAction([](){clamp.set_value(true);}, 0.98);
+    follower.startProfile(goalQ3Profile, true);
+    follower.clearActions();
+
+    // ring grab
+    CutoffTurnPID({-22, -23.5}, false, 1000, 2);
+    intake.move(128);
+    follower.startProfile(ringMidQ3Profile);
+
+    // midring grab
+    CutoffTurnPID({0, -45.7}, false, 1000, 2);
+    follower.startProfile(wallQ3Profile);
+
+    // moves backward from the Wall Stake
+	auto posFN = []() {return (rightRear.get_position() + leftRear.get_position() + rightFront.get_position() + leftFront.get_position()) / 4;};
+	double initialPos = posFN();
+	drivetrain.move_relative(-530, 200);
+	waitUntil(posFN() >= initialPos - 530);
+
+    // ring line
+    CutoffTurnPID({-56, -47}, false, 1000, 2);
+    follower.startProfile(ring3Q3Profile);
+
+    // far ring
+    CutoffTurnHeadingPID(180, false, 1000, 1);
+    follower.startProfile(ringFarQ3Profile);
+
+    // corner
+    drivetrain.move_relative(-700, 300);
+    pros::delay(500);
+    clamp.set_value(false);
+    pros::delay(200);
+
+    // cross
+    drivetrain.move_relative(400, 300);
+    pros::delay(500);
+    CutoffTurnHeadingPID(0, false, 1000, 1);
+    follower.startProfile(crossQ34Profile);
 
 }
 

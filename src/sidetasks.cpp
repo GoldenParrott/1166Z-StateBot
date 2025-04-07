@@ -138,13 +138,14 @@ void autoEject() {
 			else if ((((colorSense.get_hue() > 100) && (autonnumber < 0)) || // blue
 				      ((colorSense.get_hue() < 30)  && (autonnumber > 0)))   // red
 					&& (Distance.get() < 100)
+					&& (clamp.get_value())
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
 				if (autonnumber < 0) {
 					pros::delay(90);
 				} else if (autonnumber > 0) {
-					pros::delay(10);
+					pros::delay(70);
 				}
 				transport.move(-128);
 				ejectOn = true;
