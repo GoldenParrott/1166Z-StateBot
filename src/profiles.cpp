@@ -1,17 +1,17 @@
 #include "main.h"
 
 
-std::vector<MotionProfile*> RedAWPSetup() {
+std::vector<MotionProfile*> AWPSetup(int color) {
     // spline setup
     // CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {10, 36}, {-20, 25}, {10, 36});
-    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({-20, 25}, {-25, 51}, {-23, 44}, {-29, 83});
-    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({-23, 44}, {-34, 77}, {-50, 39}, {-49, 20});
-    CubicHermiteSpline crossSpline = CubicHermiteSpline({-49.5, 39}, {-50, 20}, {-50, -12}, {-43, -41.5});
-    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({-50, -12}, {-38, -125.5}, {-22, -56}, {-13.5, -83});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-26, -56}, {-24.5, -22.5}, {-32, -23}, {-41, 3});
-    CubicHermiteSpline ladder2Spline = CubicHermiteSpline({-32, -23}, {-41, 3.5}, {-11, -15}, {-2, -13});
-    CubicHermiteSpline newLadderSpline = CubicHermiteSpline({-23, 44}, {-28, 9.3}, {-15, 11}, {1.5, -10.3});
+    CubicHermiteSpline goalSpline = CubicHermiteSpline({color * 54.75, 13.25}, {color * -10, 36}, {color * 20, 25}, {color * -10, 36});
+    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({color * 20, 25}, {color * 25, 51}, {color * 23, 44}, {color * 29, 83});
+    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({color * 23, 44}, {color * 34, 77}, {color * 50, 39}, {color * 49, 20});
+    CubicHermiteSpline crossSpline = CubicHermiteSpline({color * 49.5, 39}, {color * 50, 20}, {color * 50, -12}, {color * 43, -41.5});
+    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({color * 50, -12}, {color * 38, -125.5}, {color * 22, -56}, {color * 13.5, -83});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({color * 26, -56}, {color * 24.5, -22.5}, {color * 32, -23}, {color * 41, 3});
+    CubicHermiteSpline ladder2Spline = CubicHermiteSpline({color * 32, -23}, {color * 41, 3.5}, {color * 11, -15}, {color * 2, -13});
+    CubicHermiteSpline newLadderSpline = CubicHermiteSpline({color * 23, 44}, {color * 28, 9.3}, {color * 15, 11}, {color * -1.5, -10.3});
 
     // profile setup
     MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
@@ -49,100 +49,51 @@ std::vector<MotionProfile*> RedAWPSetup() {
     return {goalProfile, innerRingProfile, outerRingProfile, crossProfile, southernRingProfile, ladderProfile, ladder2Profile, newLadderProfile};
 }
 
-std::vector<MotionProfile*> BlueAWPSetup() {
+std::vector<MotionProfile*> GoalRushSetup(int color) {
     // spline setup
-    // CubicHermiteSpline goalSpline = CubicHermiteSpline({-54.75, 13.25}, {28.7, 45}, {35.14, 29.54}, {11.6, 17.9});
-    CubicHermiteSpline goalSpline = CubicHermiteSpline({54.75, 13.25}, {-10, 36}, {20, 25}, {-10, 36});
-    CubicHermiteSpline innerRingSpline = CubicHermiteSpline({20, 25}, {22, 29}, {33, 58.5}, {90.5, 73.5});
-    CubicHermiteSpline outerRingSpline = CubicHermiteSpline({0, 0}, {0, 0}, {0, 0}, {0, 0});
-    CubicHermiteSpline crossSpline = CubicHermiteSpline({33, 58.5}, {82.5, 56}, {53, -12}, {49, -43.5});
-    CubicHermiteSpline southernRingSpline = CubicHermiteSpline({53, -12}, {38, -125.5}, {26, -56}, {13.5, -83});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({26, -56}, {24.5, -22.5}, {32, -23}, {41, 3});
-    CubicHermiteSpline ladder2Spline = CubicHermiteSpline({32, -23}, {41, 3.5}, {11, -15}, {2, -13});
-
+    CubicHermiteSpline rushSpline = CubicHermiteSpline({color * 53, -58.6}, {color * -22.4, -36.5}, {color * 13.9, -47}, {color * -22.37, -36.3});
+    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({color * 26.98, -53.06}, {color * 28.7, -26.3}, {color * 21.91, -12}, {color * -8.4, 72});
+    CubicHermiteSpline cornerSpline = CubicHermiteSpline({color * 22, -10}, {color * 39, -63}, {color * 51.7, -63.2}, {color * 81.4, -76});
+    CubicHermiteSpline cornerRingSpline = CubicHermiteSpline({color * 51, -63.5}, {color * 98, -8.5}, {color * 55, -10.3}, {color * 42, 14});
+    CubicHermiteSpline fetchSpline = CubicHermiteSpline({color * 55.34, -10.4}, {color * 91, -77.3}, {color * 12.2, -47.2}, {color * -4, -56.7});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({color * 12, -47.25}, {color * 59, -35.3}, {color * 13.3, -13.8}, {color * -13.5, 21.7});
     // profile setup
+    MotionProfile* rushProfile = new MotionProfile(&rushSpline, RPMtoIPS(600),
+        {
+            {{0, 0.1}, {0.05, 1}}, 
+            {{0.05, 1}, {1, 1}}
+        }
+    );
+    MotionProfile* secondGoalProfile = new MotionProfile(&secondGoalSpline, RPMtoIPS(400));
+    MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, RPMtoIPS(600));
+    MotionProfile* cornerRingProfile = new MotionProfile(&cornerRingSpline, RPMtoIPS(600));
+    MotionProfile* fetchProfile = new MotionProfile(&cornerRingSpline, RPMtoIPS(600));
+    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(500),
+        {
+            {{0, 0.1}, {0.1, 1}},
+            {{0.1, 1}, {0.4, 0.5}},
+            {{0.4, 0.5}, {1, 0.5}}
+        }
+    );
+
+    return {rushProfile, secondGoalProfile, cornerProfile, cornerRingProfile, fetchProfile, ladderProfile};
+}
+
+std::vector<MotionProfile*> RingSetup(int color) {
+    // spline setup
+    CubicHermiteSpline centerSpline = CubicHermiteSpline({color * 50, 46.75}, {color * -80.5, -30}, {color * 6, 59}, {color * 5, 135});
+    CubicHermiteSpline goalSpline = CubicHermiteSpline({color * 6, 59}, {color * 9, -10}, {color * 24, 22.75}, {color * 78.5, -17});
+    CubicHermiteSpline cornerSpline = CubicHermiteSpline({color * 24, 22.75}, {color * -37, 61.2}, {color * 52, 59}, {color * 90, 82.75});
+    CubicHermiteSpline sweepSpline = CubicHermiteSpline({color * 52, 59}, {color * 85.75, -39}, {color * 42.5, -9}, {color * 29.5, -55.25});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({color * 42.5, -9}, {color * 65, 56.75}, {color * 13.5, 11.5}, {color * -9, -58});
+    // profile setup
+    MotionProfile* centerProfile = new MotionProfile(&centerSpline, RPMtoIPS(600));
     MotionProfile* goalProfile = new MotionProfile(&goalSpline, RPMtoIPS(600));
-    MotionProfile* innerRingProfile = new MotionProfile(&innerRingSpline, RPMtoIPS(600), 
-        {
-            {{0, 0.1}, {0.05, 1}}, 
-            {{0.05, 1}, {1, 1}}
-        }
-    );
-    MotionProfile* outerRingProfile = new MotionProfile(&outerRingSpline, RPMtoIPS(600)
-
-    );
-    MotionProfile* crossProfile = new MotionProfile(&crossSpline, RPMtoIPS(600),
-        {
-            {{0, 0}, {0.1, 1}},
-            {{0.1, 1}, {0.55, 1}},
-            {{0.55, 1}, {0.7, 0.4}},
-            {{0.7, 0.4}, {1, 0.4}}
-        }
-    );
-    MotionProfile* southernRingProfile = new MotionProfile(&southernRingSpline, RPMtoIPS(600), {
-        {
-            {{0, 0.4}, {0.3, 0.4}},
-            {{0.3, 0.4}, {0.4, 1}},
-            {{0.5, 1}, {0.9, 1}},
-            {{0.9, 1}, {1, 0}}
-        }
-    });
+    MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, RPMtoIPS(600));
+    MotionProfile* sweepProfile = new MotionProfile(&sweepSpline, RPMtoIPS(600));
     MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(600));
-    MotionProfile* ladder2Profile = new MotionProfile(&ladder2Spline, RPMtoIPS(600));
 
-    return {goalProfile, innerRingProfile, outerRingProfile, crossProfile, southernRingProfile, ladderProfile, ladder2Profile};
-}
-
-std::vector<MotionProfile*> RedGoalRushSetup() {
-    // spline setup
-    CubicHermiteSpline rushSpline = CubicHermiteSpline({-53, -58.6}, {22.4, -36.5}, {-13.9, -47}, {22.37, -36.3});
-    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({-26.98, -53.06}, {-28.7, -26.3}, {-21.91, -12}, {8.4, 72});
-    CubicHermiteSpline cornerSpline = CubicHermiteSpline({-21.9, -12}, {-39, -63}, {-60, -58}, {-69.1, -84.4});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({-60, -58}, {120, -120}, {-21, 3}, {-20, 5});
-    // profile setup
-    MotionProfile* rushProfile = new MotionProfile(&rushSpline, RPMtoIPS(600),
-        {
-            {{0, 0.1}, {0.05, 1}}, 
-            {{0.05, 1}, {1, 1}}
-        }
-    );
-    MotionProfile* secondGoalProfile = new MotionProfile(&secondGoalSpline, RPMtoIPS(400));
-    MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, RPMtoIPS(600));
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(500),
-        {
-            {{0, 0.1}, {0.1, 1}},
-            {{0.1, 1}, {0.4, 0.5}},
-            {{0.4, 0.5}, {1, 0.5}}
-        }
-    );
-
-    return {rushProfile, secondGoalProfile, cornerProfile, ladderProfile};
-}
-
-std::vector<MotionProfile*> BlueGoalRushSetup() {
-    // spline setup
-    CubicHermiteSpline rushSpline = CubicHermiteSpline({50.5, -35.5}, {-17.2, -54.2}, {13.5, -47}, {-17.2, -54.2});
-    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({27.03, -42}, {85.5, -40}, {20, -12}, {9, 0});
-    CubicHermiteSpline cornerSpline = CubicHermiteSpline({20, -12}, {81.5, -61}, {60, -65}, {144, -85});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({60, -65}, {128, 105}, {10, -20}, {-2.4, 12.4});
-    // profile setup
-    MotionProfile* rushProfile = new MotionProfile(&rushSpline, RPMtoIPS(600),
-        {
-            {{0, 0.1}, {0.05, 1}}, 
-            {{0.05, 1}, {1, 1}}
-        }
-    );
-    MotionProfile* secondGoalProfile = new MotionProfile(&secondGoalSpline, RPMtoIPS(400));
-    MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, RPMtoIPS(600));
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(500),
-        {
-            {{0, 0.1}, {0.1, 1}},
-            {{0.1, 1}, {0.4, 0.5}},
-            {{0.4, 0.5}, {1, 0.5}}
-        }
-    );
-
-    return {rushProfile, secondGoalProfile, cornerProfile, ladderProfile};
+    return {centerProfile, goalProfile, cornerProfile, sweepProfile, ladderProfile};
 }
 
 std::vector<MotionProfile*> SkillsSetup() {

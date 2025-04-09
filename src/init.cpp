@@ -33,8 +33,10 @@
     // Pistons
          pros::adi::DigitalOut clamp(1);
          pros::adi::DigitalOut inPutston(2);
-         pros::adi::DigitalOut yoin(5);
-         pros::adi::DigitalOut ker(7);
+         pros::adi::DigitalOut leftYoin(5);
+         pros::adi::DigitalOut leftKer(7);
+         pros::adi::DigitalOut rightYoin(5);
+         pros::adi::DigitalOut rightKer(7);
 
     // Rotational Sensors
         pros::Rotation Rotational(6);

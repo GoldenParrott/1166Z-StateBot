@@ -163,15 +163,12 @@ class File {
 
 // autons.cpp
     // AWP autons
-    void BlueAWP(void);
-    void RedAWP(void);
+    void AWP(int color);
     void autoTest(void);
 
     // specific autons
-    void RedGoalRush(void);
-    void BlueGoalRush(void);
-    void redRingside(void);
-    void blueRingside(void);
+    void GoalRush(int color);
+    void RingSide(int color);
     void autoSkills(void);
 
 // draw.cpp
@@ -218,11 +215,9 @@ void CutoffTurnHeadingPID(int goalHeading, bool reverse, double maxAllowableTime
 void coords(void);
 
 // profiles.cpp
-std::vector<MotionProfile*> RedAWPSetup(void);
-std::vector<MotionProfile*> BlueAWPSetup(void);
-std::vector<MotionProfile*> RedGoalRushSetup(void);
-std::vector<MotionProfile*> BlueGoalRushSetup(void);
-std::vector<MotionProfile*> RedRingSetup(void);
+std::vector<MotionProfile*> AWPSetup(int color);
+std::vector<MotionProfile*> GoalRushSetup(int color);
+std::vector<MotionProfile*> RingSetup(int color);
 std::vector<MotionProfile*> SkillsSetup(void);
 
 #endif  // _PROS_MAIN_H_

@@ -35,19 +35,15 @@ void competition_initialize() {
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 	while (true) {
 		std::cout << confirm << "\n";
-		if (globalAuton == true) {
+		if (globalAuton == true) { // Solo AWPs, Skills
 			switch (autonnumber) {
-				case 1: //Blue Mogo
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -35.5}, 246);
-					break;
-				case 2:
+				case -1: // Red Solo AWP
+				case -2:
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
 					break;
-				case -1:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 64);
-					break;
-				case -2: //Red Ring
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
+				case 1:
+				case 2: // Blue Solo AWP
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {54.75, 14.25}, 131);
 					break;
 				case 3:
 				case -3: //Test (?)
@@ -55,20 +51,20 @@ void competition_initialize() {
 					break;
 			}
 		} else {
-			switch (autonnumber) {
-				case 1://Blue Mogo
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -35.5}, 245);
+			switch (autonnumber) { // Individual Corners (Goal Rush and 6-Ring)
+				case 1: // Blue MoGo
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -60.5}, 295);
 					break;
-				case -1:
+				case -1: // Red MoGo
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 65);
 					break;
-				case 2:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {55, 10}, 140);
+				case 2: // Blue Ring
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, 46.75}, 34);
 					break;
-				case -2:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
+				case -2: // Red Ring
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50, 46.75}, 236);
 					break;
-				case -5:
+				case -5: // Auto Skills
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 270);
 					break;
 			}
@@ -84,27 +80,25 @@ void competition_initialize() {
 	if (globalAuton) {
 		switch (autonnumber) {
 			case -2:
-				path = RedAWPSetup();
+				autonnumber /= 2;
+			case -1:
+				path = AWPSetup(autonnumber);
 				break;
 			case 2:
-				path = RedAWPSetup();
-				break;
+				autonnumber /= 2;
 			case 1:
-				path = BlueGoalRushSetup();
-				break;
-			case -1:
-				path = RedGoalRushSetup();
+				path = AWPSetup(autonnumber);
 				break;
 		}
 	} else {
 		switch (autonnumber) {
-			case -2:
-				path = RedAWPSetup();
+			case 1:
+			case -1:
+				path = GoalRushSetup(autonnumber);
 				break;
-			case -5:
-				std::cout << "start!\n";
-				path = SkillsSetup();
-				std::cout << "end!\n";
+			case 2:
+			case -2:
+				path = RingSetup(autonnumber);
 				break;
 		}
 	}
@@ -165,16 +159,12 @@ void autonomous() {
 	if (globalAuton) {
 		switch (autonnumber) {
 			case 1:
-				BlueGoalRush();
-				break;
 			case -1:
-				RedGoalRush();
+				AWP(autonnumber);
 				break;
 			case 2:
-				RedAWP();
-				break;
 			case -2:
-				RedAWP();
+				AWP(autonnumber / 2);
 				break;
 			case 3:
 			case -3:
@@ -183,8 +173,13 @@ void autonomous() {
 		}
 	} else {
 		switch (autonnumber) {
+			case 1:
+			case -1:
+				GoalRush(autonnumber);
+				break;
+			case 2:
 			case -2:
-				redRingside();
+				RingSide(autonnumber / 2);
 				break;
 			case -5:
 				autoSkills();
@@ -307,19 +302,19 @@ void opcontrol() {
 
 		// Yoinker
 		if (master.get_digital_new_press(DIGITAL_L1)) {
-			if (!yoin.get_value()) {
-				yoin.set_value(true);
+			if (!rightYoin.get_value()) {
+				rightYoin.set_value(true);
 			} else {
-				yoin.set_value(false);
+				rightYoin.set_value(false);
 			}
 		}
 
 		// Finger
 		if (master.get_digital_new_press(DIGITAL_L2)) {
-			if (!ker.get_value()) {
-				ker.set_value(true);
+			if (!rightKer.get_value()) {
+				rightKer.set_value(true);
 			} else {
-				ker.set_value(false);
+				rightKer.set_value(false);
 			}
 		}
 
