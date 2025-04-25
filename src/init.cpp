@@ -23,9 +23,9 @@
 
         //Intake
             pros::Motor preRoller(11,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);
-            pros::Motor transport(12,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);
+            pros::Motor transport(1,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);
 
-            pros::MotorGroup intake({11,12}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
+            pros::MotorGroup intake({11,1}, pros::v5::MotorGears::blue, pros::v5::MotorEncoderUnits::degrees);
         
         //Arm 
             pros::Motor arm(-2,pros::v5::MotorGears::green, pros::v5::MotorEncoderUnits::degrees);

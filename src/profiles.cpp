@@ -51,8 +51,8 @@ std::vector<MotionProfile*> AWPSetup(int color) {
 
 std::vector<MotionProfile*> GoalRushSetup(int color) {
     // spline setup
-    CubicHermiteSpline rushSpline = CubicHermiteSpline({color * 53, -58.6}, {color * -22.4, -36.5}, {color * 13.9, -47}, {color * -22.37, -36.3});
-    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({color * 26.98, -53.06}, {color * 28.7, -26.3}, {color * 21.91, -12}, {color * -8.4, 72});
+    CubicHermiteSpline rushSpline = CubicHermiteSpline({color * 53, -38.75}, {color * -8.66, -54.4}, {color * 13.9, -47}, {color * -9.1, -54.8});
+    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({color * 24.5, -47}, {color * 28.7, -26.3}, {color * 21.91, -12}, {color * -8.4, 72});
     CubicHermiteSpline cornerSpline = CubicHermiteSpline({color * 22, -10}, {color * 39, -63}, {color * 51.7, -63.2}, {color * 81.4, -76});
     CubicHermiteSpline cornerRingSpline = CubicHermiteSpline({color * 51, -63.5}, {color * 98, -8.5}, {color * 55, -10.3}, {color * 42, 14});
     CubicHermiteSpline fetchSpline = CubicHermiteSpline({color * 55.34, -10.4}, {color * 91, -77.3}, {color * 12.2, -47.2}, {color * -4, -56.7});

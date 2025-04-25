@@ -97,8 +97,8 @@ void eject() {
 		} else if(master.get_digital(DIGITAL_R2)){
 			preRoller.move(128);
 		} else{
-			ejectOn = false;
 			intake.brake();
+			ejectOn = false;
 		}
 		pros::delay(10);
 	}

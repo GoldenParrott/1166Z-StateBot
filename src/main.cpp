@@ -260,15 +260,6 @@ void opcontrol() {
 		
 	//INTAKE CODE IS NOW IN THE TASK
 
-		if(master.get_digital(DIGITAL_R2))
-		{
-			preRoller.move(-127);
-		}
-		else
-		{
-			preRoller.brake();
-		}
-
 	//Arm Control
 		if(master.get_digital(DIGITAL_Y)&&(armMoving == false))
 		{
@@ -302,19 +293,35 @@ void opcontrol() {
 
 		// Yoinker
 		if (master.get_digital_new_press(DIGITAL_L1)) {
-			if (!rightYoin.get_value()) {
-				rightYoin.set_value(true);
+			if (autonnumber < 0) {
+				if (!leftYoin.get_value()) {
+					leftYoin.set_value(true);
+				} else {
+					leftYoin.set_value(false);
+				}
 			} else {
-				rightYoin.set_value(false);
+				if (!rightYoin.get_value()) {
+					rightYoin.set_value(true);
+				} else {
+					rightYoin.set_value(false);
+				}
 			}
 		}
 
 		// Finger
 		if (master.get_digital_new_press(DIGITAL_L2)) {
-			if (!rightKer.get_value()) {
-				rightKer.set_value(true);
+			if (autonnumber < 0) {
+				if (!leftKer.get_value()) {
+					leftKer.set_value(true);
+				} else {
+					leftKer.set_value(false);
+				}
 			} else {
-				rightKer.set_value(false);
+				if (!rightKer.get_value()) {
+					rightKer.set_value(true);
+				} else {
+					rightKer.set_value(false);
+				}
 			}
 		}
 

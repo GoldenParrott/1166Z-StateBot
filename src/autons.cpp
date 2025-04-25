@@ -116,17 +116,17 @@ void GoalRush(int color) {
 
     // rushes MoGo in middle
     preRoller.move(128);
-    yoinSet(true, true);
-    follower.addAction([kerSet](){kerSet(true, true);}, 0.98);
+    yoinSet(true, false);
+    follower.addAction([kerSet](){kerSet(true, false);}, 0.98);
     follower.startProfile(rushProfile);
     follower.clearActions();
     drivetrain.brake();
 
     // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
     PIDMover({double (color) * 30, -52}, true);
-    kerSet(true, true);
-    CutoffTurnHeadingPID((universalCurrentLocation.heading + (color * 19)), false, 500, dirSet(true));
-    yoinSet(false, true);
+    kerSet(true, false);
+    CutoffTurnHeadingPID((universalCurrentLocation.heading - (color * 19)), false, 500, dirSet(true));
+    yoinSet(false, false);
     arm.move(96);
     drivetrain.move(80);
     pros::delay(200);
