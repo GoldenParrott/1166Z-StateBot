@@ -72,17 +72,15 @@ void eject() {
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
-			else if ((((colorSense.get_hue() > 100) && (autonnumber < 0)) || // blue
+			else if ((((colorSense.get_hue() > 160) && (autonnumber < 0)) || // blue
 				      ((colorSense.get_hue() < 30)  && (autonnumber > 0)))   // red
-					&& (Distance.get() < 100)
+					&& (Distance.get() < 15)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
-				if (autonnumber < 0) {
-					pros::delay(90);
-				} else if (autonnumber > 0) {
-					pros::delay(10);
-				}
+				
+				
+				pros::delay(210);
 				transport.move(-128);
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
