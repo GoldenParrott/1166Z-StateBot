@@ -8,6 +8,7 @@
  */
 void initialize() {
 	arm.set_zero_position(-46);
+	ArmRotational.set_position(0);
 }
 
 /**
@@ -29,9 +30,9 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -3; 
+	autonnumber = -1; 
 	globalAuton = true;
-	confirm = false;
+	confirm = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 	while (true) {
 		std::cout << confirm << "\n";
@@ -39,7 +40,7 @@ void competition_initialize() {
 			switch (autonnumber) {
 				case -1: // Red Solo AWP
 				case -2:
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-54.75, 14.25}, 229);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-55, 12.5}, 224);
 					break;
 				case 1:
 				case 2: // Blue Solo AWP

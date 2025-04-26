@@ -8,10 +8,9 @@ void AWP(int color) {
     MotionProfile* goalProfile = path[0];
     MotionProfile* innerRingProfile = path[1];
     MotionProfile* outerRingProfile = path[2];
-    MotionProfile* crossProfile = path[3];
-    MotionProfile* southernRingProfile = path[4];
-    MotionProfile* ladderProfile = path[5];
-    MotionProfile* ladder2Profile = path[6];
+    MotionProfile* southernRingProfile = path[3];
+    MotionProfile* ladderProfile = path[4];
+    MotionProfile* ladder2Profile = path[5];
 
     // determines turn direction based on color
     auto dirSet = [color](bool useRightOnRed) -> int {
@@ -24,25 +23,26 @@ void AWP(int color) {
     };
 
     // scores on Alliance Stake
-    drivetrain.move_relative(220, 150);
-    arm.move(70);
-    waitUntil(arm.get_position() > 450);
-    pros::delay(250);
-    drivetrain.move_relative(-220, 150);
-    pros::delay(200);
+    drivetrain.move_relative(230, 150);
     arm.move(-70);
-    waitUntil(arm.get_position() < 270);
+    waitUntil(((ArmRotational.get_position() / 100) > 150) && ((ArmRotational.get_position() / 100) < 170));
+    pros::delay(250);
+    drivetrain.move_relative(-230, 150);
+    pros::delay(200);
+    arm.move(70);
+    waitUntil((ArmRotational.get_position() / 100) < 15);
     arm.brake();
 
     // moves to goal and grabs it
-    if (color == -1) {
-        CutoffTurnHeadingPID(255, false, 1000, dirSet(true));
-    } else {
-        CutoffTurnHeadingPID(105, false, 1000, dirSet(true));
-    }
+    // if (color == -1) {
+    //     CutoffTurnHeadingPID(255, false, 1000, dirSet(true));
+    // } else {
+    //     CutoffTurnHeadingPID(105, false, 1000, dirSet(true));
+    // }
     follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
     follower.clearActions();
+    pros::delay(10000);
 
     // moves to inner Ring stack and takes the correct Ring
     CutoffTurnPID({double (color) * 24, 48}, false, 1000, dirSet(true));
@@ -50,13 +50,10 @@ void AWP(int color) {
     transport.move(96);
     follower.startProfile(innerRingProfile);
 
-    // moves to middle Ring stack and takes those Rings
-    follower.startProfile(outerRingProfile);
-    transport.move(128);
-
     // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
+    transport.move(128);
     follower.addAction([](){inPutston.set_value(true);}, 0.6);
-    follower.startProfile(crossProfile);
+    follower.startProfile(outerRingProfile);
     follower.clearActions();
 
     // moves to the southern Ring stack (on the Goal side)
@@ -73,7 +70,7 @@ void AWP(int color) {
     follower.clearActions();
     pros::delay(750);
     arm.set_brake_mode(pros::MotorBrake::coast);
-    follower.addAction([](){arm.move_relative(-180, 100);}, 0.5);
+    follower.addAction([](){arm.move_relative(180, 100);}, 0.5);
     follower.startProfile(ladder2Profile, true);
 }
 
