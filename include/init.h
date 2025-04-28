@@ -64,6 +64,7 @@
     extern pros::Task* rotationalBinder_task_ptr ;
     extern pros::Task* autoSelector_task_ptr;
     extern pros::Task* loggingEnabled_task_ptr;
+    extern pros::Task* cutoffMovement_task_ptr;
 
 // Image Definitions
 /*
@@ -86,6 +87,7 @@
     extern int autonnumber;
     extern bool confirm;
     extern bool globalAuton;
+    extern bool was2;
     extern int logoCount;
 
     extern std::vector<MotionProfile*> path;

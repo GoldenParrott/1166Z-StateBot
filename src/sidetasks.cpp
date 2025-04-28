@@ -72,15 +72,15 @@ void eject() {
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
-			else if ((((colorSense.get_hue() > 160) && (autonnumber < 0)) || // blue
-				      ((colorSense.get_hue() < 30)  && (autonnumber > 0)))   // red
+			else if ((((colorSense.get_hue() > 200) && (autonnumber < 0)) || // blue
+				      ((colorSense.get_hue() < 50)  && (autonnumber > 0)))   // red
 					&& (Distance.get() < 15)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
 				
 				
-				pros::delay(210);
+				pros::delay(180);
 				transport.move(-128);
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
@@ -116,6 +116,7 @@ void autoEject() {
 	//////////////////////////////////////////// 
 
 	while (true) {
+		std::cout << autonnumber << "\n";
     // distance sensor (eject)
 		// handles the cases for if B is being held down
 			// case 1: redirect is currently on
@@ -133,18 +134,13 @@ void autoEject() {
 				}
 			}
 			//case 2: eject is not on, but the distance sensor is at the proper distance and the color sensor has found a correct color
-			else if ((((colorSense.get_hue() > 100) && (autonnumber < 0)) || // blue
-				      ((colorSense.get_hue() < 30)  && (autonnumber > 0)))   // red
-					&& (Distance.get() < 100)
-					&& (clamp.get_value())
+			else if ((((colorSense.get_hue() > 200) && (autonnumber < 0)) || // blue
+				      ((colorSense.get_hue() < 50)  && (autonnumber > 0)))   // red
+					&& (Distance.get() < 15)
 					)
 			{
 				// in this case, the redirect is started and the starting point is stored for later
-				if (autonnumber < 0) {
-					pros::delay(90);
-				} else if (autonnumber > 0) {
-					pros::delay(70);
-				}
+				pros::delay(180);
 				transport.move(-128);
 				ejectOn = true;
 				ejectStartPoint = transport.get_position();
@@ -181,14 +177,13 @@ void CutoffTurnPID(Point goalPoint, bool reverse, double maxAllowableTime, int d
 	};
 	// the reversed form of the turn movement
 	auto revMovement = [goalPoint, direction, determineInverse] () {PIDTurner(determineInverse(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, goalPoint)), direction);};
-	pros::Task* movement_task = NULL;
 	if (!reverse) {
-		movement_task = new pros::Task(movement);
+		cutoffMovement_task_ptr = new pros::Task(movement);
 	} else {
-		movement_task = new pros::Task(revMovement);
+		cutoffMovement_task_ptr = new pros::Task(revMovement);
 	}
 	pros::delay(maxAllowableTime);
-	movement_task->remove();
+	cutoffMovement_task_ptr->remove();
 	drivetrain.brake();
 }
 
@@ -201,13 +196,12 @@ void CutoffTurnHeadingPID(int goalHeading, bool reverse, double maxAllowableTime
 	};
 	// the reversed form of the turn movement
 	auto revMovement = [goalHeading, direction, determineInverse] () {PIDTurner(determineInverse(goalHeading), direction);};
-	pros::Task* movement_task = NULL;
 	if (!reverse) {
-		movement_task = new pros::Task(movement);
+		cutoffMovement_task_ptr = new pros::Task(movement);
 	} else {
-		movement_task = new pros::Task(revMovement);
+		cutoffMovement_task_ptr = new pros::Task(revMovement);
 	}
 	pros::delay(maxAllowableTime);
-	movement_task->remove();
+	cutoffMovement_task_ptr->remove();
 	drivetrain.brake();
 }

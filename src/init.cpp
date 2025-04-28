@@ -63,6 +63,7 @@
     pros::Task* rotationalBinder_task_ptr = NULL;
     pros::Task* autoSelector_task_ptr = NULL;
     pros::Task* loggingEnabled_task_ptr = NULL;
+    pros::Task* cutoffMovement_task_ptr = NULL;
 
 // Image Definitions
 /*
@@ -85,6 +86,7 @@
     int autonnumber = 1;
     bool globalAuton = true;
     bool confirm = false;
+    bool was2 = false;
     int logoCount = 0;
 
     std::vector<MotionProfile*> path = {};

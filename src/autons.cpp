@@ -25,53 +25,59 @@ void AWP(int color) {
     // scores on Alliance Stake
     drivetrain.move_relative(230, 150);
     arm.move(-70);
-    waitUntil(((ArmRotational.get_position() / 100) > 150) && ((ArmRotational.get_position() / 100) < 170));
+    waitUntil(((ArmRotational.get_position() / 100) > 130) && ((ArmRotational.get_position() / 100) < 150));
     pros::delay(250);
     drivetrain.move_relative(-230, 150);
     pros::delay(200);
     arm.move(70);
-    waitUntil((ArmRotational.get_position() / 100) < 15);
+    waitUntil((ArmRotational.get_position() / 100) < -30);
     arm.brake();
 
     // moves to goal and grabs it
-    // if (color == -1) {
-    //     CutoffTurnHeadingPID(255, false, 1000, dirSet(true));
-    // } else {
-    //     CutoffTurnHeadingPID(105, false, 1000, dirSet(true));
-    // }
+    if (color == -1) {
+         PIDTurner(250, dirSet(true));
+    } else {
+         PIDTurner(120, dirSet(true));
+    }
     follower.addAction([](){clamp.set_value(true);}, 0.98);
     follower.startProfile(goalProfile, true);
     follower.clearActions();
-    pros::delay(10000);
 
     // moves to inner Ring stack and takes the correct Ring
+    pros::delay(250);
     CutoffTurnPID({double (color) * 24, 48}, false, 1000, dirSet(true));
     intake.move(128);
-    transport.move(96);
+    follower.addAction([](){transport.brake();}, 0.7);
     follower.startProfile(innerRingProfile);
+    follower.clearActions();
 
     // moves all the way to the other side of the field, grabbing the middle Ring and dropping the first MoGo
+    follower.addAction([](){transport.move(128);}, 0.2);
+    follower.addAction([](){inPutston.set_value(true);}, 0.7);
+    follower.addAction([](){transport.move_relative(-250, 200);}, 0.8);
+    follower.addAction([](){transport.move(128);}, 0.9);
+    follower.addAction([](){inPutston.set_value(false);}, 0.95);
     transport.move(128);
-    follower.addAction([](){inPutston.set_value(true);}, 0.6);
     follower.startProfile(outerRingProfile);
     follower.clearActions();
 
     // moves to the southern Ring stack (on the Goal side)
     follower.addAction([](){inPutston.set_value(false);}, 0.05);
-    follower.addAction([](){clamp.set_value(false); transport.brake();}, 0.4);
-    follower.addAction([](){transport.move(128);}, 0.5);
-    follower.addAction([](){transport.brake();}, 0.8);
+    follower.addAction([](){clamp.set_value(false); std::cout << "borb";}, 0.5);
     follower.startProfile(southernRingProfile);
     follower.clearActions();
 
     // grabs the third MoGo and touches the Ladder with it
-    follower.addAction([](){clamp.set_value(true); transport.move(128);}, 0.98);
+    follower.addAction([](){transport.brake();}, 0.15);
+    follower.addAction([](){clamp.set_value(true);}, 0.93);
     follower.startProfile(ladderProfile, true);
     follower.clearActions();
+    transport.move(128);
+    
     pros::delay(750);
     arm.set_brake_mode(pros::MotorBrake::coast);
-    follower.addAction([](){arm.move_relative(180, 100);}, 0.5);
-    follower.startProfile(ladder2Profile, true);
+    arm.move_relative(-18000, 200);
+    PIDTurner(45, 1);
 }
 
 void GoalRush(int color) {
@@ -163,8 +169,8 @@ void GoalRush(int color) {
     drivetrain.brake();
     follower.clearActions();
     pros::Task armMovement = pros::Task([](){
-        arm.move(-128);
-        waitUntil(arm.get_position() < -50);
+        arm.move(128);
+        waitUntil(ArmRotational.get_position() > 20);
         arm.brake();
     });
     pros::delay(1000);
@@ -210,12 +216,16 @@ void RingSide(int color) {
     // rushes the Rings in the center of the field
     intake.move(128);
     follower.startProfile(centerProfile);
+    intake.move(128);
 
     // grabs the goal with the two intaked Rings
     follower.addAction([](){clamp.set_value(true);}, 0.95);
+    intake.move(128);
     follower.startProfile(goalProfile, true);
+    intake.move(128);
     follower.clearActions();
-
+    intake.move(128);
+/*
     // moves to the Corner in order to sweep Rings
     follower.addAction([yoinSet](){yoinSet(true, true);}, 0.6);
     follower.startProfile(cornerProfile);
@@ -230,6 +240,7 @@ void RingSide(int color) {
 
     // moves back into the Ladder
     follower.startProfile(ladderProfile, true);
+*/
 }
 
 void autoSkills() {

@@ -30,8 +30,8 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -1; 
-	globalAuton = true;
+	autonnumber = -2; 
+	globalAuton = false;
 	confirm = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 	while (true) {
@@ -63,7 +63,7 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, 46.75}, 34);
 					break;
 				case -2: // Red Ring
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50, 46.75}, 236);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50, 48}, 116);
 					break;
 				case -5: // Auto Skills
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-60.75, 0}, 270);
@@ -81,12 +81,14 @@ void competition_initialize() {
 	if (globalAuton) {
 		switch (autonnumber) {
 			case -2:
-				autonnumber /= 2;
+				path = AWPSetup(autonnumber / 2);
+				break;
 			case -1:
 				path = AWPSetup(autonnumber);
 				break;
 			case 2:
-				autonnumber /= 2;
+				path = AWPSetup(autonnumber / 2);
+				break;
 			case 1:
 				path = AWPSetup(autonnumber);
 				break;
@@ -99,7 +101,7 @@ void competition_initialize() {
 				break;
 			case 2:
 			case -2:
-				path = RingSetup(autonnumber);
+				path = RingSetup(autonnumber / 2);
 				break;
 		}
 	}
@@ -140,7 +142,7 @@ void autonomous() {
 
 	// starts the coordinate updating system
 	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
-	autoEject_task_ptr = new pros::Task(autoEject);
+	eject_task_ptr = new pros::Task(eject);
 //hif
 	// autonomous setup
 	colorSense.set_led_pwm(100);
@@ -207,11 +209,7 @@ void opcontrol() {
 	master.rumble("-.-");
 	//std::cout << logfile.readFile();
 	std::cout << "test1\n";
-	
-	if (autoEject_task_ptr != NULL) {
-		autoEject_task_ptr->remove();
-		autoEject_task_ptr = NULL;
-	}
+
 	if (coordinateUpdater_task_ptr != NULL) {
 		coordinateUpdater_task_ptr->remove();
 		coordinateUpdater_task_ptr = NULL;
@@ -233,7 +231,6 @@ void opcontrol() {
 	int drvlr;
 	int drvtrdz = 10;
 
-	eject_task_ptr = new pros::Task(eject);
 	macros_task_ptr = new pros::Task(ArmMacros);
 	std::cout << "test3\n";
 

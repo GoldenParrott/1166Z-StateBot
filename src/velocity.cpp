@@ -59,6 +59,7 @@ void VelocityController::followProfile(MotionProfile* currentlyFollowing, bool R
     double sum = 0;
     // distance calculation variables
 
+    std::cout << "mid1";
     // point variables
     MPPoint currentPoint = {0, 0, 0, 0, 0, 0};
     MPPoint nextPoint = {0, 0, 0, 0, 0, 0};
