@@ -127,10 +127,10 @@ void GoalRush(int color) {
 
     // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
     PIDMover({double (color) * 30, -52}, true);
-    kerSet(true, false);
-    CutoffTurnHeadingPID((universalCurrentLocation.heading - (color * 19)), false, 500, dirSet(true));
+    kerSet(false, false);
+    CutoffTurnHeadingPID((universalCurrentLocation.heading + (color * 19)), false, 500, dirSet(false));
     yoinSet(false, false);
-    arm.move(96);
+    arm.move(-128);
     drivetrain.move(80);
     pros::delay(200);
     drivetrain.brake();
@@ -138,6 +138,7 @@ void GoalRush(int color) {
     arm.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
+    follower.addAction([](){arm.move(128);}, 0.75);
     follower.addAction([](){clamp.set_value(true);transport.move_relative(-500, 600);}, 0.95);
     follower.startProfile(secondGoalProfile, true);
     follower.clearActions();
@@ -153,7 +154,7 @@ void GoalRush(int color) {
 
     // moves up, intaking and scoring Rings from the Corner
     follower.addAction([](){inPutston.set_value(true);}, 0.4);
-    follower.addAction([yoinSet](){yoinSet(false, false);}, 0.4);
+    follower.addAction([yoinSet](){yoinSet(false, false);}, 0.05);
     follower.addAction([](){inPutston.set_value(false);}, 0.8);
     follower.addAction([](){clamp.set_value(false);}, 0.9);
     follower.startProfile(cornerRingProfile);
@@ -163,7 +164,7 @@ void GoalRush(int color) {
     follower.addAction([](){clamp.set_value(true);}, 0.95);
     follower.startProfile(fetchProfile, true);
     follower.clearActions();
-
+/*
     // touches the Ladder
     follower.startProfile(ladderProfile);
     drivetrain.brake();
@@ -175,6 +176,7 @@ void GoalRush(int color) {
     });
     pros::delay(1000);
     armMovement.remove();
+*/
 }
 
 void RingSide(int color) {
@@ -214,33 +216,37 @@ void RingSide(int color) {
     };
 
     // rushes the Rings in the center of the field
-    intake.move(128);
+    follower.addAction([](){preRoller.move(128);}, 0.3);
+    follower.addAction([](){transport.move(128); preRoller.move(128);}, 0.65);
+    follower.addAction([](){transport.brake(); preRoller.move(128);}, 0.75);
     follower.startProfile(centerProfile);
-    intake.move(128);
+    follower.clearActions();
 
     // grabs the goal with the two intaked Rings
     follower.addAction([](){clamp.set_value(true);}, 0.95);
-    intake.move(128);
     follower.startProfile(goalProfile, true);
-    intake.move(128);
     follower.clearActions();
-    intake.move(128);
-/*
+    transport.move(128); preRoller.move(128);
+
     // moves to the Corner in order to sweep Rings
-    follower.addAction([yoinSet](){yoinSet(true, true);}, 0.6);
+    follower.addAction([yoinSet](){yoinSet(true, true); preRoller.move(128);}, 0.6);
     follower.startProfile(cornerProfile);
-    follower.clearActions();
+    follower.clearActions(); preRoller.move(128);
 
     // sweeps the Corner Rings and intakes them
-    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {double (color) * 55, 50}), dirSet(false));
-    follower.addAction([yoinSet](){yoinSet(false, true);}, 0.5);
-    follower.addAction([](){inPutston.set_value(true);}, 0.7);
+    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {double (color) * 72, 36}), dirSet(false));
+    follower.addAction([yoinSet](){yoinSet(false, true); preRoller.move(128);}, 0.5);
+    follower.addAction([](){inPutston.set_value(true); preRoller.move(128);}, 0.7);
+    follower.addAction([](){inPutston.set_value(false); preRoller.move(128);}, 0.9);
     follower.startProfile(sweepProfile, false);
-    follower.clearActions();
+    follower.clearActions(); preRoller.move(128);
+    pros::delay(250);
 
     // moves back into the Ladder
-    follower.startProfile(ladderProfile, true);
-*/
+    arm.move_relative(-750, 200);
+    PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {double (color) * 24, 0}), dirSet(false));
+    drivetrain.set_brake_mode(pros::MotorBrake::coast);
+    drivetrain.move(128);
 }
 
 void autoSkills() {

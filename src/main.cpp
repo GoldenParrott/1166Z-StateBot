@@ -30,7 +30,7 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -2; 
+	autonnumber = -1; 
 	globalAuton = false;
 	confirm = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
@@ -57,7 +57,7 @@ void competition_initialize() {
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -60.5}, 295);
 					break;
 				case -1: // Red MoGo
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.5, -60.5}, 65);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.25, -35}, 112);
 					break;
 				case 2: // Blue Ring
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, 46.75}, 34);
@@ -105,6 +105,12 @@ void competition_initialize() {
 				break;
 		}
 	}
+
+	if (autonnumber < 0) {
+		leftNoid.set_value(true);
+	} else {
+		rightNoid.set_value(true);
+	}
 }
 
 /**
@@ -142,7 +148,7 @@ void autonomous() {
 
 	// starts the coordinate updating system
 	coordinateUpdater_task_ptr = new pros::Task(updateCoordinateLoop);
-	eject_task_ptr = new pros::Task(eject);
+	autoEject_task_ptr = new pros::Task(autoEject);
 //hif
 	// autonomous setup
 	colorSense.set_led_pwm(100);
@@ -209,7 +215,11 @@ void opcontrol() {
 	master.rumble("-.-");
 	//std::cout << logfile.readFile();
 	std::cout << "test1\n";
-
+	
+	if (autoEject_task_ptr != NULL) {
+		autoEject_task_ptr->remove();
+		autoEject_task_ptr = NULL;
+	}
 	if (coordinateUpdater_task_ptr != NULL) {
 		coordinateUpdater_task_ptr->remove();
 		coordinateUpdater_task_ptr = NULL;
@@ -231,6 +241,7 @@ void opcontrol() {
 	int drvlr;
 	int drvtrdz = 10;
 
+	eject_task_ptr = new pros::Task(eject);
 	macros_task_ptr = new pros::Task(ArmMacros);
 	std::cout << "test3\n";
 

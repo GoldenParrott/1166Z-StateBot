@@ -33,11 +33,15 @@
     
     // Pistons
         extern pros::adi::DigitalOut clamp;
+        extern pros::adi::DigitalOut inPutston;
+
         extern pros::adi::DigitalOut leftYoin;
         extern pros::adi::DigitalOut leftKer;
+        extern pros::adi::DigitalOut leftNoid;
+
         extern pros::adi::DigitalOut rightYoin;
         extern pros::adi::DigitalOut rightKer;
-        extern pros::adi::DigitalOut inPutston;
+        extern pros::adi::DigitalOut rightNoid;
 
     // Rotational Sensors
         extern pros::Rotation Rotational;
