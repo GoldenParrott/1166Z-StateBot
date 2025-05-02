@@ -272,11 +272,11 @@ void opcontrol() {
 	//Arm Control
 		if(master.get_digital(DIGITAL_Y)&&(armMoving == false))
 		{
-			arm.move(127);
+			arm.move(-127);
 		}
 		else if(master.get_digital(DIGITAL_B)&&(armMoving == false))
 		{
-			arm.move(-127);
+			arm.move(127);
 		}
 		else if(armMoving == false)
 		{

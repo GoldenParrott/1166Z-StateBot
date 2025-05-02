@@ -128,13 +128,13 @@ void GoalRush(int color) {
     // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
     PIDMover({double (color) * 30, -52}, true);
     kerSet(false, false);
-    CutoffTurnHeadingPID((universalCurrentLocation.heading + (color * 19)), false, 500, dirSet(false));
+    CutoffTurnHeadingPID((universalCurrentLocation.heading + (color * 16.5)), false, 500, dirSet(false));
     yoinSet(false, false);
     arm.move(-128);
     drivetrain.move(80);
     pros::delay(200);
     drivetrain.brake();
-    pros::delay(800);
+    pros::delay(500);
     arm.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
@@ -153,30 +153,26 @@ void GoalRush(int color) {
     intake.move(128);
 
     // moves up, intaking and scoring Rings from the Corner
-    follower.addAction([](){inPutston.set_value(true);}, 0.4);
     follower.addAction([yoinSet](){yoinSet(false, false);}, 0.05);
-    follower.addAction([](){inPutston.set_value(false);}, 0.8);
-    follower.addAction([](){clamp.set_value(false);}, 0.9);
+    follower.addAction([](){clamp.set_value(false);}, 0.4);
+    follower.addAction([](){transport.brake();}, 0.65);
     follower.startProfile(cornerRingProfile);
     follower.clearActions();
 
     // fetches the contested Goal again
+    CutoffTurnPID({double (color) * 1.5, -55.5}, true, 1000, dirSet(false));
+    follower.addAction([](){transport.move(128);}, 0.7);
     follower.addAction([](){clamp.set_value(true);}, 0.95);
     follower.startProfile(fetchProfile, true);
     follower.clearActions();
-/*
+
     // touches the Ladder
+    follower.addAction([](){arm.move_relative(-800, 200);}, 0.2);
     follower.startProfile(ladderProfile);
     drivetrain.brake();
     follower.clearActions();
-    pros::Task armMovement = pros::Task([](){
-        arm.move(128);
-        waitUntil(ArmRotational.get_position() > 20);
-        arm.brake();
-    });
     pros::delay(1000);
-    armMovement.remove();
-*/
+
 }
 
 void RingSide(int color) {
