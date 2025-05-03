@@ -79,6 +79,8 @@ void competition_initialize() {
 	}
 
 	if (globalAuton) {
+		path = AWPSetup(-1);
+		/*
 		switch (autonnumber) {
 			case -2:
 				path = AWPSetup(autonnumber / 2);
@@ -93,6 +95,7 @@ void competition_initialize() {
 				path = AWPSetup(autonnumber);
 				break;
 		}
+		*/
 	} else {
 		switch (autonnumber) {
 			case 1:

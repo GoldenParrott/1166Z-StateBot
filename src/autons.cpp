@@ -186,9 +186,11 @@ void GoalRush(int color) {
 
     // speedruns Ladder touch
     //follower.addAction([](){}, 0.0);
+    arm.set_brake_mode(pros::MotorBrake::coast);
     follower.addAction([](){arm.move_relative(-700, 200);}, 0.2);
     follower.startProfile(altLadderProfile);
     follower.clearActions();
+    drivetrain.move(64);
 
 }
 
