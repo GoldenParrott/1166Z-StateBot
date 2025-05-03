@@ -90,6 +90,7 @@ void GoalRush(int color) {
     MotionProfile* cornerRingProfile = path[3];
     MotionProfile* fetchProfile = path[4];
     MotionProfile* ladderProfile = path[5];
+    MotionProfile* altLadderProfile = path[6];
 
     // functions for determining which yoinker to use
     auto yoinSet = [color](bool setTo, bool useRightOnRed){
@@ -154,6 +155,7 @@ void GoalRush(int color) {
     CutoffTurnPID({double (color) * 59, -50}, false, 1000, dirSet(true));
     intake.move(128);
 
+/*
     // moves up, intaking and scoring Rings from the Corner
     follower.addAction([yoinSet](){yoinSet(false, false);}, 0.05);
     follower.addAction([](){clamp.set_value(false);}, 0.4);
@@ -174,6 +176,19 @@ void GoalRush(int color) {
     drivetrain.brake();
     follower.clearActions();
     pros::delay(1000);
+*/
+    // moves up, intaking and scoring Rings from the Corner
+    follower.addAction([yoinSet](){yoinSet(false, false);}, 0.05);
+    follower.addAction([](){clamp.set_value(false);}, 0.9);
+    follower.addAction([](){transport.brake();}, 0.95);
+    follower.startProfile(cornerRingProfile);
+    follower.clearActions();
+
+    // speedruns Ladder touch
+    //follower.addAction([](){}, 0.0);
+    follower.addAction([](){arm.move_relative(-700, 200);}, 0.2);
+    follower.startProfile(altLadderProfile);
+    follower.clearActions();
 
 }
 
