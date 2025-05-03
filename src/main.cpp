@@ -30,7 +30,7 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -1; 
+	autonnumber = 1; 
 	globalAuton = false;
 	confirm = true;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
@@ -54,13 +54,13 @@ void competition_initialize() {
 		} else {
 			switch (autonnumber) { // Individual Corners (Goal Rush and 6-Ring)
 				case 1: // Blue MoGo
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -60.5}, 295);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.25, -35}, 246);
 					break;
 				case -1: // Red MoGo
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.25, -35}, 112);
 					break;
 				case 2: // Blue Ring
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, 46.75}, 34);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, 48}, 248);
 					break;
 				case -2: // Red Ring
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50, 48}, 116);

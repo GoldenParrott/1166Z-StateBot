@@ -37,11 +37,11 @@
          // left items
          pros::adi::DigitalOut leftYoin(8);
          pros::adi::DigitalOut leftKer(7);
-         pros::adi::DigitalOut leftNoid(6);
+         pros::adi::DigitalOut leftNoid(4);
 
          // right items
-         pros::adi::DigitalOut rightYoin(3);
-         pros::adi::DigitalOut rightKer(4);
+         pros::adi::DigitalOut rightYoin(6);
+         pros::adi::DigitalOut rightKer(3);
          pros::adi::DigitalOut rightNoid(5);
 
     // Rotational Sensors

@@ -128,13 +128,15 @@ void GoalRush(int color) {
     // backs up from the line, then turns and moves forward to score the preload on the MoGo with the arm
     PIDMover({double (color) * 30, -52}, true);
     kerSet(false, false);
-    CutoffTurnHeadingPID((universalCurrentLocation.heading + (color * 16.5)), false, 500, dirSet(false));
+    CutoffTurnHeadingPID((universalCurrentLocation.heading + (color * 15)), false, 500, dirSet(false));
     yoinSet(false, false);
     arm.move(-128);
     drivetrain.move(80);
     pros::delay(200);
     drivetrain.brake();
     pros::delay(500);
+    arm.move(128);
+    pros::delay(300);
     arm.brake();
 
     // aligns with second MoGo via a curve and grabs that MoGo
@@ -161,7 +163,7 @@ void GoalRush(int color) {
 
     // fetches the contested Goal again
     CutoffTurnPID({double (color) * 1.5, -55.5}, true, 1000, dirSet(false));
-    follower.addAction([](){transport.move(128);}, 0.7);
+    follower.addAction([](){transport.move(128);}, 0.95);
     follower.addAction([](){clamp.set_value(true);}, 0.95);
     follower.startProfile(fetchProfile, true);
     follower.clearActions();
@@ -214,7 +216,7 @@ void RingSide(int color) {
     // rushes the Rings in the center of the field
     follower.addAction([](){preRoller.move(128);}, 0.3);
     follower.addAction([](){transport.move(128); preRoller.move(128);}, 0.65);
-    follower.addAction([](){transport.brake(); preRoller.move(128);}, 0.75);
+    follower.addAction([](){transport.brake(); preRoller.move(128);}, 0.98);
     follower.startProfile(centerProfile);
     follower.clearActions();
 
@@ -225,7 +227,7 @@ void RingSide(int color) {
     transport.move(128); preRoller.move(128);
 
     // moves to the Corner in order to sweep Rings
-    follower.addAction([yoinSet](){yoinSet(true, true); preRoller.move(128);}, 0.6);
+    follower.addAction([yoinSet](){yoinSet(false, true); preRoller.move(128);}, 0.6);
     follower.startProfile(cornerProfile);
     follower.clearActions(); preRoller.move(128);
 
@@ -242,7 +244,7 @@ void RingSide(int color) {
     arm.move_relative(-750, 200);
     PIDTurner(findHeadingOfLine({universalCurrentLocation.x, universalCurrentLocation.y}, {double (color) * 24, 0}), dirSet(false));
     drivetrain.set_brake_mode(pros::MotorBrake::coast);
-    drivetrain.move(128);
+    drivetrain.move(64);
 }
 
 void autoSkills() {
