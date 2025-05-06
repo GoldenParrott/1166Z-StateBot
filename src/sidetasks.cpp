@@ -8,8 +8,6 @@ void ArmMacros() {
 		*/
 		// Puts arm in scroing position
 
-		pros::screen::print(TEXT_MEDIUM_CENTER,1,"%d",ArmRotational.get_position());
-
 		if (master.get_digital(DIGITAL_LEFT)) {
 			armMoving = true;
 			double startTime = pros::millis();
