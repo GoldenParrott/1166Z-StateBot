@@ -35,7 +35,7 @@ void competition_initialize() {
 	confirm = false;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 	while (true) {
-		std::cout << confirm << "\n";
+		// std::cout << confirm << "\n";
 		if (globalAuton == true) { // Solo AWPs, Skills
 			switch (autonnumber) {
 				case -1: // Red Solo AWP
@@ -108,11 +108,18 @@ void competition_initialize() {
 				break;
 		}
 	}
-
 	if (autonnumber < 0) {
-		leftNoid.set_value(true);
+		if (std::abs(autonnumber) == 1) {
+			leftNoid.set_value(true);
+		} else {
+			rightNoid.set_value(true);
+		}
 	} else {
-		rightNoid.set_value(true);
+		if (std::abs(autonnumber) == 1) {
+			rightNoid.set_value(true);
+		} else {
+			leftNoid.set_value(true);
+		}
 	}
 }
 

@@ -120,7 +120,7 @@ void autoEject() {
 	//////////////////////////////////////////// 
 
 	while (true) {
-		std::cout << autonnumber << "\n";
+		// std::cout << autonnumber << "\n";
     // distance sensor (eject)
 		// handles the cases for if B is being held down
 			// case 1: redirect is currently on

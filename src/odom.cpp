@@ -98,8 +98,6 @@ void updateCoordinateLoop() {
             previousLocation = universalCurrentLocation;
             // cumulative odometry value for use in next cycle as previous value
             previousOdom = cumulativeOdom;
-
-            std::cout << "RotationalTurn.get_position()" << "\n";
         } else { // ensures that the code does not break while it is paused by a notification
             previousOdom = cumulativeOdom;
             previousLocation = universalCurrentLocation;

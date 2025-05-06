@@ -33,7 +33,7 @@
     // Pistons
          pros::adi::DigitalOut clamp(1);
          pros::adi::DigitalOut inPutston(2);
-
+// 1 2  3 4 5 6 7 8 10 11  20, 19, 15
          // left items
          pros::adi::DigitalOut leftYoin(8);
          pros::adi::DigitalOut leftKer(7);
@@ -54,7 +54,7 @@
         pros::Distance Distance(20);
 
     // Inertial Sensors/Kalman Filters
-        pros::IMU Inertial1(16);
+        pros::IMU Inertial1(18);
         KalmanFilter Kalman1 = KalmanFilter(&Inertial1, &RotationalTurn);
         pros::IMU Inertial2(19);
         KalmanFilter Kalman2 = KalmanFilter(&Inertial2, &RotationalTurn);
