@@ -7,23 +7,35 @@ void ArmMacros() {
 		Passive 0 - 45
 		*/
 		// Puts arm in scroing position
-		if (master.get_digital(DIGITAL_UP)) {
+
+		pros::screen::print(TEXT_MEDIUM_CENTER,1,"%d",ArmRotational.get_position());
+
+		if (master.get_digital(DIGITAL_LEFT)) {
 			armMoving = true;
 			double startTime = pros::millis();
 			
-            while (((arm.get_position() > 45)||(arm.get_position() < 25)) && ((pros::millis() - startTime) < 2000)) {
-                arm.move_absolute(55,96);
+            while (((ArmRotational.get_position() < -500)||(ArmRotational.get_position() > 500)) && ((pros::millis() - startTime) < 2000)) {
+                if (ArmRotational.get_position() < -500){
+					arm.move(-32);
+				} else if (ArmRotational.get_position() > 500){
+					arm.move(32);
+				}
+				
             }
 			arm.brake();
 			armMoving = false;
 		}
 		// Puts arm in passive position
-		else if (master.get_digital_new_press(DIGITAL_LEFT)) {
+		else if (master.get_digital_new_press(DIGITAL_UP)) {
 			armMoving = true;
 			double startTime = pros::millis();
 			
-            while ((arm.get_position() > 5) && ((pros::millis() - startTime) < 2000)) {
-                arm.move_absolute(0,96);
+            while (((ArmRotational.get_position() > 13300)||(ArmRotational.get_position() < 12300)) && ((pros::millis() - startTime) < 2000)) {
+                if (ArmRotational.get_position() < 12300){
+					arm.move(-32);
+				} else if (ArmRotational.get_position() > 13300){
+					arm.move(32);
+				}
             }
 			arm.brake();
 			armMoving = false;
