@@ -1,21 +1,15 @@
-#include "init.h"
+#include "init.h"-
 
 void ArmMacros() {
     while (true) {
-		/*
-		Scoring 65 - 550
-		Passive 0 - 45
-		*/
-		// Puts arm in scroing position
-
 		if (master.get_digital(DIGITAL_LEFT)) {
 			armMoving = true;
 			double startTime = pros::millis();
 			
-            while (((ArmRotational.get_position() < -500)||(ArmRotational.get_position() > 500)) && ((pros::millis() - startTime) < 2000)) {
-                if (ArmRotational.get_position() < -500){
+            while (((ArmRotational.get_position() < -250)||(ArmRotational.get_position() > 750)) && ((pros::millis() - startTime) < 2000)) {
+                if (ArmRotational.get_position() < -250){
 					arm.move(-32);
-				} else if (ArmRotational.get_position() > 500){
+				} else if (ArmRotational.get_position() > 750){
 					arm.move(32);
 				}
 				
@@ -28,10 +22,10 @@ void ArmMacros() {
 			armMoving = true;
 			double startTime = pros::millis();
 			
-            while (((ArmRotational.get_position() > 13300)||(ArmRotational.get_position() < 12300)) && ((pros::millis() - startTime) < 2000)) {
-                if (ArmRotational.get_position() < 12300){
-					arm.move(-32);
-				} else if (ArmRotational.get_position() > 13300){
+            while (((ArmRotational.get_position() > 12300)||(ArmRotational.get_position() < 11300)) && ((pros::millis() - startTime) < 2000)) {
+                if (ArmRotational.get_position() < 11300){
+					arm.move(-128);
+				} else if (ArmRotational.get_position() > 12300){
 					arm.move(32);
 				}
             }
