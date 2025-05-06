@@ -54,13 +54,13 @@ void competition_initialize() {
 		} else {
 			switch (autonnumber) { // Individual Corners (Goal Rush and 6-Ring)
 				case 1: // Blue MoGo
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.5, -60.5}, 295);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50.25, -35}, 246);
 					break;
 				case -1: // Red MoGo
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50.25, -35}, 112);
 					break;
 				case 2: // Blue Ring
-					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, 46.75}, 34);
+					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {50, 48}, 248);
 					break;
 				case -2: // Red Ring
 					initializeRobotOnCoordinate(&Rotational, &Inertial1, &Inertial2, {-50, 48}, 116);
@@ -79,6 +79,8 @@ void competition_initialize() {
 	}
 
 	if (globalAuton) {
+		path = AWPSetup(-1);
+		/*
 		switch (autonnumber) {
 			case -2:
 				path = AWPSetup(autonnumber / 2);
@@ -93,6 +95,7 @@ void competition_initialize() {
 				path = AWPSetup(autonnumber);
 				break;
 		}
+		*/
 	} else {
 		switch (autonnumber) {
 			case 1:
@@ -272,11 +275,11 @@ void opcontrol() {
 	//Arm Control
 		if(master.get_digital(DIGITAL_Y)&&(armMoving == false))
 		{
-			arm.move(127);
+			arm.move(-127);
 		}
 		else if(master.get_digital(DIGITAL_B)&&(armMoving == false))
 		{
-			arm.move(-127);
+			arm.move(127);
 		}
 		else if(armMoving == false)
 		{

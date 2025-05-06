@@ -194,8 +194,9 @@ void CutoffTurnPID(Point goalPoint, bool reverse, double maxAllowableTime, int d
 	} else {
 		cutoffMovement_task_ptr = new pros::Task(revMovement);
 	}
-	pros::delay(maxAllowableTime);
+	pros::delay(maxAllowableTime - 50);
 	cutoffMovement_task_ptr->remove();
+	pros::delay(50);
 	drivetrain.brake();
 }
 
@@ -213,7 +214,8 @@ void CutoffTurnHeadingPID(int goalHeading, bool reverse, double maxAllowableTime
 	} else {
 		cutoffMovement_task_ptr = new pros::Task(revMovement);
 	}
-	pros::delay(maxAllowableTime);
+	pros::delay(maxAllowableTime - 50);
 	cutoffMovement_task_ptr->remove();
+	pros::delay(50);
 	drivetrain.brake();
 }

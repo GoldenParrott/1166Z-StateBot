@@ -51,12 +51,13 @@ std::vector<MotionProfile*> AWPSetup(int color) {
 std::vector<MotionProfile*> GoalRushSetup(int color) {
     // spline setup
     CubicHermiteSpline rushSpline = CubicHermiteSpline({color * 50.25, -35}, {color * -8.66, -54.4}, {color * 13.9, -47}, {color * -9.1, -54.8});
-    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({color * 30, -47}, {color * 48.5, -10}, {color * 21, -12}, {color * -30.5, 39.25});
-    CubicHermiteSpline cornerSpline = CubicHermiteSpline({color * 22, -10}, {color * 39, -63}, {color * 51.7, -63.2}, {color * 81.4, -76});
-    CubicHermiteSpline cornerRingSpline = CubicHermiteSpline({color * 51, -63.5}, {color * 90, -33}, {color * 55, -15}, {color * 40.5, 26.75});
-    CubicHermiteSpline fetchSpline = CubicHermiteSpline({color * 55.34, -15}, {color * 91, -77.3}, {color * 12.2, -47.2}, {color * -4, -56.7});
-    CubicHermiteSpline ladderSpline = CubicHermiteSpline({color * 12, -47.25}, {color * 59, -35.3}, {color * 13.3, -13.8}, {color * -13.5, 21.7});
-    // profile setupa
+    CubicHermiteSpline secondGoalSpline = CubicHermiteSpline({color * 30, -47}, {color * 81.5, -16}, {color * 21.5, -5}, {color * -2, 18});
+    CubicHermiteSpline cornerSpline = CubicHermiteSpline({color * 22, -10}, {color * 39, -63}, {color * 54, -63.2}, {color * 81.4, -76});
+    CubicHermiteSpline cornerRingSpline = CubicHermiteSpline({color * 51, -63.5}, {color * 127, 24.75}, {color * 55, -10}, {color * 42.25, 14});
+    CubicHermiteSpline fetchSpline = CubicHermiteSpline({color * 55, -10}, {color * 1.5, -55.5}, {color * 11, -47.5}, {color * 1.5, -55.5});
+    CubicHermiteSpline ladderSpline = CubicHermiteSpline({color * 12, -47.5}, {color * 54.5, -10.75}, {color * 13.3, -13.8}, {color * -13.5, 21.7});
+    CubicHermiteSpline altLadderSpline = CubicHermiteSpline({color * 55, -10.25}, {color * 26, 33.5}, {color * 15, -6}, {color * -20, 144});
+    // profile setup
     MotionProfile* rushProfile = new MotionProfile(&rushSpline, RPMtoIPS(600),
         {
             {{0, 0.1}, {0.05, 1}}, 
@@ -66,16 +67,11 @@ std::vector<MotionProfile*> GoalRushSetup(int color) {
     MotionProfile* secondGoalProfile = new MotionProfile(&secondGoalSpline, RPMtoIPS(400));
     MotionProfile* cornerProfile = new MotionProfile(&cornerSpline, RPMtoIPS(600));
     MotionProfile* cornerRingProfile = new MotionProfile(&cornerRingSpline, RPMtoIPS(600));
-    MotionProfile* fetchProfile = new MotionProfile(&cornerRingSpline, RPMtoIPS(600));
-    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(500),
-        {
-            {{0, 0.1}, {0.1, 1}},
-            {{0.1, 1}, {0.4, 0.5}},
-            {{0.4, 0.5}, {1, 0.5}}
-        }
-    );
+    MotionProfile* fetchProfile = new MotionProfile(&fetchSpline, RPMtoIPS(600));
+    MotionProfile* ladderProfile = new MotionProfile(&ladderSpline, RPMtoIPS(600));
+    MotionProfile* altLadderProfile = new MotionProfile(&altLadderSpline, RPMtoIPS(600));
 
-    return {rushProfile, secondGoalProfile, cornerProfile, cornerRingProfile, fetchProfile, ladderProfile};
+    return {rushProfile, secondGoalProfile, cornerProfile, cornerRingProfile, fetchProfile, ladderProfile, altLadderProfile};
 }
 
 std::vector<MotionProfile*> RingSetup(int color) {
@@ -83,7 +79,7 @@ std::vector<MotionProfile*> RingSetup(int color) {
     CubicHermiteSpline centerSpline = CubicHermiteSpline({color * 50, 48}, {color * -73.5, -27}, {color * -0.5, 66}, {color * 13.4, 137});
     CubicHermiteSpline goalSpline = CubicHermiteSpline({color * -0.5, 66}, {color * 31, -8}, {color * 27.5, 17.85}, {color * 57.75, -40});
     CubicHermiteSpline cornerSpline = CubicHermiteSpline({color * 24, 22.75}, {color * -18.5, 109.5}, {color * 52.75, 65}, {color * 98.5, 87});
-    CubicHermiteSpline sweepSpline = CubicHermiteSpline({color * 52.75, 65}, {color * 122, -4}, {color * 53.25, -2}, {color * 52, -83.25});
+    CubicHermiteSpline sweepSpline = CubicHermiteSpline({color * 52.75, 65}, {color * 122, -4}, {color * 54.25, -2}, {color * 52, -83.25});
     CubicHermiteSpline ladderSpline = CubicHermiteSpline({color * 42.5, -9}, {color * 65, 56.75}, {color * 13.5, 11.5}, {color * -9, -58});
     // profile setup
     MotionProfile* centerProfile = new MotionProfile(&centerSpline, RPMtoIPS(600));
