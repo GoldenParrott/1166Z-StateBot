@@ -123,12 +123,12 @@ void PIDMover(
 		std::cout << "ucl = " << universalCurrentLocation.x << ", " << universalCurrentLocation.y << "\n";
 
 
-		if (std::isnan(findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, getAggregatedHeading(Kalman1, Kalman2)), {negativeSide.slope, negativeSide.yIntercept}).x) ||
-			std::isnan(findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, getAggregatedHeading(Kalman1, Kalman2)), {negativeSide.slope, negativeSide.yIntercept}).y)) {
+		if (std::isnan(findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, universalCurrentLocation.heading), {negativeSide.slope, negativeSide.yIntercept}).x) ||
+			std::isnan(findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, universalCurrentLocation.heading), {negativeSide.slope, negativeSide.yIntercept}).y)) {
 			continue;
 		}
 		// fixes the goal point to be in front of where we are facing
-		goalPosition = findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, getAggregatedHeading(Kalman1, Kalman2)), {negativeSide.slope, negativeSide.yIntercept});
+		goalPosition = findIntersection(findLineWithHeading({universalCurrentLocation.x, universalCurrentLocation.y}, universalCurrentLocation.heading), {negativeSide.slope, negativeSide.yIntercept});
 		setPoint = calculateDistance(originalPosition, goalPosition);
 
 		// calculates the distance moved as the difference between the distance left to move
@@ -196,10 +196,10 @@ void PIDTurner(
 
 
 // Checks if the movement is positive or negative
-	bool isPositive = setPoint > getAggregatedHeading(Kalman1, Kalman2);
+	bool isPositive = setPoint > universalCurrentLocation.heading;
 
 // PID LOOPING VARIABLES
-	double inertialReadingInit = getAggregatedHeading(Kalman1, Kalman2);
+	double inertialReadingInit = universalCurrentLocation.heading;
 	double distanceToMove = 0;
 
 	if (direction == 1) {
@@ -276,8 +276,8 @@ void PIDTurner(
 	// calculates the change in heading at the very start of each cycle 
 	// to ensure that the robot has not passed its relative zero by mistake
 	changeInDistance = direction == 1
-		? inertialReadingInit - getAggregatedHeading(Kalman1, Kalman2)
-		: getAggregatedHeading(Kalman1, Kalman2) - inertialReadingInit;
+		? inertialReadingInit - universalCurrentLocation.heading
+		: universalCurrentLocation.heading - inertialReadingInit;
 	changeInReading = (changeInDistance < 0)
 		    ? changeInDistance + 360
 			: changeInDistance;
@@ -328,8 +328,8 @@ void PIDTurner(
 
 		// the change in reading is set to the absolute value of the change in reading due to everything being positive
 		changeInDistance = direction == 1
-			? inertialReadingInit - getAggregatedHeading(Kalman1, Kalman2)
-			: getAggregatedHeading(Kalman1, Kalman2) - inertialReadingInit;
+			? inertialReadingInit - universalCurrentLocation.heading
+			: universalCurrentLocation.heading - inertialReadingInit;
 		changeInReading = (changeInDistance < 0)
 		    ? changeInDistance + 360
 			: changeInDistance;

@@ -91,12 +91,15 @@ void updateCoordinateLoop() {
             // updates the location
             double newHeading = getAggregatedHeading(Kalman1, Kalman2);
             Point newLocation = updateLocation(newHeading, changeInOdom);
+            //universalCurrentLocation = {newLocation.x, newLocation.y, Inertial1.get_heading()};
             universalCurrentLocation = {newLocation.x, newLocation.y, newHeading};
             //std::cout << "x = " << universalCurrentLocation.x << ", y = " << universalCurrentLocation.y << ", h = " << universalCurrentLocation.heading << "\n";
             // previous location for use in next cycle
             previousLocation = universalCurrentLocation;
             // cumulative odometry value for use in next cycle as previous value
             previousOdom = cumulativeOdom;
+
+            std::cout << "RotationalTurn.get_position()" << "\n";
         } else { // ensures that the code does not break while it is paused by a notification
             previousOdom = cumulativeOdom;
             previousLocation = universalCurrentLocation;
