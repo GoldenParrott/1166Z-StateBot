@@ -30,9 +30,9 @@ void disabled() {}
 void competition_initialize() {
 
 	
-	autonnumber = -1; 
+	autonnumber = -2; 
 	globalAuton = false;
-	confirm = true;
+	confirm = false;
 	autoSelector_task_ptr = new pros::Task(drawBasicSelector);
 	while (true) {
 		std::cout << confirm << "\n";
